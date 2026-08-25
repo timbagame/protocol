@@ -176,6 +176,18 @@ export const PlayerQuerySchema = PaginationQuerySchema.extend({
   player: SolanaAddressSchema,
 });
 
+export const LatestGamesQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(50).default(10),
+  tokenMint: SolanaAddressSchema.optional(),
+  gameType: GameTypeSchema.optional(),
+  includeLifecycle: z.enum(["0", "1"]).optional(),
+});
+
+export const GameByKeyQuerySchema = z.object({
+  gameKey: SolanaAddressSchema,
+  fresh: z.string().optional(),
+});
+
 export const indexerContract = {
   health: defineEndpoint({
     method: "GET",
@@ -205,6 +217,27 @@ export const indexerContract = {
       500: SimpleApiErrorSchema,
     },
   }),
+  latestGames: defineEndpoint({
+    method: "GET",
+    path: "/api/games/latest",
+    authenticated: false,
+    query: LatestGamesQuerySchema,
+    responses: {
+      200: z.array(IndexerGameSchema),
+      500: SimpleApiErrorSchema,
+    },
+  }),
+  gameByKey: defineEndpoint({
+    method: "GET",
+    path: "/api/games/by-key",
+    authenticated: false,
+    query: GameByKeyQuerySchema,
+    responses: {
+      200: IndexerGameSchema,
+      400: SimpleApiErrorSchema,
+      404: SimpleApiErrorSchema,
+    },
+  }),
   activeGames: defineEndpoint({
     method: "GET",
     path: "/api/active-games",
@@ -212,6 +245,16 @@ export const indexerContract = {
     responses: {
       200: IndexerActiveGamesResponseSchema,
       500: SimpleApiErrorSchema,
+    },
+  }),
+  playerActiveGames: defineEndpoint({
+    method: "GET",
+    path: "/api/my-active-games",
+    authenticated: false,
+    query: z.object({ player: SolanaAddressSchema }),
+    responses: {
+      200: IndexerActiveGamesResponseSchema,
+      400: SimpleApiErrorSchema,
     },
   }),
   playerGames: defineEndpoint({

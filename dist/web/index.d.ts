@@ -64,6 +64,12 @@ export declare const GameConfigResponseSchema: z.ZodObject<{
 export declare const VerifyGameRequestSchema: z.ZodObject<{
     signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
 }, z.core.$strict>;
+export declare const GameAddressParamsSchema: z.ZodObject<{
+    address: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+}, z.core.$strip>;
+export declare const VerifyGameParamsSchema: z.ZodObject<{
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+}, z.core.$strip>;
 export declare const VerifiedGameSchema: z.ZodObject<{
     gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
     signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
@@ -188,6 +194,44 @@ export declare const webContract: {
             }, z.core.$strip>;
         };
     };
+    readonly game: {
+        readonly method: "GET";
+        readonly path: "/api/play/games/:address";
+        readonly authenticated: false;
+        readonly query: z.ZodObject<{
+            fresh: z.ZodOptional<z.ZodEnum<{
+                0: "0";
+                1: "1";
+            }>>;
+        }, z.core.$strip>;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                address: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                type: z.ZodEnum<{
+                    coinflip: "coinflip";
+                    giveaway: "giveaway";
+                }>;
+                tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                stakeAmount: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+                prizeAmount: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+                currentPlayers: z.ZodNumber;
+                minPlayers: z.ZodNumber;
+                maxPlayers: z.ZodNumber;
+                isPrivate: z.ZodBoolean;
+                createdAt: z.ZodNumber;
+                expiresAt: z.ZodNumber;
+                lastSlot: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+                participantAddresses: z.ZodReadonly<z.ZodArray<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
+            }, z.core.$strip>;
+            readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 404: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
     readonly verifyGame: {
         readonly method: "POST";
         readonly path: "/api/verify-game";
@@ -195,6 +239,54 @@ export declare const webContract: {
         readonly body: z.ZodObject<{
             signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
         }, z.core.$strict>;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                timestamp: z.ZodNumber;
+                gameType: z.ZodOptional<z.ZodEnum<{
+                    coinflip: "coinflip";
+                    giveaway: "giveaway";
+                }>>;
+                creator: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+                isPrivate: z.ZodOptional<z.ZodBoolean>;
+                ticketAmount: z.ZodOptional<z.ZodNumber>;
+                totalAmount: z.ZodOptional<z.ZodNumber>;
+                maxTickets: z.ZodOptional<z.ZodNumber>;
+                createdAt: z.ZodOptional<z.ZodNumber>;
+                participants: z.ZodArray<z.ZodObject<{
+                    address: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    ticketCount: z.ZodNumber;
+                    ticketIndices: z.ZodArray<z.ZodNumber>;
+                }, z.core.$strip>>;
+                totalTickets: z.ZodNumber;
+                winner: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                winnerTicketIndex: z.ZodNumber;
+                prizeAmount: z.ZodNumber;
+                feeAmount: z.ZodNumber;
+                tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                tokenSymbol: z.ZodString;
+                tokenDecimals: z.ZodNumber;
+                randomValue: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+                secretKey: z.ZodOptional<z.ZodString>;
+                lastSlot: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
+                calculationBreakdown: z.ZodObject<{
+                    randomValue: z.ZodString;
+                    totalTickets: z.ZodNumber;
+                    winnerIndex: z.ZodNumber;
+                    formula: z.ZodString;
+                }, z.core.$strip>;
+                explorerUrl: z.ZodURL;
+            }, z.core.$strip>;
+            readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
+    readonly cachedVerifyGame: {
+        readonly method: "GET";
+        readonly path: "/api/verify-game/:signature";
+        readonly authenticated: false;
         readonly responses: {
             readonly 200: z.ZodObject<{
                 gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;

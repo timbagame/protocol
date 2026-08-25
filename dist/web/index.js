@@ -69,6 +69,12 @@ export const GameConfigResponseSchema = z.object({
 export const VerifyGameRequestSchema = z.strictObject({
     signature: SolanaSignatureSchema,
 });
+export const GameAddressParamsSchema = z.object({
+    address: SolanaAddressSchema,
+});
+export const VerifyGameParamsSchema = z.object({
+    signature: SolanaSignatureSchema,
+});
 export const VerifiedGameSchema = z.object({
     gameKey: SolanaAddressSchema,
     signature: SolanaSignatureSchema,
@@ -138,11 +144,28 @@ export const webContract = {
         authenticated: false,
         responses: { 200: GameConfigResponseSchema, 503: SimpleApiErrorSchema },
     }),
+    game: defineEndpoint({
+        method: "GET",
+        path: "/api/play/games/:address",
+        authenticated: false,
+        query: z.object({ fresh: z.enum(["0", "1"]).optional() }),
+        responses: {
+            200: SerializedGameSchema,
+            400: SimpleApiErrorSchema,
+            404: SimpleApiErrorSchema,
+        },
+    }),
     verifyGame: defineEndpoint({
         method: "POST",
         path: "/api/verify-game",
         authenticated: false,
         body: VerifyGameRequestSchema,
+        responses: { 200: VerifiedGameSchema, 400: SimpleApiErrorSchema },
+    }),
+    cachedVerifyGame: defineEndpoint({
+        method: "GET",
+        path: "/api/verify-game/:signature",
+        authenticated: false,
         responses: { 200: VerifiedGameSchema, 400: SimpleApiErrorSchema },
     }),
 };

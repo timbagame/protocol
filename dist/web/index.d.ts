@@ -198,6 +198,9 @@ export declare const webContract: {
         readonly method: "GET";
         readonly path: "/api/play/games/:address";
         readonly authenticated: false;
+        readonly params: z.ZodObject<{
+            address: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        }, z.core.$strip>;
         readonly query: z.ZodObject<{
             fresh: z.ZodOptional<z.ZodEnum<{
                 0: "0";
@@ -287,6 +290,9 @@ export declare const webContract: {
         readonly method: "GET";
         readonly path: "/api/verify-game/:signature";
         readonly authenticated: false;
+        readonly params: z.ZodObject<{
+            signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+        }, z.core.$strip>;
         readonly responses: {
             readonly 200: z.ZodObject<{
                 gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;

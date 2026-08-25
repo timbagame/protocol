@@ -254,6 +254,211 @@ export declare const IndexerHealthResponseSchema: z.ZodObject<{
     status: z.ZodLiteral<"ok">;
     timestamp: z.ZodNumber;
 }, z.core.$strip>;
+export declare const IndexerTriggerResponseSchema: z.ZodObject<{
+    success: z.ZodLiteral<true>;
+    indexed: z.ZodNumber;
+    total: z.ZodNumber;
+    message: z.ZodString;
+}, z.core.$strip>;
+export declare const IndexerTriggerErrorSchema: z.ZodObject<{
+    success: z.ZodLiteral<false>;
+    error: z.ZodString;
+}, z.core.$strip>;
+export declare const HistoricalBackfillStateSchema: z.ZodObject<{
+    beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+    pages: z.ZodNumber;
+    transactions: z.ZodNumber;
+    initializedEvents: z.ZodNumber;
+    closedEvents: z.ZodNumber;
+    complete: z.ZodBoolean;
+}, z.core.$strip>;
+export declare const HistoricalInitializedEventSchema: z.ZodObject<{
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    gameType: z.ZodEnum<{
+        coinflip: "coinflip";
+        giveaway: "giveaway";
+    }>;
+    ticketAmount: z.ZodNumber;
+    totalAmount: z.ZodNumber;
+    maxTickets: z.ZodNumber;
+    minTickets: z.ZodNumber;
+    tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    isPrivate: z.ZodBoolean;
+    createdAt: z.ZodNumber;
+    timeout: z.ZodNumber;
+    slot: z.ZodNumber;
+}, z.core.$strip>;
+export declare const HistoricalCompletedEventSchema: z.ZodObject<{
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    winner: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    winnerAmount: z.ZodNumber;
+    feeAmount: z.ZodNumber;
+    ticketsCount: z.ZodNumber;
+    timestamp: z.ZodNumber;
+    slot: z.ZodNumber;
+}, z.core.$strip>;
+export declare const HistoricalClosedEventSchema: z.ZodObject<{
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    timestamp: z.ZodNumber;
+    slot: z.ZodNumber;
+}, z.core.$strip>;
+export declare const HistoricalMembershipEventSchema: z.ZodObject<{
+    kind: z.ZodEnum<{
+        joined: "joined";
+        unjoined: "unjoined";
+    }>;
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    ticketsCount: z.ZodNumber;
+    ticketIndex: z.ZodNumber;
+    timestamp: z.ZodNumber;
+    slot: z.ZodNumber;
+}, z.core.$strip>;
+export declare const HistoricalGameEventPageSchema: z.ZodObject<{
+    initialized: z.ZodArray<z.ZodObject<{
+        signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+        gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        gameType: z.ZodEnum<{
+            coinflip: "coinflip";
+            giveaway: "giveaway";
+        }>;
+        ticketAmount: z.ZodNumber;
+        totalAmount: z.ZodNumber;
+        maxTickets: z.ZodNumber;
+        minTickets: z.ZodNumber;
+        tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        isPrivate: z.ZodBoolean;
+        createdAt: z.ZodNumber;
+        timeout: z.ZodNumber;
+        slot: z.ZodNumber;
+    }, z.core.$strip>>;
+    completed: z.ZodArray<z.ZodObject<{
+        signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+        gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        winner: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        winnerAmount: z.ZodNumber;
+        feeAmount: z.ZodNumber;
+        ticketsCount: z.ZodNumber;
+        timestamp: z.ZodNumber;
+        slot: z.ZodNumber;
+    }, z.core.$strip>>;
+    closed: z.ZodArray<z.ZodObject<{
+        signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+        gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        timestamp: z.ZodNumber;
+        slot: z.ZodNumber;
+    }, z.core.$strip>>;
+    membership: z.ZodArray<z.ZodObject<{
+        kind: z.ZodEnum<{
+            joined: "joined";
+            unjoined: "unjoined";
+        }>;
+        signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+        gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        ticketsCount: z.ZodNumber;
+        ticketIndex: z.ZodNumber;
+        timestamp: z.ZodNumber;
+        slot: z.ZodNumber;
+    }, z.core.$strip>>;
+    nextBefore: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+    oldestSlot: z.ZodNullable<z.ZodNumber>;
+    transactions: z.ZodNumber;
+    complete: z.ZodBoolean;
+}, z.core.$strip>;
+export declare const BackfillCommitRequestSchema: z.ZodObject<{
+    expectedBefore: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+    page: z.ZodObject<{
+        initialized: z.ZodArray<z.ZodObject<{
+            signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+            gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            gameType: z.ZodEnum<{
+                coinflip: "coinflip";
+                giveaway: "giveaway";
+            }>;
+            ticketAmount: z.ZodNumber;
+            totalAmount: z.ZodNumber;
+            maxTickets: z.ZodNumber;
+            minTickets: z.ZodNumber;
+            tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            isPrivate: z.ZodBoolean;
+            createdAt: z.ZodNumber;
+            timeout: z.ZodNumber;
+            slot: z.ZodNumber;
+        }, z.core.$strip>>;
+        completed: z.ZodArray<z.ZodObject<{
+            signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+            gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            winner: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            winnerAmount: z.ZodNumber;
+            feeAmount: z.ZodNumber;
+            ticketsCount: z.ZodNumber;
+            timestamp: z.ZodNumber;
+            slot: z.ZodNumber;
+        }, z.core.$strip>>;
+        closed: z.ZodArray<z.ZodObject<{
+            signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+            gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            timestamp: z.ZodNumber;
+            slot: z.ZodNumber;
+        }, z.core.$strip>>;
+        membership: z.ZodArray<z.ZodObject<{
+            kind: z.ZodEnum<{
+                joined: "joined";
+                unjoined: "unjoined";
+            }>;
+            signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+            gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            ticketsCount: z.ZodNumber;
+            ticketIndex: z.ZodNumber;
+            timestamp: z.ZodNumber;
+            slot: z.ZodNumber;
+        }, z.core.$strip>>;
+        nextBefore: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+        oldestSlot: z.ZodNullable<z.ZodNumber>;
+        transactions: z.ZodNumber;
+        complete: z.ZodBoolean;
+    }, z.core.$strip>;
+}, z.core.$strict>;
+export declare const BackfillStateResponseSchema: z.ZodObject<{
+    success: z.ZodLiteral<true>;
+    state: z.ZodObject<{
+        beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+        pages: z.ZodNumber;
+        transactions: z.ZodNumber;
+        initializedEvents: z.ZodNumber;
+        closedEvents: z.ZodNumber;
+        complete: z.ZodBoolean;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const BackfillConflictResponseSchema: z.ZodObject<{
+    error: z.ZodString;
+    state: z.ZodObject<{
+        beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+        pages: z.ZodNumber;
+        transactions: z.ZodNumber;
+        initializedEvents: z.ZodNumber;
+        closedEvents: z.ZodNumber;
+        complete: z.ZodBoolean;
+    }, z.core.$strip>;
+}, z.core.$strip>;
+export declare const BackfillRetryableErrorSchema: z.ZodObject<{
+    success: z.ZodLiteral<false>;
+    retryable: z.ZodLiteral<true>;
+    reason: z.ZodEnum<{
+        rpc_rate_limited: "rpc_rate_limited";
+        page_failed: "page_failed";
+    }>;
+    error: z.ZodString;
+}, z.core.$strip>;
 export declare const PaginationQuerySchema: z.ZodObject<{
     limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
@@ -293,6 +498,192 @@ export declare const indexerContract: {
             readonly 200: z.ZodObject<{
                 status: z.ZodLiteral<"ok">;
                 timestamp: z.ZodNumber;
+            }, z.core.$strip>;
+        };
+    };
+    readonly triggerIndex: {
+        readonly method: "POST";
+        readonly path: "/api/trigger-index";
+        readonly authenticated: false;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                success: z.ZodLiteral<true>;
+                indexed: z.ZodNumber;
+                total: z.ZodNumber;
+                message: z.ZodString;
+            }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
+    readonly readBackfill: {
+        readonly method: "GET";
+        readonly path: "/api/backfill";
+        readonly authenticated: true;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                success: z.ZodLiteral<true>;
+                state: z.ZodObject<{
+                    beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+                    pages: z.ZodNumber;
+                    transactions: z.ZodNumber;
+                    initializedEvents: z.ZodNumber;
+                    closedEvents: z.ZodNumber;
+                    complete: z.ZodBoolean;
+                }, z.core.$strip>;
+            }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 429: z.ZodObject<{
+                success: z.ZodLiteral<false>;
+                retryable: z.ZodLiteral<true>;
+                reason: z.ZodEnum<{
+                    rpc_rate_limited: "rpc_rate_limited";
+                    page_failed: "page_failed";
+                }>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
+                success: z.ZodLiteral<false>;
+                retryable: z.ZodLiteral<true>;
+                reason: z.ZodEnum<{
+                    rpc_rate_limited: "rpc_rate_limited";
+                    page_failed: "page_failed";
+                }>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
+    readonly runBackfill: {
+        readonly method: "POST";
+        readonly path: "/api/backfill";
+        readonly authenticated: true;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                success: z.ZodLiteral<true>;
+                state: z.ZodObject<{
+                    beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+                    pages: z.ZodNumber;
+                    transactions: z.ZodNumber;
+                    initializedEvents: z.ZodNumber;
+                    closedEvents: z.ZodNumber;
+                    complete: z.ZodBoolean;
+                }, z.core.$strip>;
+            }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 429: z.ZodObject<{
+                success: z.ZodLiteral<false>;
+                retryable: z.ZodLiteral<true>;
+                reason: z.ZodEnum<{
+                    rpc_rate_limited: "rpc_rate_limited";
+                    page_failed: "page_failed";
+                }>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
+                success: z.ZodLiteral<false>;
+                retryable: z.ZodLiteral<true>;
+                reason: z.ZodEnum<{
+                    rpc_rate_limited: "rpc_rate_limited";
+                    page_failed: "page_failed";
+                }>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
+    readonly commitBackfill: {
+        readonly method: "POST";
+        readonly path: "/api/backfill/commit";
+        readonly authenticated: true;
+        readonly body: z.ZodObject<{
+            expectedBefore: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+            page: z.ZodObject<{
+                initialized: z.ZodArray<z.ZodObject<{
+                    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    gameType: z.ZodEnum<{
+                        coinflip: "coinflip";
+                        giveaway: "giveaway";
+                    }>;
+                    ticketAmount: z.ZodNumber;
+                    totalAmount: z.ZodNumber;
+                    maxTickets: z.ZodNumber;
+                    minTickets: z.ZodNumber;
+                    tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    isPrivate: z.ZodBoolean;
+                    createdAt: z.ZodNumber;
+                    timeout: z.ZodNumber;
+                    slot: z.ZodNumber;
+                }, z.core.$strip>>;
+                completed: z.ZodArray<z.ZodObject<{
+                    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    winner: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    winnerAmount: z.ZodNumber;
+                    feeAmount: z.ZodNumber;
+                    ticketsCount: z.ZodNumber;
+                    timestamp: z.ZodNumber;
+                    slot: z.ZodNumber;
+                }, z.core.$strip>>;
+                closed: z.ZodArray<z.ZodObject<{
+                    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    timestamp: z.ZodNumber;
+                    slot: z.ZodNumber;
+                }, z.core.$strip>>;
+                membership: z.ZodArray<z.ZodObject<{
+                    kind: z.ZodEnum<{
+                        joined: "joined";
+                        unjoined: "unjoined";
+                    }>;
+                    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    ticketsCount: z.ZodNumber;
+                    ticketIndex: z.ZodNumber;
+                    timestamp: z.ZodNumber;
+                    slot: z.ZodNumber;
+                }, z.core.$strip>>;
+                nextBefore: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+                oldestSlot: z.ZodNullable<z.ZodNumber>;
+                transactions: z.ZodNumber;
+                complete: z.ZodBoolean;
+            }, z.core.$strip>;
+        }, z.core.$strict>;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                success: z.ZodLiteral<true>;
+                state: z.ZodObject<{
+                    beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+                    pages: z.ZodNumber;
+                    transactions: z.ZodNumber;
+                    initializedEvents: z.ZodNumber;
+                    closedEvents: z.ZodNumber;
+                    complete: z.ZodBoolean;
+                }, z.core.$strip>;
+            }, z.core.$strip>;
+            readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 409: z.ZodObject<{
+                error: z.ZodString;
+                state: z.ZodObject<{
+                    beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+                    pages: z.ZodNumber;
+                    transactions: z.ZodNumber;
+                    initializedEvents: z.ZodNumber;
+                    closedEvents: z.ZodNumber;
+                    complete: z.ZodBoolean;
+                }, z.core.$strip>;
             }, z.core.$strip>;
         };
     };
@@ -721,4 +1112,6 @@ export type IndexerTokenSummary = z.output<typeof IndexerTokenSummarySchema>;
 export type IndexerTokensResponse = z.output<typeof IndexerTokensResponseSchema>;
 export type IndexerLeaderboardPlayer = z.output<typeof IndexerLeaderboardPlayerSchema>;
 export type IndexerLeaderboardResponse = z.output<typeof IndexerLeaderboardResponseSchema>;
+export type HistoricalBackfillState = z.output<typeof HistoricalBackfillStateSchema>;
+export type HistoricalGameEventPage = z.output<typeof HistoricalGameEventPageSchema>;
 //# sourceMappingURL=index.d.ts.map

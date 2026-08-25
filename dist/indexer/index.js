@@ -134,6 +134,93 @@ export const IndexerHealthResponseSchema = z.object({
     status: z.literal("ok"),
     timestamp: z.number().int().nonnegative(),
 });
+export const IndexerTriggerResponseSchema = z.object({
+    success: z.literal(true),
+    indexed: NonNegativeIntegerSchema,
+    total: NonNegativeIntegerSchema,
+    message: z.string().min(1),
+});
+export const IndexerTriggerErrorSchema = z.object({
+    success: z.literal(false),
+    error: z.string().min(1),
+});
+export const HistoricalBackfillStateSchema = z.object({
+    beforeSignature: SolanaSignatureSchema.nullable(),
+    pages: NonNegativeIntegerSchema,
+    transactions: NonNegativeIntegerSchema,
+    initializedEvents: NonNegativeIntegerSchema,
+    closedEvents: NonNegativeIntegerSchema,
+    complete: z.boolean(),
+});
+export const HistoricalInitializedEventSchema = z.object({
+    signature: SolanaSignatureSchema,
+    gameKey: SolanaAddressSchema,
+    creator: SolanaAddressSchema,
+    gameType: GameTypeSchema,
+    ticketAmount: z.number().finite().nonnegative(),
+    totalAmount: z.number().finite().nonnegative(),
+    maxTickets: NonNegativeIntegerSchema,
+    minTickets: NonNegativeIntegerSchema,
+    tokenMint: SolanaAddressSchema,
+    isPrivate: z.boolean(),
+    createdAt: UnixTimestampSchema,
+    timeout: NonNegativeIntegerSchema,
+    slot: SlotSchema,
+});
+export const HistoricalCompletedEventSchema = z.object({
+    signature: SolanaSignatureSchema,
+    gameKey: SolanaAddressSchema,
+    winner: SolanaAddressSchema,
+    winnerAmount: z.number().finite().nonnegative(),
+    feeAmount: z.number().finite().nonnegative(),
+    ticketsCount: NonNegativeIntegerSchema,
+    timestamp: UnixTimestampSchema,
+    slot: SlotSchema,
+});
+export const HistoricalClosedEventSchema = z.object({
+    signature: SolanaSignatureSchema,
+    gameKey: SolanaAddressSchema,
+    timestamp: UnixTimestampSchema,
+    slot: SlotSchema,
+});
+export const HistoricalMembershipEventSchema = z.object({
+    kind: z.enum(["joined", "unjoined"]),
+    signature: SolanaSignatureSchema,
+    gameKey: SolanaAddressSchema,
+    player: SolanaAddressSchema,
+    ticketsCount: NonNegativeIntegerSchema,
+    ticketIndex: NonNegativeIntegerSchema,
+    timestamp: UnixTimestampSchema,
+    slot: SlotSchema,
+});
+export const HistoricalGameEventPageSchema = z.object({
+    initialized: z.array(HistoricalInitializedEventSchema),
+    completed: z.array(HistoricalCompletedEventSchema),
+    closed: z.array(HistoricalClosedEventSchema),
+    membership: z.array(HistoricalMembershipEventSchema),
+    nextBefore: SolanaSignatureSchema.nullable(),
+    oldestSlot: SlotSchema.nullable(),
+    transactions: z.number().int().min(0).max(100),
+    complete: z.boolean(),
+});
+export const BackfillCommitRequestSchema = z.strictObject({
+    expectedBefore: SolanaSignatureSchema.nullable(),
+    page: HistoricalGameEventPageSchema,
+});
+export const BackfillStateResponseSchema = z.object({
+    success: z.literal(true),
+    state: HistoricalBackfillStateSchema,
+});
+export const BackfillConflictResponseSchema = z.object({
+    error: z.string().min(1),
+    state: HistoricalBackfillStateSchema,
+});
+export const BackfillRetryableErrorSchema = z.object({
+    success: z.literal(false),
+    retryable: z.literal(true),
+    reason: z.enum(["rpc_rate_limited", "page_failed"]),
+    error: z.string().min(1),
+});
 export const PaginationQuerySchema = z.object({
     limit: z.coerce.number().int().min(1).max(100).default(50),
     offset: z.coerce.number().int().nonnegative().default(0),
@@ -145,7 +232,7 @@ export const PlayerQuerySchema = PaginationQuerySchema.extend({
     player: SolanaAddressSchema,
 });
 export const LatestGamesQuerySchema = z.object({
-    limit: z.coerce.number().int().min(1).max(50).default(10),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
     tokenMint: SolanaAddressSchema.optional(),
     gameType: GameTypeSchema.optional(),
     includeLifecycle: z.enum(["0", "1"]).optional(),
@@ -160,6 +247,49 @@ export const indexerContract = {
         path: "/health",
         authenticated: false,
         responses: { 200: IndexerHealthResponseSchema },
+    }),
+    triggerIndex: defineEndpoint({
+        method: "POST",
+        path: "/api/trigger-index",
+        authenticated: false,
+        responses: {
+            200: IndexerTriggerResponseSchema,
+            500: IndexerTriggerErrorSchema,
+        },
+    }),
+    readBackfill: defineEndpoint({
+        method: "GET",
+        path: "/api/backfill",
+        authenticated: true,
+        responses: {
+            200: BackfillStateResponseSchema,
+            401: SimpleApiErrorSchema,
+            429: BackfillRetryableErrorSchema,
+            500: BackfillRetryableErrorSchema,
+        },
+    }),
+    runBackfill: defineEndpoint({
+        method: "POST",
+        path: "/api/backfill",
+        authenticated: true,
+        responses: {
+            200: BackfillStateResponseSchema,
+            401: SimpleApiErrorSchema,
+            429: BackfillRetryableErrorSchema,
+            500: BackfillRetryableErrorSchema,
+        },
+    }),
+    commitBackfill: defineEndpoint({
+        method: "POST",
+        path: "/api/backfill/commit",
+        authenticated: true,
+        body: BackfillCommitRequestSchema,
+        responses: {
+            200: BackfillStateResponseSchema,
+            400: SimpleApiErrorSchema,
+            401: SimpleApiErrorSchema,
+            409: BackfillConflictResponseSchema,
+        },
     }),
     stats: defineEndpoint({
         method: "GET",

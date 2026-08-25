@@ -19,6 +19,25 @@ Import the smallest service boundary required by a consumer:
 import { GenerateHashResponseSchema } from "@timbagame/protocol/oracle";
 ```
 
+Create a typed REST client from the same contract used by the server:
+
+```ts
+import { createRestClient, expectStatus } from "@timbagame/protocol/common";
+import { indexerContract } from "@timbagame/protocol/indexer";
+
+const indexer = createRestClient(indexerContract, {
+  baseUrl: "https://indexer.example.com",
+});
+const result = await indexer.games({
+  query: { limit: 20, offset: 0 },
+});
+const games = expectStatus(result, 200).data.games;
+```
+
+The client validates parameters, queries, and bodies before sending them. It validates the JSON
+response with the schema declared for the actual HTTP status. Declared error statuses remain typed;
+unexpected statuses and invalid responses throw protocol errors.
+
 ## Private package release
 
 1. Merge the intended changes and bump `package.json` using semantic versioning.

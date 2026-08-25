@@ -148,6 +148,7 @@ export const webContract = {
         method: "GET",
         path: "/api/play/games/:address",
         authenticated: false,
+        params: GameAddressParamsSchema,
         query: z.object({ fresh: z.enum(["0", "1"]).optional() }),
         responses: {
             200: SerializedGameSchema,
@@ -166,6 +167,7 @@ export const webContract = {
         method: "GET",
         path: "/api/verify-game/:signature",
         authenticated: false,
+        params: VerifyGameParamsSchema,
         responses: { 200: VerifiedGameSchema, 400: SimpleApiErrorSchema },
     }),
 };

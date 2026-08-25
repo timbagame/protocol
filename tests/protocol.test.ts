@@ -37,10 +37,14 @@ describe("common wire values", () => {
   });
 
   test("bounds u64 decimal strings", () => {
+    expect(String(U64StringSchema.parse("0"))).toBe("0");
+    expect(String(U64StringSchema.parse("1"))).toBe("1");
     expect(String(U64StringSchema.parse("18446744073709551615"))).toBe(
       "18446744073709551615",
     );
     expect(() => U64StringSchema.parse("18446744073709551616")).toThrow();
+    expect(() => U64StringSchema.parse("9".repeat(100_000))).toThrow();
+    expect(() => U64StringSchema.parse("not-a-number")).toThrow();
     expect(() => U64StringSchema.parse("01")).toThrow();
   });
 
@@ -108,6 +112,24 @@ describe("indexer contracts", () => {
 });
 
 describe("web contracts", () => {
+  test("accepts positive u64 amounts and rejects zero", () => {
+    const request = {
+      creator: ADDRESS,
+      tokenMint: OTHER_ADDRESS,
+      type: "coinflip" as const,
+      minPlayers: 2,
+      maxPlayers: 2,
+      timeoutSeconds: 60,
+    };
+
+    expect(
+      String(CreateGameRequestSchema.parse({ ...request, amount: "1" }).amount),
+    ).toBe("1");
+    expect(() =>
+      CreateGameRequestSchema.parse({ ...request, amount: "0" }),
+    ).toThrow();
+  });
+
   test("enforces game-specific player limits", () => {
     expect(() =>
       CreateGameRequestSchema.parse({

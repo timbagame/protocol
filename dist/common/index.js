@@ -1,6 +1,7 @@
 import * as z from "zod";
 const BASE58_PATTERN = /^[1-9A-HJ-NP-Za-km-z]+$/;
 const BASE64_PATTERN = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+const U64_MAX = "18446744073709551615";
 export const SolanaAddressSchema = z
     .string()
     .min(32)
@@ -26,8 +27,9 @@ export const Hex32Schema = z
     .brand();
 export const U64StringSchema = z
     .string()
+    .max(U64_MAX.length)
     .regex(/^(0|[1-9]\d*)$/)
-    .refine((value) => BigInt(value) <= 18446744073709551615n, "Value exceeds u64")
+    .refine((value) => value.length < U64_MAX.length || value <= U64_MAX, "Value exceeds u64")
     .brand();
 export const NonNegativeIntegerSchema = z.number().int().nonnegative();
 export const PositiveIntegerSchema = z.number().int().positive();

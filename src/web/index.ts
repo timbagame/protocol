@@ -17,7 +17,7 @@ export const CreateGameRequestSchema = z
     tokenMint: SolanaAddressSchema,
     type: z.enum(["coinflip", "giveaway"]),
     amount: U64StringSchema.refine(
-      (amount) => BigInt(amount) > 0n,
+      (amount) => amount !== "0",
       "Amount must be positive",
     ),
     minPlayers: z.number().int().min(1).max(100),

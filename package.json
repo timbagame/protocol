@@ -35,8 +35,10 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "check:dist": "bun run build && git diff --exit-code -- dist",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "prepack": "bun run build",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },

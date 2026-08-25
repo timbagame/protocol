@@ -15,7 +15,7 @@ const OracleSuccessSchema = ServiceEnvelopeSchema.extend({
 });
 
 export const GenerateHashRequestSchema = z.strictObject({
-  gameType: z.enum(["coinflip", "giveaway"]).optional(),
+  gameType: z.string().trim().toLowerCase().min(1).max(128).optional(),
 });
 
 export const GenerateHashResponseSchema = OracleSuccessSchema.extend({

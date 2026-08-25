@@ -1,9 +1,6 @@
 import * as z from "zod";
 export declare const GenerateHashRequestSchema: z.ZodObject<{
-    gameType: z.ZodOptional<z.ZodEnum<{
-        coinflip: "coinflip";
-        giveaway: "giveaway";
-    }>>;
+    gameType: z.ZodOptional<z.ZodString>;
 }, z.core.$strict>;
 export declare const GenerateHashResponseSchema: z.ZodObject<{
     timestamp: z.ZodISODateTime;
@@ -146,10 +143,7 @@ export declare const oracleContract: {
         readonly path: "/generate-hash";
         readonly authenticated: true;
         readonly body: z.ZodObject<{
-            gameType: z.ZodOptional<z.ZodEnum<{
-                coinflip: "coinflip";
-                giveaway: "giveaway";
-            }>>;
+            gameType: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
         readonly responses: {
             readonly 200: z.ZodObject<{

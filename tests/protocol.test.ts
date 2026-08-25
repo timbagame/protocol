@@ -5,6 +5,7 @@ import {
   U64StringSchema,
 } from "../src/common/index.js";
 import {
+  GenerateHashRequestSchema,
   GenerateHashResponseSchema,
   SignGameTransactionRequestSchema,
 } from "../src/oracle/index.js";
@@ -59,6 +60,18 @@ describe("common wire values", () => {
 });
 
 describe("oracle contracts", () => {
+  test("normalizes supported and future game type labels", () => {
+    expect(
+      GenerateHashRequestSchema.parse({ gameType: "  Giveaway  " }).gameType,
+    ).toBe("giveaway");
+    expect(
+      GenerateHashRequestSchema.parse({ gameType: "future-game" }).gameType,
+    ).toBe("future-game");
+    expect(() =>
+      GenerateHashRequestSchema.parse({ gameType: "x".repeat(129) }),
+    ).toThrow();
+  });
+
   test("parses a generated commitment response", () => {
     const result = GenerateHashResponseSchema.parse({
       ...SERVICE,

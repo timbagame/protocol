@@ -1,8 +1,14 @@
 import { describe, expect, test } from "bun:test";
+import { z } from "zod";
 import {
   Base64TransactionSchema,
+  ProtocolHttpError,
+  ProtocolResponseError,
   SolanaAddressSchema,
   U64StringSchema,
+  createRestClient,
+  defineEndpoint,
+  expectStatus,
 } from "../src/common/index.js";
 import {
   GenerateHashRequestSchema,
@@ -56,6 +62,122 @@ describe("common wire values", () => {
   test("accepts base64 and rejects arbitrary transaction text", () => {
     expect(String(Base64TransactionSchema.parse("AQIDBA=="))).toBe("AQIDBA==");
     expect(() => Base64TransactionSchema.parse("***")).toThrow();
+  });
+});
+
+describe("typed REST client", () => {
+  const contract = {
+    update: defineEndpoint({
+      method: "POST",
+      path: "/games/:gameId",
+      authenticated: true,
+      params: z.strictObject({ gameId: z.string().min(1) }),
+      query: z.strictObject({ fresh: z.boolean() }),
+      body: z.strictObject({ amount: z.number().int().positive() }),
+      responses: {
+        200: z.object({ success: z.literal(true), amount: z.number() }),
+        400: z.object({ error: z.string() }),
+      },
+    }),
+  } as const;
+
+  test("builds and validates requests and responses from one contract", async () => {
+    const requests: Request[] = [];
+    const client = createRestClient(contract, {
+      baseUrl: "https://service.test/root/",
+      headers: { "X-Client": "protocol-test" },
+      getHeaders: (endpoint) =>
+        endpoint.authenticated
+          ? { Authorization: "Bearer synthetic-token" }
+          : {},
+      fetch: async (input, init) => {
+        requests.push(new Request(input, init));
+        return Response.json({ success: true, amount: 7 });
+      },
+    });
+
+    const result = await client.update({
+      params: { gameId: "game / one" },
+      query: { fresh: true },
+      body: { amount: 7 },
+      request: { cache: "no-store" },
+    });
+    const success = expectStatus(result, 200);
+
+    expect(success.data.amount).toBe(7);
+    expect(requests).toHaveLength(1);
+    expect(requests[0]?.url).toBe(
+      "https://service.test/root/games/game%20%2F%20one?fresh=true",
+    );
+    expect(requests[0]?.method).toBe("POST");
+    expect(requests[0]?.headers.get("authorization")).toBe(
+      "Bearer synthetic-token",
+    );
+    expect(requests[0]?.headers.get("x-client")).toBe("protocol-test");
+    expect(await requests[0]?.json()).toEqual({ amount: 7 });
+  });
+
+  test("rejects invalid input before making a request", async () => {
+    let called = false;
+    const client = createRestClient(contract, {
+      baseUrl: "https://service.test",
+      fetch: async () => {
+        called = true;
+        return Response.json({ success: true, amount: 1 });
+      },
+    });
+
+    await expect(
+      client.update({
+        params: { gameId: "game" },
+        query: { fresh: true },
+        body: { amount: 0 },
+      }),
+    ).rejects.toThrow();
+    expect(called).toBe(false);
+  });
+
+  test("returns typed declared errors and can require a success status", async () => {
+    const client = createRestClient(contract, {
+      baseUrl: "https://service.test",
+      fetch: async () =>
+        Response.json({ error: "invalid amount" }, { status: 400 }),
+    });
+    const result = await client.update({
+      params: { gameId: "game" },
+      query: { fresh: false },
+      body: { amount: 1 },
+    });
+
+    expect(result.status).toBe(400);
+    if (result.status === 400) expect(result.data.error).toBe("invalid amount");
+    expect(() => expectStatus(result, 200)).toThrow(ProtocolHttpError);
+  });
+
+  test("rejects undeclared statuses and malformed declared responses", async () => {
+    const unexpected = createRestClient(contract, {
+      baseUrl: "https://service.test",
+      fetch: async () => Response.json({ error: "busy" }, { status: 503 }),
+    });
+    await expect(
+      unexpected.update({
+        params: { gameId: "game" },
+        query: { fresh: false },
+        body: { amount: 1 },
+      }),
+    ).rejects.toBeInstanceOf(ProtocolHttpError);
+
+    const malformed = createRestClient(contract, {
+      baseUrl: "https://service.test",
+      fetch: async () => Response.json({ success: true, amount: "seven" }),
+    });
+    await expect(
+      malformed.update({
+        params: { gameId: "game" },
+        query: { fresh: false },
+        body: { amount: 1 },
+      }),
+    ).rejects.toBeInstanceOf(ProtocolResponseError);
   });
 });
 
@@ -129,7 +251,8 @@ describe("indexer contracts", () => {
 
   test("normalizes and bounds route queries", () => {
     expect(LatestGamesQuerySchema.parse({ limit: "10" }).limit).toBe(10);
-    expect(() => LatestGamesQuerySchema.parse({ limit: "51" })).toThrow();
+    expect(LatestGamesQuerySchema.parse({ limit: "100" }).limit).toBe(100);
+    expect(() => LatestGamesQuerySchema.parse({ limit: "101" })).toThrow();
     expect(
       String(GameByKeyQuerySchema.parse({ gameKey: ADDRESS }).gameKey),
     ).toBe(ADDRESS);

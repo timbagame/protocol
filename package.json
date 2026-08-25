@@ -1,0 +1,58 @@
+{
+  "name": "@timbagame/protocol",
+  "version": "0.1.0",
+  "description": "Runtime-validated HTTP contracts shared by Timba services",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./common": {
+      "types": "./dist/common/index.d.ts",
+      "import": "./dist/common/index.js"
+    },
+    "./oracle": {
+      "types": "./dist/oracle/index.d.ts",
+      "import": "./dist/oracle/index.js"
+    },
+    "./indexer": {
+      "types": "./dist/indexer/index.d.ts",
+      "import": "./dist/indexer/index.js"
+    },
+    "./bot": {
+      "types": "./dist/bot/index.d.ts",
+      "import": "./dist/bot/index.js"
+    },
+    "./web": {
+      "types": "./dist/web/index.d.ts",
+      "import": "./dist/web/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.0",
+    "prettier": "^3.9.5",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}

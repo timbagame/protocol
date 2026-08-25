@@ -9,12 +9,16 @@ import {
   SignGameTransactionRequestSchema,
 } from "../src/oracle/index.js";
 import {
+  GameByKeyQuerySchema,
   IndexerGamesResponseSchema,
   IndexerStatsResponseSchema,
+  LatestGamesQuerySchema,
 } from "../src/indexer/index.js";
 import {
   CreateGameRequestSchema,
+  GameAddressParamsSchema,
   PrepareGameResponseSchema,
+  VerifyGameParamsSchema,
 } from "../src/web/index.js";
 
 const ADDRESS = "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5";
@@ -109,6 +113,14 @@ describe("indexer contracts", () => {
       }).financials,
     ).toEqual([]);
   });
+
+  test("normalizes and bounds route queries", () => {
+    expect(LatestGamesQuerySchema.parse({ limit: "10" }).limit).toBe(10);
+    expect(() => LatestGamesQuerySchema.parse({ limit: "51" })).toThrow();
+    expect(
+      String(GameByKeyQuerySchema.parse({ gameKey: ADDRESS }).gameKey),
+    ).toBe(ADDRESS);
+  });
 });
 
 describe("web contracts", () => {
@@ -154,5 +166,14 @@ describe("web contracts", () => {
         }).gameAddress,
       ),
     ).toBe(ADDRESS);
+  });
+
+  test("validates dynamic route parameters", () => {
+    expect(
+      String(GameAddressParamsSchema.parse({ address: ADDRESS }).address),
+    ).toBe(ADDRESS);
+    expect(
+      String(VerifyGameParamsSchema.parse({ signature: SIGNATURE }).signature),
+    ).toBe(SIGNATURE);
   });
 });

@@ -17,7 +17,17 @@ export const CompletedGameNotificationResponseSchema = z.object({
   success: z.literal(true),
 });
 
+export const BotHealthResponseSchema = z.object({
+  status: z.literal("ok"),
+});
+
 export const botContract = {
+  health: defineEndpoint({
+    method: "GET",
+    path: "/health",
+    authenticated: false,
+    responses: { 200: BotHealthResponseSchema },
+  }),
   completedGame: defineEndpoint({
     method: "POST",
     path: "/internal/completed",

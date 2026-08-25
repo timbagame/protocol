@@ -268,6 +268,22 @@ export declare const PlayerQuerySchema: z.ZodObject<{
     offset: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
 }, z.core.$strip>;
+export declare const LatestGamesQuerySchema: z.ZodObject<{
+    limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    tokenMint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+    gameType: z.ZodOptional<z.ZodEnum<{
+        coinflip: "coinflip";
+        giveaway: "giveaway";
+    }>>;
+    includeLifecycle: z.ZodOptional<z.ZodEnum<{
+        0: "0";
+        1: "1";
+    }>>;
+}, z.core.$strip>;
+export declare const GameByKeyQuerySchema: z.ZodObject<{
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    fresh: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
 export declare const indexerContract: {
     readonly health: {
         readonly method: "GET";
@@ -368,6 +384,111 @@ export declare const indexerContract: {
             }, z.core.$strip>;
         };
     };
+    readonly latestGames: {
+        readonly method: "GET";
+        readonly path: "/api/games/latest";
+        readonly authenticated: false;
+        readonly query: z.ZodObject<{
+            limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+            tokenMint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+            gameType: z.ZodOptional<z.ZodEnum<{
+                coinflip: "coinflip";
+                giveaway: "giveaway";
+            }>>;
+            includeLifecycle: z.ZodOptional<z.ZodEnum<{
+                0: "0";
+                1: "1";
+            }>>;
+        }, z.core.$strip>;
+        readonly responses: {
+            readonly 200: z.ZodArray<z.ZodObject<{
+                signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                status: z.ZodOptional<z.ZodEnum<{
+                    completed: "completed";
+                    active: "active";
+                    cancelled: "cancelled";
+                }>>;
+                creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
+                gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+                    coinflip: "coinflip";
+                    giveaway: "giveaway";
+                }>>>;
+                ticketAmount: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                totalAmount: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                maxTickets: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                minTickets: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                isPrivate: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
+                createdAt: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                timeout: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                expiresAt: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                winner: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+                winnerAmount: z.ZodNullable<z.ZodNumber>;
+                feeAmount: z.ZodNullable<z.ZodNumber>;
+                ticketsCount: z.ZodNullable<z.ZodNumber>;
+                tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                timestamp: z.ZodNumber;
+                slot: z.ZodNumber;
+                priceUsd: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                isCreator: z.ZodOptional<z.ZodBoolean>;
+                isPlayer: z.ZodOptional<z.ZodBoolean>;
+                isJoined: z.ZodOptional<z.ZodBoolean>;
+            }, z.core.$strip>>;
+            readonly 500: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
+    readonly gameByKey: {
+        readonly method: "GET";
+        readonly path: "/api/games/by-key";
+        readonly authenticated: false;
+        readonly query: z.ZodObject<{
+            gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            fresh: z.ZodOptional<z.ZodString>;
+        }, z.core.$strip>;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                status: z.ZodOptional<z.ZodEnum<{
+                    completed: "completed";
+                    active: "active";
+                    cancelled: "cancelled";
+                }>>;
+                creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
+                gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+                    coinflip: "coinflip";
+                    giveaway: "giveaway";
+                }>>>;
+                ticketAmount: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                totalAmount: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                maxTickets: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                minTickets: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                isPrivate: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
+                createdAt: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                timeout: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                expiresAt: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                winner: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+                winnerAmount: z.ZodNullable<z.ZodNumber>;
+                feeAmount: z.ZodNullable<z.ZodNumber>;
+                ticketsCount: z.ZodNullable<z.ZodNumber>;
+                tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                timestamp: z.ZodNumber;
+                slot: z.ZodNumber;
+                priceUsd: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                isCreator: z.ZodOptional<z.ZodBoolean>;
+                isPlayer: z.ZodOptional<z.ZodBoolean>;
+                isJoined: z.ZodOptional<z.ZodBoolean>;
+            }, z.core.$strip>;
+            readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 404: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
     readonly activeGames: {
         readonly method: "GET";
         readonly path: "/api/active-games";
@@ -401,6 +522,46 @@ export declare const indexerContract: {
                 count: z.ZodNumber;
             }, z.core.$strip>;
             readonly 500: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+        };
+    };
+    readonly playerActiveGames: {
+        readonly method: "GET";
+        readonly path: "/api/my-active-games";
+        readonly authenticated: false;
+        readonly query: z.ZodObject<{
+            player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        }, z.core.$strip>;
+        readonly responses: {
+            readonly 200: z.ZodObject<{
+                games: z.ZodArray<z.ZodObject<{
+                    game_key: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    ticket_amount: z.ZodNumber;
+                    total_amount: z.ZodNumber;
+                    max_tickets: z.ZodNumber;
+                    min_tickets: z.ZodNumber;
+                    current_tickets: z.ZodNumber;
+                    token_mint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    is_private: z.ZodUnion<readonly [z.ZodLiteral<0>, z.ZodLiteral<1>]>;
+                    created_at: z.ZodNumber;
+                    timeout: z.ZodNumber;
+                    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                    slot: z.ZodNumber;
+                    indexed_at: z.ZodNumber;
+                    expiresAt: z.ZodNumber;
+                    timeLeft: z.ZodNumber;
+                    isPrivate: z.ZodBoolean;
+                    game_type: z.ZodNullable<z.ZodEnum<{
+                        coinflip: "coinflip";
+                        giveaway: "giveaway";
+                    }>>;
+                    priceUsd: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+                }, z.core.$strip>>;
+                count: z.ZodNumber;
+            }, z.core.$strip>;
+            readonly 400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };

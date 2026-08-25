@@ -54,7 +54,12 @@
     "node": ">=22"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timbagame/protocol.git"
+  },
   "publishConfig": {
-    "access": "public"
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }

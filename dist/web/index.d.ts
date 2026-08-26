@@ -203,8 +203,8 @@ export declare const webContract: {
         }, z.core.$strip>;
         readonly query: z.ZodObject<{
             fresh: z.ZodOptional<z.ZodEnum<{
-                0: "0";
                 1: "1";
+                0: "0";
             }>>;
         }, z.core.$strip>;
         readonly responses: {
@@ -231,6 +231,9 @@ export declare const webContract: {
                 error: z.ZodString;
             }, z.core.$strip>;
             readonly 404: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -284,6 +287,12 @@ export declare const webContract: {
             readonly 400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
+            readonly 403: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 503: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
         };
     };
     readonly cachedVerifyGame: {
@@ -333,6 +342,9 @@ export declare const webContract: {
                 explorerUrl: z.ZodURL;
             }, z.core.$strip>;
             readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };

@@ -481,8 +481,8 @@ export declare const LatestGamesQuerySchema: z.ZodObject<{
         giveaway: "giveaway";
     }>>;
     includeLifecycle: z.ZodOptional<z.ZodEnum<{
-        0: "0";
         1: "1";
+        0: "0";
     }>>;
 }, z.core.$strip>;
 export declare const GameByKeyQuerySchema: z.ZodObject<{
@@ -504,13 +504,16 @@ export declare const indexerContract: {
     readonly triggerIndex: {
         readonly method: "POST";
         readonly path: "/api/trigger-index";
-        readonly authenticated: false;
+        readonly authenticated: true;
         readonly responses: {
             readonly 200: z.ZodObject<{
                 success: z.ZodLiteral<true>;
                 indexed: z.ZodNumber;
                 total: z.ZodNumber;
                 message: z.ZodString;
+            }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                error: z.ZodString;
             }, z.core.$strip>;
             readonly 500: z.ZodObject<{
                 success: z.ZodLiteral<false>;
@@ -685,6 +688,9 @@ export declare const indexerContract: {
                     complete: z.ZodBoolean;
                 }, z.core.$strip>;
             }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
         };
     };
     readonly stats: {
@@ -787,8 +793,8 @@ export declare const indexerContract: {
                 giveaway: "giveaway";
             }>>;
             includeLifecycle: z.ZodOptional<z.ZodEnum<{
-                0: "0";
                 1: "1";
+                0: "0";
             }>>;
         }, z.core.$strip>;
         readonly responses: {
@@ -825,6 +831,9 @@ export declare const indexerContract: {
                 isPlayer: z.ZodOptional<z.ZodBoolean>;
                 isJoined: z.ZodOptional<z.ZodBoolean>;
             }, z.core.$strip>>;
+            readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
             readonly 500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
@@ -876,6 +885,9 @@ export declare const indexerContract: {
                 error: z.ZodString;
             }, z.core.$strip>;
             readonly 404: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -953,6 +965,9 @@ export declare const indexerContract: {
                 count: z.ZodNumber;
             }, z.core.$strip>;
             readonly 400: z.ZodObject<{
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };

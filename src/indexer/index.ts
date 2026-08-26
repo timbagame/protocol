@@ -297,9 +297,10 @@ export const indexerContract = {
   triggerIndex: defineEndpoint({
     method: "POST",
     path: "/api/trigger-index",
-    authenticated: false,
+    authenticated: true,
     responses: {
       200: IndexerTriggerResponseSchema,
+      401: SimpleApiErrorSchema,
       500: IndexerTriggerErrorSchema,
     },
   }),
@@ -335,6 +336,7 @@ export const indexerContract = {
       400: SimpleApiErrorSchema,
       401: SimpleApiErrorSchema,
       409: BackfillConflictResponseSchema,
+      500: SimpleApiErrorSchema,
     },
   }),
   stats: defineEndpoint({
@@ -366,6 +368,7 @@ export const indexerContract = {
     query: LatestGamesQuerySchema,
     responses: {
       200: z.array(IndexerGameSchema),
+      400: SimpleApiErrorSchema,
       500: SimpleApiErrorSchema,
     },
   }),
@@ -378,6 +381,7 @@ export const indexerContract = {
       200: IndexerGameSchema,
       400: SimpleApiErrorSchema,
       404: SimpleApiErrorSchema,
+      500: SimpleApiErrorSchema,
     },
   }),
   activeGames: defineEndpoint({
@@ -397,6 +401,7 @@ export const indexerContract = {
     responses: {
       200: IndexerActiveGamesResponseSchema,
       400: SimpleApiErrorSchema,
+      500: SimpleApiErrorSchema,
     },
   }),
   playerGames: defineEndpoint({

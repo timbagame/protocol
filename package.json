@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Runtime-validated HTTP contracts shared by Timba services",
   "type": "module",
   "sideEffects": false,

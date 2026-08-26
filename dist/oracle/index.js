@@ -63,6 +63,8 @@ export const oracleContract = {
         responses: {
             200: GenerateHashResponseSchema,
             400: ApiErrorSchema,
+            401: ApiErrorSchema,
+            429: ApiErrorSchema,
             500: ApiErrorSchema,
         },
     }),
@@ -74,6 +76,8 @@ export const oracleContract = {
         responses: {
             200: SignGameTransactionResponseSchema,
             400: ApiErrorSchema,
+            401: ApiErrorSchema,
+            429: ApiErrorSchema,
             503: ApiErrorSchema,
         },
     }),
@@ -81,7 +85,12 @@ export const oracleContract = {
         method: "GET",
         path: "/stats",
         authenticated: true,
-        responses: { 200: OracleStatsResponseSchema, 500: ApiErrorSchema },
+        responses: {
+            200: OracleStatsResponseSchema,
+            401: ApiErrorSchema,
+            429: ApiErrorSchema,
+            500: ApiErrorSchema,
+        },
     }),
     completeGameNow: defineEndpoint({
         method: "POST",
@@ -91,8 +100,10 @@ export const oracleContract = {
         responses: {
             200: CompleteGameNowResponseSchema,
             400: ApiErrorSchema,
+            401: ApiErrorSchema,
             404: ApiErrorSchema,
             409: ApiErrorSchema,
+            429: ApiErrorSchema,
             500: ApiErrorSchema,
         },
     }),

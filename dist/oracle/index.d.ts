@@ -170,6 +170,28 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 429: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
             readonly 500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
@@ -203,6 +225,28 @@ export declare const oracleContract: {
                 txBase64: z.core.$ZodBranded<z.ZodString, "Base64Transaction", "out">;
             }, z.core.$strip>;
             readonly 400: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -249,6 +293,28 @@ export declare const oracleContract: {
                     eventListening: z.ZodBoolean;
                     activeListeners: z.ZodNumber;
                 }, z.core.$strip>;
+            }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 429: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
             }, z.core.$strip>;
             readonly 500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
@@ -319,6 +385,17 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
+            readonly 401: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
             readonly 404: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
@@ -331,6 +408,17 @@ export declare const oracleContract: {
                 error: z.ZodString;
             }, z.core.$strip>;
             readonly 409: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
+            readonly 429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;

@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { z } from "zod";
 import {
   Base64TransactionSchema,
+  ApiErrorSchema,
   ProtocolHttpError,
   ProtocolResponseError,
   SolanaAddressSchema,
@@ -14,6 +15,7 @@ import {
   GenerateHashRequestSchema,
   GenerateHashResponseSchema,
   SignGameTransactionRequestSchema,
+  oracleContract,
 } from "../src/oracle/index.js";
 import {
   GameByKeyQuerySchema,
@@ -40,6 +42,16 @@ const SERVICE = {
     uptime: 1,
   },
 };
+
+describe("Oracle contract", () => {
+  test("declares auth and rate-limit responses for every protected endpoint", () => {
+    for (const endpoint of Object.values(oracleContract)) {
+      if (!endpoint.authenticated) continue;
+      expect(endpoint.responses[401]).toBe(ApiErrorSchema);
+      expect(endpoint.responses[429]).toBe(ApiErrorSchema);
+    }
+  });
+});
 
 describe("common wire values", () => {
   test("accepts lexical Solana addresses and rejects invalid strings", () => {

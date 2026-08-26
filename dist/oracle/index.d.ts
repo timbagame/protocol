@@ -257,6 +257,17 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
+            readonly 500: z.ZodObject<{
+                timestamp: z.ZodISODateTime;
+                service: z.ZodObject<{
+                    name: z.ZodString;
+                    version: z.ZodString;
+                    environment: z.ZodString;
+                    uptime: z.ZodNumber;
+                }, z.core.$strip>;
+                success: z.ZodLiteral<false>;
+                error: z.ZodString;
+            }, z.core.$strip>;
             readonly 503: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{

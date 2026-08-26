@@ -5,7 +5,9 @@ import {
   ApiErrorSchema,
   ProtocolHttpError,
   ProtocolResponseError,
+  SimpleApiErrorSchema,
   SolanaAddressSchema,
+  SolanaSignatureSchema,
   U64StringSchema,
   createRestClient,
   defineEndpoint,
@@ -22,17 +24,21 @@ import {
   IndexerGamesResponseSchema,
   IndexerStatsResponseSchema,
   LatestGamesQuerySchema,
+  indexerContract,
 } from "../src/indexer/index.js";
 import {
   CreateGameRequestSchema,
   GameAddressParamsSchema,
   PrepareGameResponseSchema,
   VerifyGameParamsSchema,
+  webContract,
 } from "../src/web/index.js";
 
 const ADDRESS = "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5";
 const OTHER_ADDRESS = "11111111111111111111111111111111";
 const SIGNATURE = "1".repeat(64);
+const NONZERO_SIGNATURE =
+  "2tPC5XVkNxEfErA7gF5Z1Pz9GWubEGEg7QtNCnBx6WHPzfQ5y3Pxz1E8ppK88topdba7h1FAp4CLUyeLfsqFVY9a";
 const SERVICE = {
   timestamp: "2026-08-25T12:00:00.000Z",
   service: {
@@ -51,12 +57,35 @@ describe("Oracle contract", () => {
       expect(endpoint.responses[429]).toBe(ApiErrorSchema);
     }
   });
+
+  test("declares internal signing failures as shaped API errors", () => {
+    expect(oracleContract.signGameTransaction.responses[500]).toBe(
+      ApiErrorSchema,
+    );
+  });
 });
 
 describe("common wire values", () => {
-  test("accepts lexical Solana addresses and rejects invalid strings", () => {
+  test("accepts addresses that decode to exactly 32 bytes", () => {
     expect(String(SolanaAddressSchema.parse(ADDRESS))).toBe(ADDRESS);
+    expect(String(SolanaAddressSchema.parse(OTHER_ADDRESS))).toBe(
+      OTHER_ADDRESS,
+    );
     expect(() => SolanaAddressSchema.parse("not a public key")).toThrow();
+    expect(() => SolanaAddressSchema.parse("z".repeat(44))).toThrow();
+    expect(() => SolanaAddressSchema.parse("2".repeat(32))).toThrow();
+    expect(() => SolanaAddressSchema.parse("z".repeat(100_000))).toThrow();
+  });
+
+  test("accepts signatures that decode to exactly 64 bytes", () => {
+    expect(String(SolanaSignatureSchema.parse(SIGNATURE))).toBe(SIGNATURE);
+    expect(String(SolanaSignatureSchema.parse(NONZERO_SIGNATURE))).toBe(
+      NONZERO_SIGNATURE,
+    );
+    expect(() => SolanaSignatureSchema.parse("2".repeat(64))).toThrow();
+    expect(() => SolanaSignatureSchema.parse("z".repeat(128))).toThrow();
+    expect(() => SolanaSignatureSchema.parse("0".repeat(64))).toThrow();
+    expect(() => SolanaSignatureSchema.parse("z".repeat(100_000))).toThrow();
   });
 
   test("bounds u64 decimal strings", () => {
@@ -229,6 +258,23 @@ describe("oracle contracts", () => {
 });
 
 describe("indexer contracts", () => {
+  test("protects state-changing indexing and declares implementation statuses", () => {
+    expect(indexerContract.triggerIndex.authenticated).toBe(true);
+    expect(indexerContract.triggerIndex.responses[401]).toBe(
+      SimpleApiErrorSchema,
+    );
+    expect(indexerContract.latestGames.responses[400]).toBe(
+      SimpleApiErrorSchema,
+    );
+    expect(indexerContract.gameByKey.responses[500]).toBe(SimpleApiErrorSchema);
+    expect(indexerContract.playerActiveGames.responses[500]).toBe(
+      SimpleApiErrorSchema,
+    );
+    expect(indexerContract.commitBackfill.responses[500]).toBe(
+      SimpleApiErrorSchema,
+    );
+  });
+
   test("parses current game and stats responses", () => {
     expect(
       IndexerGamesResponseSchema.parse({
@@ -272,6 +318,15 @@ describe("indexer contracts", () => {
 });
 
 describe("web contracts", () => {
+  test("declares sanitized client and dependency failures", () => {
+    expect(webContract.verifyGame.responses[403]).toBe(SimpleApiErrorSchema);
+    expect(webContract.game.responses[503]).toBe(SimpleApiErrorSchema);
+    expect(webContract.verifyGame.responses[503]).toBe(SimpleApiErrorSchema);
+    expect(webContract.cachedVerifyGame.responses[503]).toBe(
+      SimpleApiErrorSchema,
+    );
+  });
+
   test("accepts positive u64 amounts and rejects zero", () => {
     const request = {
       creator: ADDRESS,

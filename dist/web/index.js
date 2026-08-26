@@ -154,6 +154,7 @@ export const webContract = {
             200: SerializedGameSchema,
             400: SimpleApiErrorSchema,
             404: SimpleApiErrorSchema,
+            503: SimpleApiErrorSchema,
         },
     }),
     verifyGame: defineEndpoint({
@@ -161,14 +162,23 @@ export const webContract = {
         path: "/api/verify-game",
         authenticated: false,
         body: VerifyGameRequestSchema,
-        responses: { 200: VerifiedGameSchema, 400: SimpleApiErrorSchema },
+        responses: {
+            200: VerifiedGameSchema,
+            400: SimpleApiErrorSchema,
+            403: SimpleApiErrorSchema,
+            503: SimpleApiErrorSchema,
+        },
     }),
     cachedVerifyGame: defineEndpoint({
         method: "GET",
         path: "/api/verify-game/:signature",
         authenticated: false,
         params: VerifyGameParamsSchema,
-        responses: { 200: VerifiedGameSchema, 400: SimpleApiErrorSchema },
+        responses: {
+            200: VerifiedGameSchema,
+            400: SimpleApiErrorSchema,
+            503: SimpleApiErrorSchema,
+        },
     }),
 };
 //# sourceMappingURL=index.js.map

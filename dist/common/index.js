@@ -1,18 +1,47 @@
 import * as z from "zod";
 const BASE58_PATTERN = /^[1-9A-HJ-NP-Za-km-z]+$/;
+const BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 const BASE64_PATTERN = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 const U64_MAX = "18446744073709551615";
+function hasBase58DecodedLength(value, expectedLength) {
+    const maximumEncodedLength = Math.ceil((expectedLength * 8) / Math.log2(58));
+    if (value.length < expectedLength || value.length > maximumEncodedLength) {
+        return false;
+    }
+    let decoded = 0n;
+    for (const character of value) {
+        const digit = BASE58_ALPHABET.indexOf(character);
+        if (digit < 0)
+            return false;
+        decoded = decoded * 58n + BigInt(digit);
+    }
+    let significantBytes = 0;
+    while (decoded > 0n) {
+        significantBytes += 1;
+        decoded >>= 8n;
+    }
+    let leadingZeroBytes = 0;
+    while (value[leadingZeroBytes] === "1")
+        leadingZeroBytes += 1;
+    return leadingZeroBytes + significantBytes === expectedLength;
+}
 export const SolanaAddressSchema = z
     .string()
     .min(32)
     .max(44)
     .regex(BASE58_PATTERN)
+    .refine((value) => hasBase58DecodedLength(value, 32), {
+    message: "Solana address must decode to 32 bytes",
+})
     .brand();
 export const SolanaSignatureSchema = z
     .string()
     .min(64)
-    .max(128)
+    .max(88)
     .regex(BASE58_PATTERN)
+    .refine((value) => hasBase58DecodedLength(value, 64), {
+    message: "Solana signature must decode to 64 bytes",
+})
     .brand();
 export const Base64TransactionSchema = z
     .string()

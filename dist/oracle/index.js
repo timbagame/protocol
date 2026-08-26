@@ -78,6 +78,7 @@ export const oracleContract = {
             400: ApiErrorSchema,
             401: ApiErrorSchema,
             429: ApiErrorSchema,
+            500: ApiErrorSchema,
             503: ApiErrorSchema,
         },
     }),

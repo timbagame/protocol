@@ -306,6 +306,16 @@ export declare const HistoricalClosedEventSchema: z.ZodObject<{
     timestamp: z.ZodNumber;
     slot: z.ZodNumber;
 }, z.core.$strip>;
+export declare const HistoricalOperatorClosedEventSchema: z.ZodObject<{
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    timestamp: z.ZodNumber;
+    slot: z.ZodNumber;
+    creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    refundedAmount: z.ZodNumber;
+    recoveredLamports: z.ZodNumber;
+}, z.core.$strip>;
 export declare const HistoricalMembershipEventSchema: z.ZodObject<{
     kind: z.ZodEnum<{
         joined: "joined";
@@ -353,6 +363,16 @@ export declare const HistoricalGameEventPageSchema: z.ZodObject<{
         gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         timestamp: z.ZodNumber;
         slot: z.ZodNumber;
+    }, z.core.$strip>>;
+    operatorClosed: z.ZodArray<z.ZodObject<{
+        signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+        gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        timestamp: z.ZodNumber;
+        slot: z.ZodNumber;
+        creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        refundedAmount: z.ZodNumber;
+        recoveredLamports: z.ZodNumber;
     }, z.core.$strip>>;
     membership: z.ZodArray<z.ZodObject<{
         kind: z.ZodEnum<{
@@ -408,6 +428,16 @@ export declare const BackfillCommitRequestSchema: z.ZodObject<{
             gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
             timestamp: z.ZodNumber;
             slot: z.ZodNumber;
+        }, z.core.$strip>>;
+        operatorClosed: z.ZodArray<z.ZodObject<{
+            signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+            gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            timestamp: z.ZodNumber;
+            slot: z.ZodNumber;
+            creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+            refundedAmount: z.ZodNumber;
+            recoveredLamports: z.ZodNumber;
         }, z.core.$strip>>;
         membership: z.ZodArray<z.ZodObject<{
             kind: z.ZodEnum<{
@@ -639,6 +669,16 @@ export declare const indexerContract: {
                     gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     timestamp: z.ZodNumber;
                     slot: z.ZodNumber;
+                }, z.core.$strip>>;
+                operatorClosed: z.ZodArray<z.ZodObject<{
+                    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+                    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    timestamp: z.ZodNumber;
+                    slot: z.ZodNumber;
+                    creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+                    refundedAmount: z.ZodNumber;
+                    recoveredLamports: z.ZodNumber;
                 }, z.core.$strip>>;
                 membership: z.ZodArray<z.ZodObject<{
                     kind: z.ZodEnum<{

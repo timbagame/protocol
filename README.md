@@ -19,6 +19,28 @@ Import the smallest service boundary required by a consumer:
 import { GenerateHashResponseSchema } from "@timbagame/protocol/oracle";
 ```
 
+Contract v0.3 consumers can read the Oracle-owned creation policy through the
+authenticated `GET /token-policies` contract:
+
+```ts
+import { createRestClient, expectStatus } from "@timbagame/protocol/common";
+import { oracleContract } from "@timbagame/protocol/oracle";
+
+const oracle = createRestClient(oracleContract, {
+  baseUrl: "https://oracle.example.com",
+  getHeaders: (endpoint) =>
+    endpoint.authenticated
+      ? { Authorization: "Bearer <service-token>" }
+      : undefined,
+});
+const result = await oracle.tokenPolicies();
+const policies = expectStatus(result, 200).data.policies;
+```
+
+`signGameTransaction` returns typed creation-policy rejections at HTTP 422.
+Generic validation, authentication, rate-limit, and service error responses keep
+their existing schemas and status codes.
+
 Create a typed REST client from the same contract used by the server:
 
 ```ts

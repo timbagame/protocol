@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { ApiErrorSchema, Base64TransactionSchema, Hex32Schema, NonNegativeIntegerSchema, ServiceEnvelopeSchema, SolanaAddressSchema, SolanaSignatureSchema, defineEndpoint, } from "../common/index.js";
+import { ApiErrorSchema, Base64TransactionSchema, Hex32Schema, NonNegativeIntegerSchema, ServiceEnvelopeSchema, SolanaAddressSchema, SolanaSignatureSchema, U64StringSchema, defineEndpoint, } from "../common/index.js";
 const OracleSuccessSchema = ServiceEnvelopeSchema.extend({
     success: z.literal(true),
 });
@@ -16,6 +16,28 @@ export const SignGameTransactionRequestSchema = z.strictObject({
 });
 export const SignGameTransactionResponseSchema = OracleSuccessSchema.extend({
     txBase64: Base64TransactionSchema,
+});
+export const TokenPolicySchema = z.strictObject({
+    mint: SolanaAddressSchema,
+    enabled: z.boolean(),
+    minimumAmountRaw: U64StringSchema,
+    revision: NonNegativeIntegerSchema,
+    effectiveAt: z.iso.datetime(),
+});
+export const TokenPoliciesResponseSchema = OracleSuccessSchema.extend({
+    policies: z.array(TokenPolicySchema),
+});
+export const CreationPolicyRejectionCodeSchema = z.enum([
+    "unsupported_mint",
+    "token_disabled",
+    "amount_below_minimum",
+    "policy_unavailable",
+]);
+export const CreationPolicyRejectionSchema = ApiErrorSchema.extend({
+    code: CreationPolicyRejectionCodeSchema,
+    mint: SolanaAddressSchema.optional(),
+    minimumAmountRaw: U64StringSchema.optional(),
+    revision: NonNegativeIntegerSchema.optional(),
 });
 export const OracleHealthResponseSchema = OracleSuccessSchema.extend({
     status: z.literal("healthy"),
@@ -68,6 +90,18 @@ export const oracleContract = {
             500: ApiErrorSchema,
         },
     }),
+    tokenPolicies: defineEndpoint({
+        method: "GET",
+        path: "/token-policies",
+        authenticated: true,
+        responses: {
+            200: TokenPoliciesResponseSchema,
+            401: ApiErrorSchema,
+            429: ApiErrorSchema,
+            500: ApiErrorSchema,
+            503: ApiErrorSchema,
+        },
+    }),
     signGameTransaction: defineEndpoint({
         method: "POST",
         path: "/sign-game-transaction",
@@ -77,6 +111,7 @@ export const oracleContract = {
             200: SignGameTransactionResponseSchema,
             400: ApiErrorSchema,
             401: ApiErrorSchema,
+            422: CreationPolicyRejectionSchema,
             429: ApiErrorSchema,
             500: ApiErrorSchema,
             503: ApiErrorSchema,

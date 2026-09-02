@@ -7,6 +7,7 @@ import {
   ServiceEnvelopeSchema,
   SolanaAddressSchema,
   SolanaSignatureSchema,
+  U64StringSchema,
   defineEndpoint,
 } from "../common/index.js";
 
@@ -30,6 +31,32 @@ export const SignGameTransactionRequestSchema = z.strictObject({
 
 export const SignGameTransactionResponseSchema = OracleSuccessSchema.extend({
   txBase64: Base64TransactionSchema,
+});
+
+export const TokenPolicySchema = z.strictObject({
+  mint: SolanaAddressSchema,
+  enabled: z.boolean(),
+  minimumAmountRaw: U64StringSchema,
+  revision: NonNegativeIntegerSchema,
+  effectiveAt: z.iso.datetime(),
+});
+
+export const TokenPoliciesResponseSchema = OracleSuccessSchema.extend({
+  policies: z.array(TokenPolicySchema),
+});
+
+export const CreationPolicyRejectionCodeSchema = z.enum([
+  "unsupported_mint",
+  "token_disabled",
+  "amount_below_minimum",
+  "policy_unavailable",
+]);
+
+export const CreationPolicyRejectionSchema = ApiErrorSchema.extend({
+  code: CreationPolicyRejectionCodeSchema,
+  mint: SolanaAddressSchema.optional(),
+  minimumAmountRaw: U64StringSchema.optional(),
+  revision: NonNegativeIntegerSchema.optional(),
 });
 
 export const OracleHealthResponseSchema = OracleSuccessSchema.extend({
@@ -89,6 +116,18 @@ export const oracleContract = {
       500: ApiErrorSchema,
     },
   }),
+  tokenPolicies: defineEndpoint({
+    method: "GET",
+    path: "/token-policies",
+    authenticated: true,
+    responses: {
+      200: TokenPoliciesResponseSchema,
+      401: ApiErrorSchema,
+      429: ApiErrorSchema,
+      500: ApiErrorSchema,
+      503: ApiErrorSchema,
+    },
+  }),
   signGameTransaction: defineEndpoint({
     method: "POST",
     path: "/sign-game-transaction",
@@ -98,6 +137,7 @@ export const oracleContract = {
       200: SignGameTransactionResponseSchema,
       400: ApiErrorSchema,
       401: ApiErrorSchema,
+      422: CreationPolicyRejectionSchema,
       429: ApiErrorSchema,
       500: ApiErrorSchema,
       503: ApiErrorSchema,
@@ -138,6 +178,16 @@ export type SignGameTransactionRequest = z.input<
 >;
 export type SignGameTransactionResponse = z.output<
   typeof SignGameTransactionResponseSchema
+>;
+export type TokenPolicy = z.output<typeof TokenPolicySchema>;
+export type TokenPoliciesResponse = z.output<
+  typeof TokenPoliciesResponseSchema
+>;
+export type CreationPolicyRejectionCode = z.output<
+  typeof CreationPolicyRejectionCodeSchema
+>;
+export type CreationPolicyRejection = z.output<
+  typeof CreationPolicyRejectionSchema
 >;
 export type OracleStats = z.output<typeof OracleStatsSchema>;
 export type OracleStatsResponse = z.output<typeof OracleStatsResponseSchema>;

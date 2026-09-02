@@ -14,9 +14,12 @@ import {
   expectStatus,
 } from "../src/common/index.js";
 import {
+  CreationPolicyRejectionSchema,
   GenerateHashRequestSchema,
   GenerateHashResponseSchema,
   SignGameTransactionRequestSchema,
+  TokenPoliciesResponseSchema,
+  TokenPolicySchema,
   oracleContract,
 } from "../src/oracle/index.js";
 import {
@@ -60,6 +63,27 @@ describe("Oracle contract", () => {
 
   test("declares internal signing failures as shaped API errors", () => {
     expect(oracleContract.signGameTransaction.responses[500]).toBe(
+      ApiErrorSchema,
+    );
+  });
+
+  test("declares a protected token-policy endpoint", () => {
+    expect(oracleContract.tokenPolicies.method).toBe("GET");
+    expect(oracleContract.tokenPolicies.path).toBe("/token-policies");
+    expect(oracleContract.tokenPolicies.authenticated).toBe(true);
+    expect(oracleContract.tokenPolicies.responses[200]).toBe(
+      TokenPoliciesResponseSchema,
+    );
+  });
+
+  test("keeps generic signing errors and declares typed policy rejections", () => {
+    expect(oracleContract.signGameTransaction.responses[400]).toBe(
+      ApiErrorSchema,
+    );
+    expect(oracleContract.signGameTransaction.responses[422]).toBe(
+      CreationPolicyRejectionSchema,
+    );
+    expect(oracleContract.signGameTransaction.responses[503]).toBe(
       ApiErrorSchema,
     );
   });
@@ -223,6 +247,75 @@ describe("typed REST client", () => {
 });
 
 describe("oracle contracts", () => {
+  test("validates versioned token policies", () => {
+    const policy = TokenPolicySchema.parse({
+      mint: ADDRESS,
+      enabled: true,
+      minimumAmountRaw: "1000000",
+      revision: 7,
+      effectiveAt: "2026-09-02T12:00:00.000Z",
+    });
+
+    expect(policy.revision).toBe(7);
+    expect(String(policy.minimumAmountRaw)).toBe("1000000");
+    expect(
+      TokenPoliciesResponseSchema.parse({
+        ...SERVICE,
+        success: true,
+        policies: [policy],
+      }).policies,
+    ).toHaveLength(1);
+
+    expect(() =>
+      TokenPolicySchema.parse({
+        mint: ADDRESS,
+        enabled: true,
+        minimumAmountRaw: "18446744073709551616",
+        revision: 7,
+        effectiveAt: "2026-09-02T12:00:00.000Z",
+      }),
+    ).toThrow();
+    expect(() =>
+      TokenPolicySchema.parse({
+        mint: ADDRESS,
+        enabled: true,
+        minimumAmountRaw: "1",
+        revision: -1,
+        effectiveAt: "not-a-timestamp",
+      }),
+    ).toThrow();
+  });
+
+  test("validates every creation-policy rejection code", () => {
+    for (const code of [
+      "unsupported_mint",
+      "token_disabled",
+      "amount_below_minimum",
+      "policy_unavailable",
+    ] as const) {
+      expect(
+        CreationPolicyRejectionSchema.parse({
+          ...SERVICE,
+          success: false,
+          error: "Creation policy rejected the transaction",
+          code,
+          mint: ADDRESS,
+          minimumAmountRaw: "1000000",
+          revision: 7,
+        }).code,
+      ).toBe(code);
+    }
+
+    expect(() =>
+      CreationPolicyRejectionSchema.parse({
+        ...SERVICE,
+        success: false,
+        error: "Creation policy rejected the transaction",
+        code: "unknown_policy_error",
+      }),
+    ).toThrow();
+  });
+
   test("normalizes supported and future game type labels", () => {
     expect(
       GenerateHashRequestSchema.parse({ gameType: "  Giveaway  " }).gameType,

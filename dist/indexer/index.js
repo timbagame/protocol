@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { NonNegativeIntegerSchema, NullablePriceUsdSchema, PositiveIntegerSchema, SimpleApiErrorSchema, SlotSchema, SolanaAddressSchema, SolanaSignatureSchema, UnixTimestampSchema, defineEndpoint, } from "../common/index.js";
+import { NonNegativeIntegerSchema, NullablePriceUsdSchema, PositiveIntegerSchema, SimpleApiErrorSchema, SlotSchema, SolanaAddressSchema, SolanaSignatureSchema, U64StringSchema, UnixTimestampSchema, defineEndpoint, } from "../common/index.js";
 export const GameTypeSchema = z.enum(["coinflip", "giveaway"]);
 export const GameStatusSchema = z.enum(["active", "completed", "cancelled"]);
 const NullableAmountSchema = z.number().finite().nonnegative().nullable();
@@ -186,7 +186,7 @@ export const HistoricalClosedEventSchema = z.object({
 export const HistoricalOperatorClosedEventSchema = HistoricalClosedEventSchema.extend({
     creator: SolanaAddressSchema,
     operator: SolanaAddressSchema,
-    refundedAmount: z.number().finite().nonnegative(),
+    refundedAmount: U64StringSchema,
     recoveredLamports: z.number().finite().nonnegative(),
 });
 export const HistoricalMembershipEventSchema = z.object({

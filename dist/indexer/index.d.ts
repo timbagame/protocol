@@ -313,7 +313,7 @@ export declare const HistoricalOperatorClosedEventSchema: z.ZodObject<{
     slot: z.ZodNumber;
     creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
     operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
-    refundedAmount: z.ZodNumber;
+    refundedAmount: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
     recoveredLamports: z.ZodNumber;
 }, z.core.$strip>;
 export declare const HistoricalMembershipEventSchema: z.ZodObject<{
@@ -371,7 +371,7 @@ export declare const HistoricalGameEventPageSchema: z.ZodObject<{
         slot: z.ZodNumber;
         creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
-        refundedAmount: z.ZodNumber;
+        refundedAmount: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
         recoveredLamports: z.ZodNumber;
     }, z.core.$strip>>;
     membership: z.ZodArray<z.ZodObject<{
@@ -436,7 +436,7 @@ export declare const BackfillCommitRequestSchema: z.ZodObject<{
             slot: z.ZodNumber;
             creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
             operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
-            refundedAmount: z.ZodNumber;
+            refundedAmount: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
             recoveredLamports: z.ZodNumber;
         }, z.core.$strip>>;
         membership: z.ZodArray<z.ZodObject<{
@@ -677,7 +677,7 @@ export declare const indexerContract: {
                     slot: z.ZodNumber;
                     creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     operator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
-                    refundedAmount: z.ZodNumber;
+                    refundedAmount: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                     recoveredLamports: z.ZodNumber;
                 }, z.core.$strip>>;
                 membership: z.ZodArray<z.ZodObject<{

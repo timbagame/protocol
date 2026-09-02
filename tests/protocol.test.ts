@@ -363,7 +363,7 @@ describe("indexer contracts", () => {
           gameKey: ADDRESS,
           creator: OTHER_ADDRESS,
           operator: ADDRESS,
-          refundedAmount: 1,
+          refundedAmount: "9007199254740993",
           recoveredLamports: 2,
           timestamp: 3,
           slot: 4,
@@ -377,6 +377,17 @@ describe("indexer contracts", () => {
     });
 
     expect(page.operatorClosed[0]?.recoveredLamports).toBe(2);
+    expect(String(page.operatorClosed[0]?.refundedAmount)).toBe(
+      "9007199254740993",
+    );
+    expect(() =>
+      HistoricalGameEventPageSchema.parse({
+        ...page,
+        operatorClosed: [
+          { ...page.operatorClosed[0]!, refundedAmount: 9_007_199_254_740_992 },
+        ],
+      }),
+    ).toThrow();
   });
 
   test("protects state-changing indexing and declares implementation statuses", () => {

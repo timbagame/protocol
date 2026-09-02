@@ -7,6 +7,7 @@ import {
   SlotSchema,
   SolanaAddressSchema,
   SolanaSignatureSchema,
+  U64StringSchema,
   UnixTimestampSchema,
   defineEndpoint,
 } from "../common/index.js";
@@ -222,7 +223,7 @@ export const HistoricalOperatorClosedEventSchema =
   HistoricalClosedEventSchema.extend({
     creator: SolanaAddressSchema,
     operator: SolanaAddressSchema,
-    refundedAmount: z.number().finite().nonnegative(),
+    refundedAmount: U64StringSchema,
     recoveredLamports: z.number().finite().nonnegative(),
   });
 

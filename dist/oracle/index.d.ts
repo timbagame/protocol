@@ -33,6 +33,7 @@ export declare const TokenPolicySchema: z.ZodObject<{
     mint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
     enabled: z.ZodBoolean;
     minimumAmountRaw: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+    acceptedMinimumAmountRaw: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
     revision: z.ZodNumber;
     effectiveAt: z.ZodISODateTime;
 }, z.core.$strict>;
@@ -49,6 +50,7 @@ export declare const TokenPoliciesResponseSchema: z.ZodObject<{
         mint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         enabled: z.ZodBoolean;
         minimumAmountRaw: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+        acceptedMinimumAmountRaw: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
         revision: z.ZodNumber;
         effectiveAt: z.ZodISODateTime;
     }, z.core.$strict>>;
@@ -77,6 +79,7 @@ export declare const CreationPolicyRejectionSchema: z.ZodObject<{
     }>;
     mint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
     minimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
+    acceptedMinimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
     revision: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strip>;
 export declare const OracleHealthResponseSchema: z.ZodObject<{
@@ -273,6 +276,7 @@ export declare const oracleContract: {
                     mint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     enabled: z.ZodBoolean;
                     minimumAmountRaw: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+                    acceptedMinimumAmountRaw: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                     revision: z.ZodNumber;
                     effectiveAt: z.ZodISODateTime;
                 }, z.core.$strict>>;
@@ -382,6 +386,7 @@ export declare const oracleContract: {
                 }>;
                 mint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
                 minimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
+                acceptedMinimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
                 revision: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strip>;
             readonly 429: z.ZodObject<{

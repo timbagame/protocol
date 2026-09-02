@@ -253,12 +253,14 @@ describe("oracle contracts", () => {
       mint: ADDRESS,
       enabled: true,
       minimumAmountRaw: "1000000",
+      acceptedMinimumAmountRaw: "950000",
       revision: 7,
       effectiveAt: "2026-09-02T12:00:00.000Z",
     });
 
     expect(policy.revision).toBe(7);
     expect(String(policy.minimumAmountRaw)).toBe("1000000");
+    expect(String(policy.acceptedMinimumAmountRaw)).toBe("950000");
     expect(
       TokenPoliciesResponseSchema.parse({
         ...SERVICE,
@@ -272,6 +274,7 @@ describe("oracle contracts", () => {
         mint: ADDRESS,
         enabled: true,
         minimumAmountRaw: "18446744073709551616",
+        acceptedMinimumAmountRaw: "950000",
         revision: 7,
         effectiveAt: "2026-09-02T12:00:00.000Z",
       }),
@@ -281,10 +284,21 @@ describe("oracle contracts", () => {
         mint: ADDRESS,
         enabled: true,
         minimumAmountRaw: "1",
+        acceptedMinimumAmountRaw: "1",
         revision: -1,
         effectiveAt: "not-a-timestamp",
       }),
     ).toThrow();
+    expect(() =>
+      TokenPolicySchema.parse({
+        mint: ADDRESS,
+        enabled: true,
+        minimumAmountRaw: "1000000",
+        acceptedMinimumAmountRaw: "1000001",
+        revision: 7,
+        effectiveAt: "2026-09-02T12:00:00.000Z",
+      }),
+    ).toThrow("accepted minimum must not exceed");
   });
 
   test("validates every creation-policy rejection code", () => {
@@ -302,6 +316,7 @@ describe("oracle contracts", () => {
           code,
           mint: ADDRESS,
           minimumAmountRaw: "1000000",
+          acceptedMinimumAmountRaw: "950000",
           revision: 7,
         }).code,
       ).toBe(code);

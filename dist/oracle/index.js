@@ -17,12 +17,18 @@ export const SignGameTransactionRequestSchema = z.strictObject({
 export const SignGameTransactionResponseSchema = OracleSuccessSchema.extend({
     txBase64: Base64TransactionSchema,
 });
-export const TokenPolicySchema = z.strictObject({
+export const TokenPolicySchema = z
+    .strictObject({
     mint: SolanaAddressSchema,
     enabled: z.boolean(),
     minimumAmountRaw: U64StringSchema,
+    acceptedMinimumAmountRaw: U64StringSchema,
     revision: NonNegativeIntegerSchema,
     effectiveAt: z.iso.datetime(),
+})
+    .refine(({ minimumAmountRaw, acceptedMinimumAmountRaw }) => BigInt(acceptedMinimumAmountRaw) <= BigInt(minimumAmountRaw), {
+    message: "accepted minimum must not exceed the recommended minimum",
+    path: ["acceptedMinimumAmountRaw"],
 });
 export const TokenPoliciesResponseSchema = OracleSuccessSchema.extend({
     policies: z.array(TokenPolicySchema),
@@ -37,6 +43,7 @@ export const CreationPolicyRejectionSchema = ApiErrorSchema.extend({
     code: CreationPolicyRejectionCodeSchema,
     mint: SolanaAddressSchema.optional(),
     minimumAmountRaw: U64StringSchema.optional(),
+    acceptedMinimumAmountRaw: U64StringSchema.optional(),
     revision: NonNegativeIntegerSchema.optional(),
 });
 export const OracleHealthResponseSchema = OracleSuccessSchema.extend({

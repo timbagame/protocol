@@ -24,6 +24,7 @@ import {
 } from "../src/oracle/index.js";
 import {
   GameByKeyQuerySchema,
+  HistoricalGameEventPageSchema,
   IndexerGamesResponseSchema,
   IndexerStatsResponseSchema,
   LatestGamesQuerySchema,
@@ -351,6 +352,33 @@ describe("oracle contracts", () => {
 });
 
 describe("indexer contracts", () => {
+  test("preserves operator game closure audit fields in backfill pages", () => {
+    const page = HistoricalGameEventPageSchema.parse({
+      initialized: [],
+      completed: [],
+      closed: [],
+      operatorClosed: [
+        {
+          signature: NONZERO_SIGNATURE,
+          gameKey: ADDRESS,
+          creator: OTHER_ADDRESS,
+          operator: ADDRESS,
+          refundedAmount: 1,
+          recoveredLamports: 2,
+          timestamp: 3,
+          slot: 4,
+        },
+      ],
+      membership: [],
+      nextBefore: null,
+      oldestSlot: 4,
+      transactions: 1,
+      complete: true,
+    });
+
+    expect(page.operatorClosed[0]?.recoveredLamports).toBe(2);
+  });
+
   test("protects state-changing indexing and declares implementation statuses", () => {
     expect(indexerContract.triggerIndex.authenticated).toBe(true);
     expect(indexerContract.triggerIndex.responses[401]).toBe(

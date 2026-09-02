@@ -183,6 +183,12 @@ export const HistoricalClosedEventSchema = z.object({
     timestamp: UnixTimestampSchema,
     slot: SlotSchema,
 });
+export const HistoricalOperatorClosedEventSchema = HistoricalClosedEventSchema.extend({
+    creator: SolanaAddressSchema,
+    operator: SolanaAddressSchema,
+    refundedAmount: z.number().finite().nonnegative(),
+    recoveredLamports: z.number().finite().nonnegative(),
+});
 export const HistoricalMembershipEventSchema = z.object({
     kind: z.enum(["joined", "unjoined"]),
     signature: SolanaSignatureSchema,
@@ -197,6 +203,7 @@ export const HistoricalGameEventPageSchema = z.object({
     initialized: z.array(HistoricalInitializedEventSchema),
     completed: z.array(HistoricalCompletedEventSchema),
     closed: z.array(HistoricalClosedEventSchema),
+    operatorClosed: z.array(HistoricalOperatorClosedEventSchema),
     membership: z.array(HistoricalMembershipEventSchema),
     nextBefore: SolanaSignatureSchema.nullable(),
     oldestSlot: SlotSchema.nullable(),

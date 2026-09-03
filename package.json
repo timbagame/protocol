@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,
@@ -40,25 +40,39 @@
       "types": "./dist/contracts/v0.2.0/index.d.ts",
       "import": "./dist/contracts/v0.2.0/index.js"
     },
+    "./contracts/v0.2.0/kit": {
+      "types": "./dist/contracts/v0.2.0/generated/index.d.ts",
+      "import": "./dist/contracts/v0.2.0/generated/index.js"
+    },
     "./contracts/v0.3.0": {
       "types": "./dist/contracts/v0.3.0/index.d.ts",
       "import": "./dist/contracts/v0.3.0/index.js"
+    },
+    "./contracts/v0.3.0/kit": {
+      "types": "./dist/contracts/v0.3.0/generated/index.d.ts",
+      "import": "./dist/contracts/v0.3.0/generated/index.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check:dist": "bun run build && git diff --exit-code -- dist",
+    "check:generated": "bun run generate:contracts && git diff --exit-code -- src/contracts/v0.2.0/generated src/contracts/v0.3.0/generated",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "generate:contracts": "bun run scripts/generate-contract-clients.ts",
     "prepack": "bun run build",
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@solana/kit": "8.2.0",
     "zod": "4.5.4"
   },
   "devDependencies": {
+    "@codama/nodes-from-anchor": "1.5.4",
+    "@codama/renderers-js": "2.3.1",
     "@types/bun": "^1.4.0",
+    "codama": "1.10.1",
     "prettier": "^3.9.6",
     "typescript": "6.0.3"
   },

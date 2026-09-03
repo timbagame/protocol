@@ -23,6 +23,8 @@ jobs:
         run: bun audit
       - name: Check formatting
         run: bun run format:check
+      - name: Check generated contract clients
+        run: bun run check:generated
       - name: Typecheck
         run: bun run typecheck
       - name: Test

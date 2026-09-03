@@ -1,8 +1,8 @@
 # `@timbagame/protocol`
 
-Runtime-validated HTTP contracts shared by independently deployed Timba services.
+Runtime-validated HTTP contracts and versioned on-chain artifacts shared by independently deployed Timba services.
 
-This package contains only JSON wire formats owned by Timba. The Anchor IDL remains the source of truth for the on-chain program, and third-party API schemas remain with their service adapters.
+The Contracts repository remains the source of truth for the Anchor program. This package publishes immutable IDL and generated type snapshots so each consumer uses the same artifact during staged upgrades. Third-party API schemas remain with their service adapters.
 
 ## Commands
 
@@ -18,6 +18,26 @@ Import the smallest service boundary required by a consumer:
 ```ts
 import { GenerateHashResponseSchema } from "@timbagame/protocol/oracle";
 ```
+
+Select the deployed contract version explicitly. The lightweight registry does not import either IDL:
+
+```ts
+import {
+  getContractCapabilities,
+  parseContractVersion,
+} from "@timbagame/protocol/contracts";
+import {
+  timbaIdlV020,
+  type TimbaV020,
+} from "@timbagame/protocol/contracts/v0.2.0";
+
+const version = parseContractVersion(process.env.CONTRACT_VERSION);
+const capabilities = getContractCapabilities(version);
+```
+
+Import `@timbagame/protocol/contracts/v0.3.0` only in consumers that need the v0.3.0 IDL. There is intentionally no `latest` alias because both versions use the same program address and the active version must come from deployment configuration.
+
+The v0.2.0 snapshot comes from Contracts tag `v0.2.0` (`bb81f1983473a0bf580f711386ec361519e1813c`). The v0.3.0 snapshot comes from Contracts commit `6c2bb07f9299704efee3bef840bb092857e7111e`. Copy both the Anchor IDL and its generated TypeScript type together when adding a contract version.
 
 Contract v0.3 consumers can read the Oracle-owned creation policy through the
 authenticated `GET /token-policies` contract:

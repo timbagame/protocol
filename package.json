@@ -1,7 +1,7 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.5.1",
-  "description": "Runtime-validated HTTP contracts shared by Timba services",
+  "version": "0.6.0",
+  "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -31,6 +31,18 @@
     "./web": {
       "types": "./dist/web/index.d.ts",
       "import": "./dist/web/index.js"
+    },
+    "./contracts": {
+      "types": "./dist/contracts/index.d.ts",
+      "import": "./dist/contracts/index.js"
+    },
+    "./contracts/v0.2.0": {
+      "types": "./dist/contracts/v0.2.0/index.d.ts",
+      "import": "./dist/contracts/v0.2.0/index.js"
+    },
+    "./contracts/v0.3.0": {
+      "types": "./dist/contracts/v0.3.0/index.d.ts",
+      "import": "./dist/contracts/v0.3.0/index.js"
     }
   },
   "scripts": {

@@ -6,7 +6,19 @@ import {
   parseContractVersion,
 } from "../src/contracts/index.js";
 import { timbaIdlV020 } from "../src/contracts/v0.2.0/index.js";
+import {
+  getJoinGameDiscriminatorBytes as getJoinGameDiscriminatorBytesV020,
+  identifyTimbaInstruction as identifyTimbaInstructionV020,
+  TIMBA_PROGRAM_ADDRESS as TIMBA_PROGRAM_ADDRESS_V020,
+  TimbaInstruction as TimbaInstructionV020,
+} from "../src/contracts/v0.2.0/generated/index.js";
 import { timbaIdlV030 } from "../src/contracts/v0.3.0/index.js";
+import {
+  getOperatorCloseGameDiscriminatorBytes,
+  identifyTimbaInstruction as identifyTimbaInstructionV030,
+  TIMBA_PROGRAM_ADDRESS as TIMBA_PROGRAM_ADDRESS_V030,
+  TimbaInstruction as TimbaInstructionV030,
+} from "../src/contracts/v0.3.0/generated/index.js";
 
 describe("versioned contract artifacts", () => {
   test("exports immutable IDL snapshots", () => {
@@ -37,5 +49,16 @@ describe("versioned contract artifacts", () => {
       operatorGameClosedEvent: true,
       directCompletionFeeTransfer: true,
     });
+  });
+
+  test("generates version-specific Kit clients from the IDL snapshots", () => {
+    expect(String(TIMBA_PROGRAM_ADDRESS_V020)).toBe(timbaIdlV020.address);
+    expect(String(TIMBA_PROGRAM_ADDRESS_V030)).toBe(timbaIdlV030.address);
+    expect(
+      identifyTimbaInstructionV020(getJoinGameDiscriminatorBytesV020()),
+    ).toBe(TimbaInstructionV020.JoinGame);
+    expect(
+      identifyTimbaInstructionV030(getOperatorCloseGameDiscriminatorBytes()),
+    ).toBe(TimbaInstructionV030.OperatorCloseGame);
   });
 });

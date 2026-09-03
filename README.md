@@ -30,6 +30,10 @@ import {
   timbaIdlV020,
   type TimbaV020,
 } from "@timbagame/protocol/contracts/v0.2.0";
+import {
+  fetchGame,
+  getJoinGameInstructionAsync,
+} from "@timbagame/protocol/contracts/v0.2.0/kit";
 
 const version = parseContractVersion(process.env.CONTRACT_VERSION);
 const capabilities = getContractCapabilities(version);
@@ -37,7 +41,12 @@ const capabilities = getContractCapabilities(version);
 
 Import `@timbagame/protocol/contracts/v0.3.0` only in consumers that need the v0.3.0 IDL. There is intentionally no `latest` alias because both versions use the same program address and the active version must come from deployment configuration.
 
-The v0.2.0 snapshot comes from Contracts tag `v0.2.0` (`bb81f1983473a0bf580f711386ec361519e1813c`). The v0.3.0 snapshot comes from Contracts commit `6c2bb07f9299704efee3bef840bb092857e7111e`. Copy both the Anchor IDL and its generated TypeScript type together when adding a contract version.
+Each version also exposes a generated `@solana/kit` client from its `/kit`
+subpath. Run `bun run generate:contracts` after updating an IDL snapshot and
+commit the generated source and package output. CI verifies that both remain in
+sync.
+
+The v0.2.0 snapshot comes from Contracts tag `v0.2.0` (`bb81f1983473a0bf580f711386ec361519e1813c`). The v0.3.0 snapshot comes from Contracts commit `6c2bb07f9299704efee3bef840bb092857e7111e`. Copy both the Anchor IDL and its generated Anchor TypeScript type together when adding a contract version, then regenerate the Kit client.
 
 Contract v0.3 consumers can read the Oracle-owned creation policy through the
 authenticated `GET /token-policies` contract:

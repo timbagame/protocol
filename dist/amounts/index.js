@@ -1,0 +1,41 @@
+/** Exact token amounts. No floating point conversion or implicit rounding. */
+export class TokenAmountError extends Error {
+    code;
+    constructor(code, message) {
+        super(message);
+        this.code = code;
+        this.name = "TokenAmountError";
+    }
+}
+function assertDecimals(decimals) {
+    if (!Number.isInteger(decimals) || decimals < 0 || decimals > 255) {
+        throw new TokenAmountError("decimals", "Decimals must be an integer between 0 and 255");
+    }
+}
+/** Accepts unsigned decimal strings, including .5 and 1., with surrounding whitespace. */
+export function parseTokenAmount(value, decimals) {
+    assertDecimals(decimals);
+    const normalized = value.trim();
+    if (!/^(?:\d+\.?\d*|\.\d+)$/.test(normalized)) {
+        throw new TokenAmountError("format", "Invalid amount format");
+    }
+    const [whole = "", fraction = ""] = normalized.split(".");
+    if (fraction.length > decimals) {
+        throw new TokenAmountError("precision", `This token supports ${decimals} decimal places`);
+    }
+    return (BigInt(whole || "0") * 10n ** BigInt(decimals) +
+        BigInt(fraction.padEnd(decimals, "0") || "0"));
+}
+/** Formats unsigned base units without rounding, including zero-decimal tokens. */
+export function formatTokenAmount(value, decimals) {
+    assertDecimals(decimals);
+    if (value < 0n)
+        throw new TokenAmountError("format", "Amount must be non-negative");
+    if (decimals === 0)
+        return value.toString();
+    const padded = value.toString().padStart(decimals + 1, "0");
+    const whole = padded.slice(0, -decimals);
+    const fraction = padded.slice(-decimals).replace(/0+$/, "");
+    return fraction ? `${whole}.${fraction}` : whole;
+}
+//# sourceMappingURL=index.js.map

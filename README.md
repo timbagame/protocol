@@ -104,3 +104,47 @@ Consumer workflows need `contents: read` and `packages: read`. Set `NODE_AUTH_TO
 ```
 
 For local installation, supply a classic personal access token with `read:packages` through the `NODE_AUTH_TOKEN` environment variable. Never commit the token.
+
+## Shared client behavior (0.8.0)
+
+Use `@timbagame/protocol/amounts` for exact unsigned decimal-string and bigint
+conversion. `parseTokenAmount` trims surrounding whitespace, accepts `.5` and
+`1.`, permits zero, and rejects excess fractional digits instead of truncating.
+Decimals must be integers from 0 through 255. `formatTokenAmount` preserves all
+base units, including for zero-decimal tokens. Applications own positive-amount
+requirements, safe-number conversion, rounding for display, and error wording.
+
+Use `@timbagame/protocol/contracts/client` when a consumer supports both deployed
+versions. `getContractClient(version)` selects the generated operations;
+`decodeGame(version, bytes)` checks the account discriminator and participant
+count; `getGameTypeName` normalizes the generated game enum. Literal versions
+retain the complete generated types. Runtime version unions
+broaden only instruction-builder address literals so either version can be called;
+account-decoder overloads and RPC address inference remain intact. Import the explicit
+version's `/kit` subpath when a single-version bundle matters.
+Always pass deployment-specific `programAddress` to PDA and instruction builders.
+Game random hashes must be exactly 32 bytes; service adapters validate them before
+calling the generated PDA encoder.
+
+`@timbagame/protocol/contracts/idl` owns `getContractIdl(version)`. The lightweight
+`/contracts` capability registry still imports neither IDLs nor generated clients.
+
+### Ownership and migration
+
+- Bot, web, and Oracle use shared client/IDL selection. Bot and Oracle derive
+  Timba PDAs with generated helpers; web already did so.
+- Web maps decoded accounts to its presentation model. Bot converts Kit addresses
+  to its PublicKey boundary. Oracle retains RPC orchestration and creation policy.
+- Standard token/ATA adapters remain local: the bot and Oracle expose synchronous
+  compatibility APIs, while web uses asynchronous Kit APIs. These are not a new
+  Timba protocol abstraction.
+- Signing, wallet transaction setup, caching, storage, provider integrations, and
+  presentation remain in their owning services.
+
+Consumer changes can be tested before registry publication using the identical
+`0.8.0` package archive in each consumer's `vendor/` directory. These file dependencies
+are deliberate and work in isolated checkouts with frozen lockfiles. After publishing
+`v0.8.0` through the existing release workflow, replace each consumer's archive
+dependency with registry version `0.8.0`, regenerate its lockfile, remove its archive,
+and run consumer checks before deployment. Do not deploy against a registry version
+that has not been published.

@@ -126,24 +126,24 @@ export declare const webContract: {
             timeoutSeconds: z.ZodNumber;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 txBase64: z.core.$ZodBranded<z.ZodString, "Base64Transaction", "out">;
                 gameAddress: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 lastValidBlockHeight: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 403: z.ZodObject<{
+            403: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 413: z.ZodObject<{
+            413: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 415: z.ZodObject<{
+            415: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -156,19 +156,19 @@ export declare const webContract: {
             txBase64: z.core.$ZodBranded<z.ZodString, "Base64Transaction", "out">;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 403: z.ZodObject<{
+            403: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 415: z.ZodObject<{
+            415: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -178,7 +178,7 @@ export declare const webContract: {
         readonly path: "/api/play/config";
         readonly authenticated: false;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 tokens: z.ZodArray<z.ZodObject<{
                     mint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     symbol: z.ZodString;
@@ -189,7 +189,7 @@ export declare const webContract: {
                     priceUsd: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
                 }, z.core.$strip>>;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -203,12 +203,12 @@ export declare const webContract: {
         }, z.core.$strip>;
         readonly query: z.ZodObject<{
             fresh: z.ZodOptional<z.ZodEnum<{
-                1: "1";
                 0: "0";
+                1: "1";
             }>>;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 address: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 type: z.ZodEnum<{
@@ -227,13 +227,13 @@ export declare const webContract: {
                 lastSlot: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                 participantAddresses: z.ZodReadonly<z.ZodArray<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 404: z.ZodObject<{
+            404: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -246,7 +246,7 @@ export declare const webContract: {
             signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
                 timestamp: z.ZodNumber;
@@ -284,13 +284,13 @@ export declare const webContract: {
                 }, z.core.$strip>;
                 explorerUrl: z.ZodURL;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 403: z.ZodObject<{
+            403: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -303,7 +303,7 @@ export declare const webContract: {
             signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
                 timestamp: z.ZodNumber;
@@ -341,10 +341,10 @@ export declare const webContract: {
                 }, z.core.$strip>;
                 explorerUrl: z.ZodURL;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };

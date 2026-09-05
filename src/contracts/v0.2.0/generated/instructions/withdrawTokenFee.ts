@@ -226,20 +226,26 @@ export async function getWithdrawTokenFeeInstructionAsync<
 
   // Resolve default values.
   if (!accounts.gameToken.value) {
-    accounts.gameToken.value = await findGameTokenPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.gameToken.value = await findGameTokenPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.gameVault.value) {
-    accounts.gameVault.value = await findGameVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.gameVault.value = await findGameVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
@@ -276,7 +282,7 @@ export async function getWithdrawTokenFeeInstructionAsync<
       "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
   }
   if (!accounts.oracle.value) {
-    accounts.oracle.value = await findOraclePda();
+    accounts.oracle.value = await findOraclePda({ programAddress });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

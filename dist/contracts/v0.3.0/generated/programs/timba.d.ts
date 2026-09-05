@@ -18,6 +18,20 @@ export declare enum TimbaAccount {
 export declare function identifyTimbaAccount(account: {
     data: ReadonlyUint8Array;
 } | ReadonlyUint8Array): TimbaAccount;
+export declare enum TimbaEvent {
+    GameClosed = 0,
+    GameCompleted = 1,
+    GameInitialized = 2,
+    OperatorGameClosed = 3,
+    OracleClosed = 4,
+    OracleInitialized = 5,
+    OracleUpdated = 6,
+    PlayerJoined = 7,
+    PlayerUnjoined = 8
+}
+export declare function identifyTimbaEvent(event: {
+    data: ReadonlyUint8Array;
+} | ReadonlyUint8Array): TimbaEvent;
 export declare enum TimbaInstruction {
     CloseGame = 0,
     CloseOracle = 1,

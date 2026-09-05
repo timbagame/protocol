@@ -174,15 +174,18 @@ export async function getUpdateTokenInstructionAsync<
 
   // Resolve default values.
   if (!accounts.gameToken.value) {
-    accounts.gameToken.value = await findGameTokenPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.gameToken.value = await findGameTokenPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.oracle.value) {
-    accounts.oracle.value = await findOraclePda();
+    accounts.oracle.value = await findOraclePda({ programAddress });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

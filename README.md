@@ -163,3 +163,7 @@ overlapping-window rejection sampling; secret storage remains application-owned.
 accepted minimum, returning structured rejection codes. It does not fetch prices,
 load metadata, or produce user-facing messages. `TokenPolicyInput` describes the
 unvalidated wire input; `TokenPolicy` is the validated schema output.
+
+## Cross-repository integration
+
+The shared local-validator suite lives in the sibling `operations/integration` directory. Run `bun run test:integration --web` from `operations`; see its README for pinned toolchains, candidate protocol packages and optional manual GitHub runs. Normal CI does not run the combined system suite or require a cross-repository credential.

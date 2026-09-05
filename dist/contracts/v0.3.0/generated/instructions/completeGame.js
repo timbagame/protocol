@@ -71,12 +71,12 @@ export async function getCompleteGameInstructionAsync(input, config) {
     if (!accounts.game.value) {
         accounts.game.value = await findGamePda({
             randomHash: getNonNullResolvedInstructionInput("randomHash", args.randomHash),
-        });
+        }, { programAddress });
     }
     if (!accounts.gameVault.value) {
         accounts.gameVault.value = await findGameVaultPda({
             tokenMint: getAddressFromResolvedInstructionAccount("tokenMint", accounts.tokenMint.value),
-        });
+        }, { programAddress });
     }
     if (!accounts.tokenProgram.value) {
         accounts.tokenProgram.value =
@@ -97,7 +97,7 @@ export async function getCompleteGameInstructionAsync(input, config) {
             "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
     }
     if (!accounts.oracle.value) {
-        accounts.oracle.value = await findOraclePda();
+        accounts.oracle.value = await findOraclePda({ programAddress });
     }
     const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({

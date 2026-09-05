@@ -56,10 +56,10 @@ export declare const TokenPoliciesResponseSchema: z.ZodObject<{
     }, z.core.$strict>>;
 }, z.core.$strip>;
 export declare const CreationPolicyRejectionCodeSchema: z.ZodEnum<{
-    unsupported_mint: "unsupported_mint";
-    token_disabled: "token_disabled";
     amount_below_minimum: "amount_below_minimum";
     policy_unavailable: "policy_unavailable";
+    token_disabled: "token_disabled";
+    unsupported_mint: "unsupported_mint";
 }>;
 export declare const CreationPolicyRejectionSchema: z.ZodObject<{
     timestamp: z.ZodISODateTime;
@@ -72,10 +72,10 @@ export declare const CreationPolicyRejectionSchema: z.ZodObject<{
     success: z.ZodLiteral<false>;
     error: z.ZodString;
     code: z.ZodEnum<{
-        unsupported_mint: "unsupported_mint";
-        token_disabled: "token_disabled";
         amount_below_minimum: "amount_below_minimum";
         policy_unavailable: "policy_unavailable";
+        token_disabled: "token_disabled";
+        unsupported_mint: "unsupported_mint";
     }>;
     mint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
     minimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
@@ -167,7 +167,7 @@ export declare const oracleContract: {
         readonly path: "/health";
         readonly authenticated: false;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -178,7 +178,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<true>;
                 status: z.ZodLiteral<"healthy">;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -199,7 +199,7 @@ export declare const oracleContract: {
             gameType: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -212,7 +212,7 @@ export declare const oracleContract: {
                 gameAddress: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 oracleOperator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -223,7 +223,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -234,7 +234,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -245,7 +245,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -263,7 +263,7 @@ export declare const oracleContract: {
         readonly path: "/token-policies";
         readonly authenticated: true;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -281,7 +281,7 @@ export declare const oracleContract: {
                     effectiveAt: z.ZodISODateTime;
                 }, z.core.$strict>>;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -292,7 +292,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -303,7 +303,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -314,7 +314,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -335,7 +335,7 @@ export declare const oracleContract: {
             txBase64: z.core.$ZodBranded<z.ZodString, "Base64Transaction", "out">;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -346,7 +346,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<true>;
                 txBase64: z.core.$ZodBranded<z.ZodString, "Base64Transaction", "out">;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -357,7 +357,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -368,7 +368,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 422: z.ZodObject<{
+            422: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -379,17 +379,17 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
                 code: z.ZodEnum<{
-                    unsupported_mint: "unsupported_mint";
-                    token_disabled: "token_disabled";
                     amount_below_minimum: "amount_below_minimum";
                     policy_unavailable: "policy_unavailable";
+                    token_disabled: "token_disabled";
+                    unsupported_mint: "unsupported_mint";
                 }>;
                 mint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
                 minimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
                 acceptedMinimumAmountRaw: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
                 revision: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -400,7 +400,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -411,7 +411,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 503: z.ZodObject<{
+            503: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -429,7 +429,7 @@ export declare const oracleContract: {
         readonly path: "/stats";
         readonly authenticated: true;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -448,7 +448,7 @@ export declare const oracleContract: {
                     activeListeners: z.ZodNumber;
                 }, z.core.$strip>;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -459,7 +459,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -470,7 +470,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -491,7 +491,7 @@ export declare const oracleContract: {
             gameAddress: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodDiscriminatedUnion<[z.ZodObject<{
+            200: z.ZodDiscriminatedUnion<[z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -528,7 +528,7 @@ export declare const oracleContract: {
                 winnerAddress: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 totalPot: z.ZodNumber;
             }, z.core.$strip>], "status">;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -539,7 +539,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -550,7 +550,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 404: z.ZodObject<{
+            404: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -561,7 +561,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 409: z.ZodObject<{
+            409: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -572,7 +572,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;
@@ -583,7 +583,7 @@ export declare const oracleContract: {
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 timestamp: z.ZodISODateTime;
                 service: z.ZodObject<{
                     name: z.ZodString;

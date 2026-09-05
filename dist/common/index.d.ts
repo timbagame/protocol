@@ -106,8 +106,8 @@ export interface RestClientOptions {
 export declare class ProtocolHttpError extends Error {
     readonly status: number;
     readonly response: Response;
-    readonly data?: unknown | undefined;
-    constructor(message: string, status: number, response: Response, data?: unknown | undefined, options?: ErrorOptions);
+    readonly data?: unknown;
+    constructor(message: string, status: number, response: Response, data?: unknown, options?: ErrorOptions);
 }
 export declare class ProtocolResponseError extends Error {
     readonly status: number;

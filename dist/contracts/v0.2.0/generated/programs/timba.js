@@ -30,6 +30,57 @@ export function identifyTimbaAccount(account) {
     }
     throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT, { accountData: data, programName: "timba" });
 }
+export var TimbaEvent;
+(function (TimbaEvent) {
+    TimbaEvent[TimbaEvent["GameClosed"] = 0] = "GameClosed";
+    TimbaEvent[TimbaEvent["GameCompleted"] = 1] = "GameCompleted";
+    TimbaEvent[TimbaEvent["GameInitialized"] = 2] = "GameInitialized";
+    TimbaEvent[TimbaEvent["OracleInitialized"] = 3] = "OracleInitialized";
+    TimbaEvent[TimbaEvent["OracleUpdated"] = 4] = "OracleUpdated";
+    TimbaEvent[TimbaEvent["PlayerJoined"] = 5] = "PlayerJoined";
+    TimbaEvent[TimbaEvent["PlayerUnjoined"] = 6] = "PlayerUnjoined";
+    TimbaEvent[TimbaEvent["TokenClosed"] = 7] = "TokenClosed";
+    TimbaEvent[TimbaEvent["TokenFeeWithdrawn"] = 8] = "TokenFeeWithdrawn";
+    TimbaEvent[TimbaEvent["TokenInitialized"] = 9] = "TokenInitialized";
+    TimbaEvent[TimbaEvent["TokenUpdated"] = 10] = "TokenUpdated";
+})(TimbaEvent || (TimbaEvent = {}));
+export function identifyTimbaEvent(event) {
+    const data = "data" in event ? event.data : event;
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([178, 203, 179, 224, 43, 18, 209, 4])), 0)) {
+        return TimbaEvent.GameClosed;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([103, 26, 106, 108, 240, 191, 179, 120])), 0)) {
+        return TimbaEvent.GameCompleted;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([82, 221, 11, 2, 244, 52, 240, 250])), 0)) {
+        return TimbaEvent.GameInitialized;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([42, 87, 109, 208, 1, 105, 101, 142])), 0)) {
+        return TimbaEvent.OracleInitialized;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([138, 9, 51, 219, 228, 198, 11, 147])), 0)) {
+        return TimbaEvent.OracleUpdated;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([39, 144, 49, 106, 108, 210, 183, 38])), 0)) {
+        return TimbaEvent.PlayerJoined;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([191, 34, 140, 22, 253, 20, 237, 73])), 0)) {
+        return TimbaEvent.PlayerUnjoined;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([237, 76, 164, 114, 61, 65, 0, 152])), 0)) {
+        return TimbaEvent.TokenClosed;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([92, 98, 195, 90, 108, 129, 244, 119])), 0)) {
+        return TimbaEvent.TokenFeeWithdrawn;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([77, 70, 233, 124, 236, 92, 204, 0])), 0)) {
+        return TimbaEvent.TokenInitialized;
+    }
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([75, 194, 205, 144, 160, 56, 53, 139])), 0)) {
+        return TimbaEvent.TokenUpdated;
+    }
+    throw new Error("The provided event could not be identified as a timba event.");
+}
 export var TimbaInstruction;
 (function (TimbaInstruction) {
     TimbaInstruction[TimbaInstruction["CloseGame"] = 0] = "CloseGame";

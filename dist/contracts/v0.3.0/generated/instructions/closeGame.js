@@ -53,12 +53,12 @@ export async function getCloseGameInstructionAsync(input, config) {
     const accounts = originalAccounts;
     // Resolve default values.
     if (!accounts.oracle.value) {
-        accounts.oracle.value = await findOraclePda();
+        accounts.oracle.value = await findOraclePda({ programAddress });
     }
     if (!accounts.gameVault.value) {
         accounts.gameVault.value = await findGameVaultPda({
             tokenMint: getAddressFromResolvedInstructionAccount("tokenMint", accounts.tokenMint.value),
-        });
+        }, { programAddress });
     }
     if (!accounts.tokenProgram.value) {
         accounts.tokenProgram.value =

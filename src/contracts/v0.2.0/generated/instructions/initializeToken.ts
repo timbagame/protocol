@@ -238,20 +238,26 @@ export async function getInitializeTokenInstructionAsync<
 
   // Resolve default values.
   if (!accounts.gameToken.value) {
-    accounts.gameToken.value = await findGameTokenPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.gameToken.value = await findGameTokenPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.gameVault.value) {
-    accounts.gameVault.value = await findGameVaultPda({
-      tokenMint: getAddressFromResolvedInstructionAccount(
-        "tokenMint",
-        accounts.tokenMint.value,
-      ),
-    });
+    accounts.gameVault.value = await findGameVaultPda(
+      {
+        tokenMint: getAddressFromResolvedInstructionAccount(
+          "tokenMint",
+          accounts.tokenMint.value,
+        ),
+      },
+      { programAddress },
+    );
   }
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
@@ -284,7 +290,7 @@ export async function getInitializeTokenInstructionAsync<
     });
   }
   if (!accounts.oracle.value) {
-    accounts.oracle.value = await findOraclePda();
+    accounts.oracle.value = await findOraclePda({ programAddress });
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

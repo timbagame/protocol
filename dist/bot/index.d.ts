@@ -17,7 +17,7 @@ export declare const botContract: {
         readonly path: "/health";
         readonly authenticated: false;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 status: z.ZodLiteral<"ok">;
             }, z.core.$strip>;
         };
@@ -33,13 +33,13 @@ export declare const botContract: {
             totalPot: z.ZodNumber;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 success: z.ZodLiteral<true>;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };

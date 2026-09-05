@@ -11,15 +11,15 @@ export declare const EVENT_DISCRIMINATORS: {
 declare function initialized(data: ReadonlyUint8Array): {
     gameType: "coinflip" | "giveaway";
     isPrivate: boolean;
-    gameKey: import("@solana/kit").Address<string>;
+    createdAt: bigint;
     creator: import("@solana/kit").Address<string>;
-    totalAmount: bigint;
+    gameKey: import("@solana/kit").Address<string>;
     maxTickets: number;
+    minTickets: number;
     ticketAmount: bigint;
     timeout: bigint;
-    minTickets: number;
     tokenMint: import("@solana/kit").Address<string>;
-    createdAt: bigint;
+    totalAmount: bigint;
 };
 declare function unjoined(data: ReadonlyUint8Array): {
     movedParticipant: import("@solana/kit").Address<string> | null;
@@ -27,18 +27,18 @@ declare function unjoined(data: ReadonlyUint8Array): {
     timestamp: bigint;
     gameKey: import("@solana/kit").Address<string>;
     player: import("@solana/kit").Address<string>;
-    totalAmount: bigint;
     ticketIndex: number;
     ticketsCount: number;
+    totalAmount: bigint;
 };
 declare const readers: {
     GameInitialized: typeof initialized;
     GameCompleted: (data: ReadonlyUint8Array) => {
-        gameKey: import("@solana/kit").Address<string>;
-        winner: import("@solana/kit").Address<string>;
-        ticketsCount: number;
         feeAmount: bigint;
+        gameKey: import("@solana/kit").Address<string>;
+        ticketsCount: number;
         timestamp: bigint;
+        winner: import("@solana/kit").Address<string>;
         winnerAmount: bigint;
     };
     GameClosed: (data: ReadonlyUint8Array) => {
@@ -47,26 +47,26 @@ declare const readers: {
     };
     PlayerJoined: (data: ReadonlyUint8Array) => {
         gameKey: import("@solana/kit").Address<string>;
-        player: import("@solana/kit").Address<string>;
-        totalAmount: bigint;
-        ticketIndex: number;
         lastSlot: bigint;
+        player: import("@solana/kit").Address<string>;
+        ticketIndex: number;
         ticketsCount: number;
         timestamp: bigint;
+        totalAmount: bigint;
     };
     PlayerUnjoined: typeof unjoined;
     TokenFeeWithdrawn: (data: ReadonlyUint8Array) => {
+        amount: bigint;
         operator: import("@solana/kit").Address<string>;
         tokenMint: import("@solana/kit").Address<string>;
-        amount: bigint;
     };
     OperatorGameClosed: (data: ReadonlyUint8Array) => {
-        gameKey: import("@solana/kit").Address<string>;
         creator: import("@solana/kit").Address<string>;
+        gameKey: import("@solana/kit").Address<string>;
         operator: import("@solana/kit").Address<string>;
         recoveredLamports: bigint;
-        timestamp: bigint;
         refundedAmount: bigint;
+        timestamp: bigint;
     };
 };
 export type EventName = keyof typeof readers;

@@ -169,7 +169,7 @@ export async function getUpdateOracleInstructionAsync<
 
   // Resolve default values.
   if (!accounts.oracle.value) {
-    accounts.oracle.value = await findOraclePda();
+    accounts.oracle.value = await findOraclePda({ programAddress });
   }
 
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

@@ -4,17 +4,17 @@ export declare const GameTypeSchema: z.ZodEnum<{
     giveaway: "giveaway";
 }>;
 export declare const GameStatusSchema: z.ZodEnum<{
-    completed: "completed";
     active: "active";
     cancelled: "cancelled";
+    completed: "completed";
 }>;
 export declare const IndexerGameSchema: z.ZodObject<{
     signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
     gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
     status: z.ZodOptional<z.ZodEnum<{
-        completed: "completed";
         active: "active";
         cancelled: "cancelled";
+        completed: "completed";
     }>>;
     creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
     gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -73,9 +73,9 @@ export declare const IndexerGamesResponseSchema: z.ZodObject<{
         signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
         gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
             active: "active";
             cancelled: "cancelled";
+            completed: "completed";
         }>>;
         creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
         gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -111,9 +111,9 @@ export declare const IndexerPlayerGamesResponseSchema: z.ZodObject<{
         signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
         gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
             active: "active";
             cancelled: "cancelled";
+            completed: "completed";
         }>>;
         creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
         gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -484,8 +484,8 @@ export declare const BackfillRetryableErrorSchema: z.ZodObject<{
     success: z.ZodLiteral<false>;
     retryable: z.ZodLiteral<true>;
     reason: z.ZodEnum<{
-        rpc_rate_limited: "rpc_rate_limited";
         page_failed: "page_failed";
+        rpc_rate_limited: "rpc_rate_limited";
     }>;
     error: z.ZodString;
 }, z.core.$strip>;
@@ -511,8 +511,8 @@ export declare const LatestGamesQuerySchema: z.ZodObject<{
         giveaway: "giveaway";
     }>>;
     includeLifecycle: z.ZodOptional<z.ZodEnum<{
-        1: "1";
         0: "0";
+        1: "1";
     }>>;
 }, z.core.$strip>;
 export declare const GameByKeyQuerySchema: z.ZodObject<{
@@ -525,7 +525,7 @@ export declare const indexerContract: {
         readonly path: "/health";
         readonly authenticated: false;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 status: z.ZodLiteral<"ok">;
                 timestamp: z.ZodNumber;
             }, z.core.$strip>;
@@ -536,16 +536,16 @@ export declare const indexerContract: {
         readonly path: "/api/trigger-index";
         readonly authenticated: true;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 success: z.ZodLiteral<true>;
                 indexed: z.ZodNumber;
                 total: z.ZodNumber;
                 message: z.ZodString;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 success: z.ZodLiteral<false>;
                 error: z.ZodString;
             }, z.core.$strip>;
@@ -556,7 +556,7 @@ export declare const indexerContract: {
         readonly path: "/api/backfill";
         readonly authenticated: true;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 success: z.ZodLiteral<true>;
                 state: z.ZodObject<{
                     beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
@@ -567,24 +567,24 @@ export declare const indexerContract: {
                     complete: z.ZodBoolean;
                 }, z.core.$strip>;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 success: z.ZodLiteral<false>;
                 retryable: z.ZodLiteral<true>;
                 reason: z.ZodEnum<{
-                    rpc_rate_limited: "rpc_rate_limited";
                     page_failed: "page_failed";
+                    rpc_rate_limited: "rpc_rate_limited";
                 }>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 success: z.ZodLiteral<false>;
                 retryable: z.ZodLiteral<true>;
                 reason: z.ZodEnum<{
-                    rpc_rate_limited: "rpc_rate_limited";
                     page_failed: "page_failed";
+                    rpc_rate_limited: "rpc_rate_limited";
                 }>;
                 error: z.ZodString;
             }, z.core.$strip>;
@@ -595,7 +595,7 @@ export declare const indexerContract: {
         readonly path: "/api/backfill";
         readonly authenticated: true;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 success: z.ZodLiteral<true>;
                 state: z.ZodObject<{
                     beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
@@ -606,24 +606,24 @@ export declare const indexerContract: {
                     complete: z.ZodBoolean;
                 }, z.core.$strip>;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 429: z.ZodObject<{
+            429: z.ZodObject<{
                 success: z.ZodLiteral<false>;
                 retryable: z.ZodLiteral<true>;
                 reason: z.ZodEnum<{
-                    rpc_rate_limited: "rpc_rate_limited";
                     page_failed: "page_failed";
+                    rpc_rate_limited: "rpc_rate_limited";
                 }>;
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 success: z.ZodLiteral<false>;
                 retryable: z.ZodLiteral<true>;
                 reason: z.ZodEnum<{
-                    rpc_rate_limited: "rpc_rate_limited";
                     page_failed: "page_failed";
+                    rpc_rate_limited: "rpc_rate_limited";
                 }>;
                 error: z.ZodString;
             }, z.core.$strip>;
@@ -700,7 +700,7 @@ export declare const indexerContract: {
             }, z.core.$strip>;
         }, z.core.$strict>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 success: z.ZodLiteral<true>;
                 state: z.ZodObject<{
                     beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
@@ -711,13 +711,13 @@ export declare const indexerContract: {
                     complete: z.ZodBoolean;
                 }, z.core.$strip>;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 401: z.ZodObject<{
+            401: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 409: z.ZodObject<{
+            409: z.ZodObject<{
                 error: z.ZodString;
                 state: z.ZodObject<{
                     beforeSignature: z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
@@ -728,7 +728,7 @@ export declare const indexerContract: {
                     complete: z.ZodBoolean;
                 }, z.core.$strip>;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -741,7 +741,7 @@ export declare const indexerContract: {
             tokenMint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 totalGames: z.ZodNumber;
                 uniquePlayers: z.ZodNumber;
                 financials: z.ZodArray<z.ZodObject<{
@@ -757,10 +757,10 @@ export declare const indexerContract: {
                 }, z.core.$strip>>;
                 lastUpdated: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -775,14 +775,14 @@ export declare const indexerContract: {
             tokenMint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 games: z.ZodArray<z.ZodObject<{
                     signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
                     gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     status: z.ZodOptional<z.ZodEnum<{
-                        completed: "completed";
                         active: "active";
                         cancelled: "cancelled";
+                        completed: "completed";
                     }>>;
                     creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
                     gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -813,10 +813,10 @@ export declare const indexerContract: {
                 page: z.ZodNumber;
                 limit: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -833,18 +833,18 @@ export declare const indexerContract: {
                 giveaway: "giveaway";
             }>>;
             includeLifecycle: z.ZodOptional<z.ZodEnum<{
-                1: "1";
                 0: "0";
+                1: "1";
             }>>;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodArray<z.ZodObject<{
+            200: z.ZodArray<z.ZodObject<{
                 signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
                 gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
                     active: "active";
                     cancelled: "cancelled";
+                    completed: "completed";
                 }>>;
                 creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
                 gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -871,10 +871,10 @@ export declare const indexerContract: {
                 isPlayer: z.ZodOptional<z.ZodBoolean>;
                 isJoined: z.ZodOptional<z.ZodBoolean>;
             }, z.core.$strip>>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -888,13 +888,13 @@ export declare const indexerContract: {
             fresh: z.ZodOptional<z.ZodString>;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
                 gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
                     active: "active";
                     cancelled: "cancelled";
+                    completed: "completed";
                 }>>;
                 creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
                 gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -921,13 +921,13 @@ export declare const indexerContract: {
                 isPlayer: z.ZodOptional<z.ZodBoolean>;
                 isJoined: z.ZodOptional<z.ZodBoolean>;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 404: z.ZodObject<{
+            404: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -937,7 +937,7 @@ export declare const indexerContract: {
         readonly path: "/api/active-games";
         readonly authenticated: false;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 games: z.ZodArray<z.ZodObject<{
                     game_key: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
@@ -964,7 +964,7 @@ export declare const indexerContract: {
                 }, z.core.$strip>>;
                 count: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -977,7 +977,7 @@ export declare const indexerContract: {
             player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 games: z.ZodArray<z.ZodObject<{
                     game_key: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     creator: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
@@ -1004,10 +1004,10 @@ export declare const indexerContract: {
                 }, z.core.$strip>>;
                 count: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -1022,14 +1022,14 @@ export declare const indexerContract: {
             player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 games: z.ZodArray<z.ZodObject<{
                     signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
                     gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     status: z.ZodOptional<z.ZodEnum<{
-                        completed: "completed";
                         active: "active";
                         cancelled: "cancelled";
+                        completed: "completed";
                     }>>;
                     creator: z.ZodOptional<z.ZodNullable<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>>;
                     gameType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
@@ -1060,10 +1060,10 @@ export declare const indexerContract: {
                 limit: z.ZodNumber;
                 offset: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -1076,7 +1076,7 @@ export declare const indexerContract: {
             player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 wallet: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 summary: z.ZodObject<{
                     relatedGames: z.ZodNumber;
@@ -1102,10 +1102,10 @@ export declare const indexerContract: {
                 }, z.core.$strip>>;
                 historyComplete: z.ZodBoolean;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -1115,7 +1115,7 @@ export declare const indexerContract: {
         readonly path: "/api/tokens";
         readonly authenticated: false;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 tokens: z.ZodArray<z.ZodObject<{
                     tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     games: z.ZodNumber;
@@ -1123,7 +1123,7 @@ export declare const indexerContract: {
                     priceUsd: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
                 }, z.core.$strip>>;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };
@@ -1137,7 +1137,7 @@ export declare const indexerContract: {
             tokenMint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
         }, z.core.$strip>;
         readonly responses: {
-            readonly 200: z.ZodObject<{
+            200: z.ZodObject<{
                 players: z.ZodArray<z.ZodObject<{
                     player: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                     games_won: z.ZodNumber;
@@ -1146,10 +1146,10 @@ export declare const indexerContract: {
                 }, z.core.$strip>>;
                 count: z.ZodNumber;
             }, z.core.$strip>;
-            readonly 400: z.ZodObject<{
+            400: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
-            readonly 500: z.ZodObject<{
+            500: z.ZodObject<{
                 error: z.ZodString;
             }, z.core.$strip>;
         };

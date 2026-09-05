@@ -11,6 +11,7 @@ const contractVersions = ["v0.2.0", "v0.3.0"] as const;
 const generatedDirectories = new Set([
   "accounts",
   "errors",
+  "events",
   "instructions",
   "pdas",
   "programs",

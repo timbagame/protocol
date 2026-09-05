@@ -49,7 +49,7 @@ export async function getInitializeOracleInstructionAsync(input, config) {
     const args = { ...input };
     // Resolve default values.
     if (!accounts.oracle.value) {
-        accounts.oracle.value = await findOraclePda();
+        accounts.oracle.value = await findOraclePda({ programAddress });
     }
     if (!accounts.program.value) {
         accounts.program.value =

@@ -9,14 +9,18 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
     runs-on: ubuntu-26.04
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
-          bun-version: 1.4.0
+          bun-version: 1.4.1
       - name: Install dependencies
         run: bun install --frozen-lockfile
       - name: Audit dependencies
@@ -33,3 +37,49 @@ jobs:
         run: bun run build
       - name: Check generated package
         run: git diff --exit-code -- dist
+
+  integration:
+    name: Validator integration
+    needs: validate
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      pull-requests: read
+      packages: read
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          path: workspace/protocol
+          persist-credentials: false
+      - name: Select integration scope
+        id: scope
+        shell: bash
+        working-directory: workspace/protocol
+        env:
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run=true
+          if [[ "$EVENT" == pull_request ]]; then
+            gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename' > "$RUNNER_TEMP/integration-paths"
+            grep -Ev '(^|/)(README[^/]*|[^/]+\.md)$|^\.(gitignore|prettierignore)$' "$RUNNER_TEMP/integration-paths" > "$RUNNER_TEMP/runtime-paths" || [[ $? == 1 ]]
+            if [[ ! -s "$RUNNER_TEMP/runtime-paths" ]]; then run=false; fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+      - name: Checkout integration runner
+        if: steps.scope.outputs.run == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: timbagame/operations
+          ref: test/validator-integration-and-toolchains
+          path: workspace/operations
+          token: ${{ secrets.INTEGRATION_READ_TOKEN }}
+          persist-credentials: false
+      - uses: ./workspace/operations/.github/actions/integration
+        if: steps.scope.outputs.run == 'true'
+        with:
+          candidate: protocol
+          read-token: ${{ secrets.INTEGRATION_READ_TOKEN }}
+          web: "true"

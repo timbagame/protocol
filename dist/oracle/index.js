@@ -151,4 +151,15 @@ export const oracleContract = {
         },
     }),
 };
+/** Pure eligibility check; callers own availability, metadata, and error presentation. */
+export function evaluateTokenPolicy(policies, mint, amount) {
+    const policy = policies.find((policy) => policy.mint === mint);
+    if (!policy)
+        return { accepted: false, code: "unsupported_mint" };
+    if (!policy.enabled)
+        return { accepted: false, code: "token_disabled", policy };
+    if (amount !== undefined && amount < BigInt(policy.acceptedMinimumAmountRaw))
+        return { accepted: false, code: "amount_below_minimum", policy };
+    return { accepted: true, policy };
+}
 //# sourceMappingURL=index.js.map

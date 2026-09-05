@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,
@@ -63,6 +63,14 @@
     "./contracts/idl": {
       "types": "./dist/contracts/idl/index.d.ts",
       "import": "./dist/contracts/idl/index.js"
+    },
+    "./contracts/events": {
+      "types": "./dist/contracts/events/index.d.ts",
+      "import": "./dist/contracts/events/index.js"
+    },
+    "./randomness": {
+      "types": "./dist/randomness/index.d.ts",
+      "import": "./dist/randomness/index.js"
     }
   },
   "scripts": {

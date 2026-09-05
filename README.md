@@ -141,10 +141,6 @@ calling the generated PDA encoder.
 - Signing, wallet transaction setup, caching, storage, provider integrations, and
   presentation remain in their owning services.
 
-Consumer changes can be tested before registry publication using the identical
-`0.8.0` package archive in each consumer's `vendor/` directory. These file dependencies
-are deliberate and work in isolated checkouts with frozen lockfiles. After publishing
-`v0.8.0` through the existing release workflow, replace each consumer's archive
-dependency with registry version `0.8.0`, regenerate its lockfile, remove its archive,
-and run consumer checks before deployment. Do not deploy against a registry version
-that has not been published.
+Consumers pin the published `@timbagame/protocol@0.8.0` registry package in
+`package.json` and `bun.lock`. Install it with `bun install --frozen-lockfile` using
+the GitHub Packages authentication described above.

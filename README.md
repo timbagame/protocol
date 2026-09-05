@@ -135,12 +135,31 @@ calling the generated PDA encoder.
   Timba PDAs with generated helpers; web already did so.
 - Web maps decoded accounts to its presentation model. Bot converts Kit addresses
   to its PublicKey boundary. Oracle retains RPC orchestration and creation policy.
-- Standard token/ATA adapters remain local: the bot and Oracle expose synchronous
-  compatibility APIs, while web uses asynchronous Kit APIs. These are not a new
-  Timba protocol abstraction.
+- Standard token/ATA and signer adapters remain local and use asynchronous Solana
+  helpers. They are not a Timba protocol abstraction.
 - Signing, wallet transaction setup, caching, storage, provider integrations, and
   presentation remain in their owning services.
 
 Consumers pin the published `@timbagame/protocol@0.8.0` registry package in
 `package.json` and `bun.lock`. Install it with `bun install --frozen-lockfile` using
 the GitHub Packages authentication described above.
+
+### Shared events, randomness, and token policy
+
+`@timbagame/protocol/contracts/events` exports `decodeProgramEvent`,
+`getTrustedProgramData`, and typed event data. Decode only data from the active
+Timba invocation frame. Unknown events return null; malformed recognized layouts
+throw. Consumers choose whether malformed history should abort indexing or be
+skipped. Amounts and timestamps remain bigint. Historical PlayerUnjoined layouts
+are supported alongside the v0.2/v0.3 events.
+
+`@timbagame/protocol/randomness` exports `calculateWinner(secret, lastSlot, tickets)`
+and the pure `createWinnerSeed`/`selectWinnerFromEntropy` functions for services
+using a synchronous standard SHA-256 implementation. Seeds are 32-byte secrets
+followed by an unsigned little-endian u64 slot. Selection matches the contract's
+overlapping-window rejection sampling; secret storage remains application-owned.
+
+`evaluateTokenPolicy` from `/oracle` checks mint support, enabled status, and the
+accepted minimum, returning structured rejection codes. It does not fetch prices,
+load metadata, or produce user-facing messages. `TokenPolicyInput` describes the
+unvalidated wire input; `TokenPolicy` is the validated schema output.

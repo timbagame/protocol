@@ -190,6 +190,7 @@ export type SignGameTransactionRequest = z.input<
 export type SignGameTransactionResponse = z.output<
   typeof SignGameTransactionResponseSchema
 >;
+export type TokenPolicyInput = z.input<typeof TokenPolicySchema>;
 export type TokenPolicy = z.output<typeof TokenPolicySchema>;
 export type TokenPoliciesResponse = z.output<
   typeof TokenPoliciesResponseSchema
@@ -202,3 +203,26 @@ export type CreationPolicyRejection = z.output<
 >;
 export type OracleStats = z.output<typeof OracleStatsSchema>;
 export type OracleStatsResponse = z.output<typeof OracleStatsResponseSchema>;
+
+/** Pure eligibility check; callers own availability, metadata, and error presentation. */
+export function evaluateTokenPolicy<
+  T extends Pick<TokenPolicy, "mint" | "enabled" | "acceptedMinimumAmountRaw">,
+>(
+  policies: readonly T[],
+  mint: string,
+  amount?: bigint,
+):
+  | { accepted: true; policy: T }
+  | {
+      accepted: false;
+      code: "unsupported_mint" | "token_disabled" | "amount_below_minimum";
+      policy?: T;
+    } {
+  const policy = policies.find((policy) => policy.mint === mint);
+  if (!policy) return { accepted: false, code: "unsupported_mint" };
+  if (!policy.enabled)
+    return { accepted: false, code: "token_disabled", policy };
+  if (amount !== undefined && amount < BigInt(policy.acceptedMinimumAmountRaw))
+    return { accepted: false, code: "amount_below_minimum", policy };
+  return { accepted: true, policy };
+}

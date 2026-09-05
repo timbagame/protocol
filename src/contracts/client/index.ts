@@ -1,25 +1,53 @@
 import * as v020 from "../v0.2.0/generated/index.js";
 import * as v030 from "../v0.3.0/generated/index.js";
 import { isContractVersion, type ContractVersion } from "../index.js";
-import type { ReadonlyUint8Array } from "@solana/kit";
+import type {
+  Account,
+  EncodedAccount,
+  MaybeAccount,
+  MaybeEncodedAccount,
+  ReadonlyUint8Array,
+} from "@solana/kit";
 
 const clients = { "0.2.0": v020, "0.3.0": v030 } as const;
 
-// Runtime selection cannot preserve a particular version's generic address literals.
-// Keep parameter and result types; direct versioned exports retain full inference.
+// Only instruction builders need their generic address literals widened when
+// selecting between versions. Keep account-decoder overloads and RPC generics.
 type RuntimeClient<T> = {
-  [K in keyof T]: T[K] extends (...args: infer A) => infer R
-    ? (...args: A) => R
+  [K in keyof T]: K extends
+    `get${string}Instruction` | `get${string}InstructionAsync`
+    ? T[K] extends (...args: infer A) => infer R
+      ? (...args: A) => R
+      : T[K]
     : T[K];
 };
+
+type AccountDecoder<T extends object> = {
+  <A extends string = string>(account: EncodedAccount<A>): Account<T, A>;
+  <A extends string = string>(
+    account: MaybeEncodedAccount<A>,
+  ): MaybeAccount<T, A>;
+};
+
+// A union of overloaded generic decoders is not callable in TypeScript. Expose
+// the same two overloads once, with the union of the supported account layouts.
+type RuntimeDecoders = {
+  decodeGame: AccountDecoder<v020.Game | v030.Game>;
+  decodeOracle: AccountDecoder<v020.Oracle | v030.Oracle>;
+};
+
+type SelectedClient<V extends ContractVersion> = ContractVersion extends V
+  ? Omit<RuntimeClient<(typeof clients)[V]>, keyof RuntimeDecoders> &
+      RuntimeDecoders
+  : (typeof clients)[V];
 
 /** Use explicit version exports when only one deployment version is needed. */
 export function getContractClient<V extends ContractVersion>(
   version: V,
-): RuntimeClient<(typeof clients)[V]> {
+): SelectedClient<V> {
   if (!isContractVersion(version))
     throw new Error(`Unsupported contract version: ${version}`);
-  return clients[version] as RuntimeClient<(typeof clients)[V]>;
+  return clients[version] as SelectedClient<V>;
 }
 
 export type DecodedGame = v020.Game | v030.Game;

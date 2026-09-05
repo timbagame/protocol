@@ -117,9 +117,11 @@ requirements, safe-number conversion, rounding for display, and error wording.
 Use `@timbagame/protocol/contracts/client` when a consumer supports both deployed
 versions. `getContractClient(version)` selects the generated operations;
 `decodeGame(version, bytes)` checks the account discriminator and participant
-count; `getGameTypeName` normalizes the generated game enum. The selector keeps
-parameter/result types but broadens generic address literals. Import the explicit
-version's `/kit` subpath when those literals or a single-version bundle matter.
+count; `getGameTypeName` normalizes the generated game enum. Literal versions
+retain the complete generated types. Runtime version unions
+broaden only instruction-builder address literals so either version can be called;
+account-decoder overloads and RPC address inference remain intact. Import the explicit
+version's `/kit` subpath when a single-version bundle matters.
 Always pass deployment-specific `programAddress` to PDA and instruction builders.
 Game random hashes must be exactly 32 bytes; service adapters validate them before
 calling the generated PDA encoder.

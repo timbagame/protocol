@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,
@@ -71,21 +71,77 @@
     "./randomness": {
       "types": "./dist/randomness/index.d.ts",
       "import": "./dist/randomness/index.js"
+    },
+    "./games": {
+      "types": "./dist/games/index.d.ts",
+      "import": "./dist/games/index.js"
+    },
+    "./evm": {
+      "types": "./dist/evm/index.d.ts",
+      "import": "./dist/evm/index.js"
+    },
+    "./evm/v0.1.0": {
+      "types": "./dist/evm/v0.1.0/index.d.ts",
+      "import": "./dist/evm/v0.1.0/index.js"
+    },
+    "./solana": {
+      "types": "./dist/contracts/index.d.ts",
+      "import": "./dist/contracts/index.js"
+    },
+    "./solana/v0.2.0": {
+      "types": "./dist/contracts/v0.2.0/index.d.ts",
+      "import": "./dist/contracts/v0.2.0/index.js"
+    },
+    "./solana/v0.3.0": {
+      "types": "./dist/contracts/v0.3.0/index.d.ts",
+      "import": "./dist/contracts/v0.3.0/index.js"
+    },
+    "./solana/v0.2.0/kit": {
+      "types": "./dist/contracts/v0.2.0/generated/index.d.ts",
+      "import": "./dist/contracts/v0.2.0/generated/index.js"
+    },
+    "./solana/v0.3.0/kit": {
+      "types": "./dist/contracts/v0.3.0/generated/index.d.ts",
+      "import": "./dist/contracts/v0.3.0/generated/index.js"
+    },
+    "./solana/events": {
+      "types": "./dist/contracts/events/index.d.ts",
+      "import": "./dist/contracts/events/index.js"
+    },
+    "./solana/client": {
+      "types": "./dist/contracts/client/index.d.ts",
+      "import": "./dist/contracts/client/index.js"
+    },
+    "./solana/idl": {
+      "types": "./dist/contracts/idl/index.d.ts",
+      "import": "./dist/contracts/idl/index.js"
+    },
+    "./solana/randomness": {
+      "types": "./dist/randomness/index.d.ts",
+      "import": "./dist/randomness/index.js"
+    },
+    "./evm/v0.1.0/abi": "./dist/evm/v0.1.0/timba.json",
+    "./solana/v0.3.0/randomness": {
+      "types": "./dist/randomness/index.d.ts",
+      "import": "./dist/randomness/index.js"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "check:dist": "bun run build && git diff --exit-code -- dist",
-    "check:generated": "bun run generate:contracts && git diff --exit-code -- src/contracts/v0.2.0/generated src/contracts/v0.3.0/generated",
+    "check:generated": "bun run generate:contracts && git diff --exit-code -- src/contracts/v0.2.0/generated src/contracts/v0.3.0/generated && bun run generate:evm && git diff --exit-code -- src/evm/v0.1.0/abi.ts",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "generate:contracts": "bun run scripts/generate-contract-clients.ts",
     "prepack": "bun run build",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate:evm": "bun run scripts/generate-evm.ts",
+    "check:evm-upstream": "bun run scripts/check-evm-upstream.ts"
   },
   "dependencies": {
     "@solana/kit": "8.2.0",
+    "viem": "2.56.3",
     "zod": "4.5.4"
   },
   "devDependencies": {

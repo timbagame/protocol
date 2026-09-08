@@ -1,0 +1,1 @@
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../src/evm/v0.1.0/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,QAAQ,EAAE,MAAM,UAAU,CAAC;AACpC,cAAc,aAAa,CAAC;AAC5B,cAAc,iBAAiB,CAAC;AAChC,cAAc,aAAa,CAAC;AAC5B,eAAO,MAAM,oBAAoB,EAAG,OAAgB,CAAC;AAErD,OAAO,EAAE,OAAO,IAAI,YAAY,EAAE,MAAM,cAAc,CAAuB;AAC7E,OAAO,EAAE,OAAO,IAAI,iBAAiB,EAAE,MAAM,eAAe,CAAuB"}

@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.11.0",
+  "version": "0.12.0-rc.1",
   "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,

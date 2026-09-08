@@ -277,3 +277,18 @@ against their implementations. Contracts regenerates/checks them with its
 TypeScript, distribution and vectors without cloning another repository.
 The optional upstream check compares both ABI and vectors; an offline CI run
 cannot discover unimported upstream changes.
+
+## Shared application workflows
+
+`@timbagame/protocol/games` exports `GameDraft`, `validateGameDraft`,
+`gameCapabilities`, `gamePath` and `gameReferenceKey`. These pure helpers preserve
+exact token amounts and network/deployment identity. Apps own UI, translations,
+RPC transports, signing and durable transaction journals.
+
+`@timbagame/protocol/evm` also exports the shared HTTP schemas,
+`checkCreationAuthorization` and `evmGameActions`. Authorization checks validate
+economic terms and identity; consumers must still verify the current operator's
+signature before spending. Action eligibility is advisory; contract simulation
+and on-chain execution remain authoritative.
+
+Prereleases publish under the `next` tag; they do not move `latest`.

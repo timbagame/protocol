@@ -66,6 +66,7 @@ jobs:
         run: npm pack --dry-run
 
       - name: Publish package
-        run: npm publish --access restricted
+        run: npm publish --access restricted --tag "$RELEASE_CHANNEL"
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
+          RELEASE_CHANNEL: ${{ github.event.release.prerelease && 'next' || 'latest' }}

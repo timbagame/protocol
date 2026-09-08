@@ -91,7 +91,7 @@
   "devDependencies": {
     "@codama/nodes-from-anchor": "1.5.5",
     "@codama/renderers-js": "2.4.0",
-    "@types/bun": "^1.4.1",
+    "@types/bun": "^1.4.2",
     "codama": "1.10.2",
     "prettier": "^3.9.6",
     "typescript": "npm:@typescript/typescript6@6.0.2",
@@ -109,5 +109,5 @@
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
   },
-  "packageManager": "bun@1.4.1"
+  "packageManager": "bun@1.4.2"
 }

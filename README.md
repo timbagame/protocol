@@ -167,3 +167,33 @@ unvalidated wire input; `TokenPolicy` is the validated schema output.
 ## Cross-repository integration
 
 The shared local-validator suite lives in the sibling `operations/integration` directory. Run `bun run test:integration --web` from `operations`; see its README for pinned toolchains, candidate protocol packages and optional manual GitHub runs. Normal CI does not run the combined system suite or require a cross-repository credential.
+
+## Cross-chain game adapters
+
+Import `observeSolanaGame`, `observeEvmGame`, `gameLifecycle`,
+`normalizeSolanaMembership`, and `normalizeEvmMembership` from
+`@timbagame/protocol/games`. These pure adapters accept decoded current Solana
+v0.3 accounts or EVM Timba tuples. Existing Solana HTTP schemas and transaction
+builders are unchanged.
+
+Game references include the chain/network, deployment, and game identifier.
+Amounts remain bigint token units. Expiry and the current Oracle buffer determine
+join, settlement, and refund eligibility; these helpers describe timing, not
+wallet authorization, token balances, or transaction success.
+
+A missing account is unknown, never automatically completed. Supply a verified
+indexed Solana terminal outcome to distinguish settlement from cancellation.
+Bind that evidence to the same network/deployment and account incarnation in your
+indexer: Solana commitment-derived PDAs can be reused after closure. Fetch errors
+must not be converted into terminal outcomes.
+
+Solana commitments are not present in the Game account; pass the indexed creation
+commitment when available. Entropy positions retain their slot/block distinction.
+Continue using the existing Solana randomness verifier; EVM uses its own
+`winnerIndex` contract view and ABI. These formulas are intentionally different.
+
+Membership adapters consume decoded events. EVM refunds require the new
+`removedIndex` and `movedParticipant` event fields; a zero moved address becomes
+null. Keep events in canonical chain order and handle reorgs before applying them.
+Historical Solana event versions without swap-removal information require their
+version-specific reconstruction rules.

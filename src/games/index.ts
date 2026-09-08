@@ -207,3 +207,5 @@ export function normalizeEvmMembership(
         : null,
   };
 }
+
+export * from "./events.js";

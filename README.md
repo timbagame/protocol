@@ -189,11 +189,91 @@ must not be converted into terminal outcomes.
 
 Solana commitments are not present in the Game account; pass the indexed creation
 commitment when available. Entropy positions retain their slot/block distinction.
-Continue using the existing Solana randomness verifier; EVM uses its own
-`winnerIndex` contract view and ABI. These formulas are intentionally different.
+Use the versioned Solana and EVM randomness verifiers below. Their formulas
+are intentionally different.
 
 Membership adapters consume decoded events. EVM refunds require the new
 `removedIndex` and `movedParticipant` event fields; a zero moved address becomes
 null. Keep events in canonical chain order and handle reorgs before applying them.
 Historical Solana event versions without swap-removal information require their
 version-specific reconstruction rules.
+
+## Versioned chain interfaces
+
+| Import                                         | Purpose                                                                  |
+| ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `@timbagame/protocol/solana`                   | Existing Solana version/capability metadata                              |
+| `@timbagame/protocol/solana/v0.3.0`            | Solana IDL and Anchor types                                              |
+| `@timbagame/protocol/solana/v0.3.0/kit`        | Generated Solana transaction builders                                    |
+| `@timbagame/protocol/solana/v0.3.0/randomness` | Solana SHA-256/slot verifier                                             |
+| `@timbagame/protocol/evm`                      | EVM interface versions and deployment type                               |
+| `@timbagame/protocol/evm/v0.1.0`               | Typed ABI, transaction builders, EIP-712 payloads, randomness and events |
+| `@timbagame/protocol/evm/v0.1.0/abi`           | Raw JSON ABI                                                             |
+| `@timbagame/protocol/games`                    | Shared observations, lifecycle and normalized event types                |
+
+Existing `contracts/*` and `randomness` exports remain compatible. The new Solana
+paths are aliases, not a second copy of generated code. Solana imports do not
+load viem. EVM v0.1.0 identifies the initial, not-yet-deployed Solidity interface;
+it is separate from the protocol package version and EIP-712 domain version.
+
+```ts
+import {
+  creationTypedData,
+  createGameTransaction,
+} from "@timbagame/protocol/evm/v0.1.0";
+
+// proxy is the configured proxy address, never the implementation address.
+const deployment = { chainId: 8453, address: proxy, version: "0.1.0" } as const;
+const payload = creationTypedData(deployment, request);
+const signature = await operatorWallet.signTypedData(payload);
+const transaction = createGameTransaction(deployment, request, signature, true);
+// Submit with the creator's wallet on deployment.chainId.
+```
+
+Transaction helpers only encode calls. They do not fetch nonces, estimate fees,
+sign, broadcast, retry or select an RPC. Fetch the current creator nonce and
+validate off-chain token/game policy before signing. Use `privateJoinTypedData`
+for private-entry signatures; public joins omit authorization.
+Amounts and nonces are bigint. Approval amounts are explicit; no helper silently
+grants unlimited allowances.
+
+`calculateEvmWinner` verifies the SHA-256 commitment and reproduces Solidity's
+domain-separated Keccak/rejection-sampling algorithm. Pass the stored
+`lastEntryBlock`, not an assumed RPC block height. Its result verifies selection,
+not whether settlement is currently authorized or timely. Do not expose unrevealed
+secrets through public simulation services.
+
+`decodeEvmGameEvent` accepts raw logs, checks chain ID and emitting proxy, and
+rejects removed or malformed recognized logs. `normalizeSolanaGameEvent` consumes
+decoded events from trusted program logs. Both cover creation, joins, refunds,
+completion and closure. Unavailable event fields are null, not guessed. Callers
+retain transaction/block/log identities, canonical ordering and reorg rollback.
+
+A proxy address does not identify an immutable implementation. Maintain the
+interface version by deployment and upgrade block in the application, and select
+the versioned decoder accordingly. There is no automatic on-chain version
+discovery or hardcoded production deployment registry.
+
+## EVM artifact maintenance
+
+The JSON ABI is copied from the public contracts artifact. `source.json` records
+its source commit and SHA-256. Generate its literal TypeScript ABI with
+`bun run generate:evm`. This preserves viem's inferred argument and event types.
+
+Before updating the pinned artifact, review interface compatibility and select
+the appropriate contract version. Update the source metadata, regenerate the
+typed ABI and distribution, then check the intended local contracts checkout:
+
+```bash
+bun run check:evm-upstream /path/to/contracts
+bun run generate:evm
+bun run build
+bun test
+```
+
+Solidity-generated client vectors are committed in both repositories and tested
+against their implementations. Contracts regenerates/checks them with its
+`ClientVectors` script/test. Protocol CI verifies the committed ABI, generated
+TypeScript, distribution and vectors without cloning another repository.
+The optional upstream check compares both ABI and vectors; an offline CI run
+cannot discover unimported upstream changes.

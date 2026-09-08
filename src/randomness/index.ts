@@ -1,3 +1,4 @@
+export const SOLANA_RANDOMNESS_VERSION = "sha256-slot-le-u64-v1" as const;
 import { getU64Decoder, getU64Encoder } from "@solana/kit";
 const U64_MAX = (1n << 64n) - 1n;
 

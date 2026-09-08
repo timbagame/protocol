@@ -108,4 +108,5 @@ export function normalizeEvmMembership(reference, event) {
             : null,
     };
 }
+export * from "./events.js";
 //# sourceMappingURL=index.js.map

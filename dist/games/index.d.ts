@@ -108,4 +108,5 @@ export declare function normalizeEvmMembership(reference: EvmGameReference, even
     removedIndex: bigint;
     movedParticipant: string;
 }): MembershipChange;
+export * from "./events.js";
 //# sourceMappingURL=index.d.ts.map

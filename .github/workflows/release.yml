@@ -1,15 +1,14 @@
 name: Release protocol package
 
 on:
-  release:
-    types: [published]
+  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
   publish:
-    if: github.repository == 'timbagame/protocol'
+    if: github.repository == 'timbagame/protocol' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-26.04
     permissions:
       contents: read
@@ -33,44 +32,22 @@ jobs:
         with:
           bun-version: 1.4.2
 
-      - name: Verify release tag
+      - name: Check whether this version is published
+        id: version
+        run: bun run scripts/check-package-version.ts
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: |
-          expected_tag="v$(node -p "require('./package.json').version")"
-          if [ "$RELEASE_TAG" != "$expected_tag" ]; then
-            echo "Release tag $RELEASE_TAG does not match package version $expected_tag" >&2
-            exit 1
-          fi
+          NODE_AUTH_TOKEN: ${{ github.token }}
 
       - name: Install dependencies
+        if: steps.version.outputs.publish == 'true'
         run: bun install --frozen-lockfile
 
-      - name: Audit dependencies
-        run: bun audit
-
-      - name: Check formatting
-        run: bun run format:check
-
-      - name: Check generated contract clients
-        run: bun run check:generated
-
-      - name: Typecheck
-        run: bun run typecheck
-
-      - name: Test
-        run: bun test
-
-      - name: Build package
-        run: bun run build
-
-      - name: Check generated package
-        run: git diff --exit-code -- dist
-
       - name: Inspect package contents
+        if: steps.version.outputs.publish == 'true'
         run: npm pack --dry-run
 
       - name: Publish package
+        if: steps.version.outputs.publish == 'true'
         run: npm publish --access restricted
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}

@@ -91,15 +91,19 @@ unexpected statuses and invalid responses throw protocol errors.
 
 ## Private package release
 
-Merge the version bump and reviewed changes into `main` before creating a release.
-Tag the resulting commit on `main` (the merge commit when squash merging). The
-workflow rejects release commits that are not ancestors of `main`. Published
-versions are immutable; fixes to an existing release need a new patch version.
+1. Include a semantic version bump in `package.json` with the PR's changes.
+2. Merge the reviewed PR into `main`. After CI validation succeeds, the workflow
+   automatically publishes the version privately to GitHub Packages. No manual
+   tag or GitHub Release is required.
+3. Update consumer pins after publication succeeds.
 
-1. Merge the intended changes and bump `package.json` using semantic versioning.
-2. Create a GitHub Release with a `vX.Y.Z` tag that exactly matches the package version. For example, package version `1.2.3` requires tag `v1.2.3`.
-3. The release workflow validates the package and publishes it privately to GitHub Packages.
-4. After the first release, confirm that the package is private. In the package settings under **Manage Actions access**, grant read access only to `timbagame/web`, `timbagame/oracle`, and `timbagame/bot`.
+Publishing only runs for `main` commits after validation. If the exact version is
+already published, it skips publishing; authentication and registry errors fail
+instead of being mistaken for a missing version. Published versions are immutable,
+so fixes require a new version. Re-running a failed workflow retries publication.
+
+In the package settings under **Manage Actions access**, grant read access to the
+consumer repositories that install it.
 
 Consumer workflows need `contents: read` and `packages: read`. Set `NODE_AUTH_TOKEN` to `${{ github.token }}` for `bun install`, and commit this token-free `.npmrc` in each consumer:
 

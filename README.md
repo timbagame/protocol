@@ -290,5 +290,3 @@ RPC transports, signing and durable transaction journals.
 economic terms and identity; consumers must still verify the current operator's
 signature before spending. Action eligibility is advisory; contract simulation
 and on-chain execution remain authoritative.
-
-Prereleases publish under the `next` tag; they do not move `latest`.

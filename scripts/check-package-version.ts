@@ -43,7 +43,8 @@ if (import.meta.main) {
     result.stderr.toString(),
     version,
   );
-  if (!process.env["GITHUB_OUTPUT"]) throw new Error("Missing GitHub output path");
+  if (!process.env["GITHUB_OUTPUT"])
+    throw new Error("Missing GitHub output path");
   appendFileSync(process.env["GITHUB_OUTPUT"], `publish=${publish}\n`);
   console.log(
     publish

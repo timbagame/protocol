@@ -91,6 +91,11 @@ unexpected statuses and invalid responses throw protocol errors.
 
 ## Private package release
 
+Merge the version bump and reviewed changes into `main` before creating a release.
+Tag the resulting commit on `main` (the merge commit when squash merging). The
+workflow rejects release commits that are not ancestors of `main`. Published
+versions are immutable; fixes to an existing release need a new patch version.
+
 1. Merge the intended changes and bump `package.json` using semantic versioning.
 2. Create a GitHub Release with a `vX.Y.Z` tag that exactly matches the package version. For example, package version `1.2.3` requires tag `v1.2.3`.
 3. The release workflow validates the package and publishes it privately to GitHub Packages.

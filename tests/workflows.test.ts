@@ -123,3 +123,85 @@ test("EVM recovery permissions match caller, game type and boundary", async () =
     evmGameActions({ ...game, status: 2 }, "creator", 110n, 10n).close,
   ).toBe(false);
 });
+
+test("second-based chat timeouts survive conversion to minutes", () => {
+  const token = { decimals: 6, minimumAmount: "0.25" };
+  for (const seconds of [300, 301, 307, 3599, 86400]) {
+    expect(
+      validateGameDraft(
+        { ...draft, timeoutMinutes: seconds / 60 },
+        token,
+        gameCapabilities("evm"),
+      ),
+    ).toBe(500000n);
+  }
+  for (const seconds of [299, 301.5, 86401, NaN, Infinity]) {
+    expect(() =>
+      validateGameDraft(
+        { ...draft, timeoutMinutes: seconds / 60 },
+        token,
+        gameCapabilities("evm"),
+      ),
+    ).toThrow();
+  }
+});
+
+test("authorization compares address identity while rejecting changed terms", async () => {
+  const { checkCreationAuthorization } =
+    await import("../src/evm/authorization.js");
+  const { gameIdFor } = await import("../src/evm/v0.1.0/client.js");
+  const { getAddress, zeroHash } = await import("viem");
+  const creator = "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd" as const;
+  const deployment = {
+    chainId: 8453,
+    address: creator,
+    version: "0.1.0",
+  } as const;
+  const expected = {
+    creator,
+    token: creator,
+    gameType: 0,
+    amount: 1n,
+    minPlayers: 2,
+    maxPlayers: 2,
+    timeout: 3600,
+    isPrivate: false,
+    nonce: 0n,
+    deadline: 9999999999n,
+    commitment: zeroHash,
+  } as const;
+  const response = {
+    gameId: gameIdFor(deployment, creator, 0n),
+    request: {
+      ...expected,
+      amount: "1",
+      nonce: "0",
+      deadline: "9999999999",
+      commitment: `0x${"11".repeat(32)}`,
+    },
+    signature: `0x${"11".repeat(65)}`,
+  };
+  expect(
+    checkCreationAuthorization(deployment, expected, response).request.creator,
+  ).toBe(getAddress(creator));
+  for (const change of [
+    { amount: "2" },
+    { token: "0x1111111111111111111111111111111111111111" },
+    { creator: "0x1111111111111111111111111111111111111111" },
+    { nonce: "1" },
+    { commitment: zeroHash },
+  ]) {
+    expect(() =>
+      checkCreationAuthorization(deployment, expected, {
+        ...response,
+        request: { ...response.request, ...change },
+      }),
+    ).toThrow();
+  }
+  expect(() =>
+    checkCreationAuthorization(deployment, expected, {
+      ...response,
+      gameId: zeroHash,
+    }),
+  ).toThrow();
+});

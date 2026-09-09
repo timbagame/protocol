@@ -1,12 +1,18 @@
-import { zeroHash } from "viem";
+import { getAddress, zeroHash } from "viem";
 import { evmAuthorizationSchema } from "./http.js";
 import { gameIdFor } from "./v0.1.0/client.js";
 /** Verify economic terms and identity before the adapter verifies the live operator signature. */
 export function checkCreationAuthorization(deployment, expected, input) {
     const response = evmAuthorizationSchema.parse(input);
-    const request = { ...expected, commitment: response.request.commitment };
+    const request = {
+        ...expected,
+        creator: getAddress(expected.creator),
+        token: getAddress(expected.token),
+        commitment: response.request.commitment,
+    };
     if (request.commitment === zeroHash ||
-        response.gameId !== gameIdFor(deployment, expected.creator, expected.nonce))
+        response.gameId.toLowerCase() !==
+            gameIdFor(deployment, expected.creator, expected.nonce))
         throw new Error("Invalid game authorization");
     for (const key of Object.keys(request)) {
         if (String(response.request[key]) !== String(request[key]))

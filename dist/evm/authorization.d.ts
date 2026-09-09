@@ -5,9 +5,10 @@ export declare function checkCreationAuthorization(deployment: EvmDeployment, ex
     gameId: `0x${string}`;
     signature: `0x${string}`;
     request: {
+        creator: `0x${string}`;
+        token: `0x${string}`;
         commitment: `0x${string}`;
         amount: bigint;
-        creator: `0x${string}`;
         deadline: bigint;
         gameType: number;
         isPrivate: boolean;
@@ -15,7 +16,6 @@ export declare function checkCreationAuthorization(deployment: EvmDeployment, ex
         minPlayers: number;
         nonce: bigint;
         timeout: number;
-        token: `0x${string}`;
     };
 };
 //# sourceMappingURL=authorization.d.ts.map

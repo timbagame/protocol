@@ -19,6 +19,8 @@ export const gameCapabilities = (chain) => ({
 export function validateGameDraft(draft, token, capabilities) {
     const amount = parseTokenAmount(draft.amount, token.decimals);
     const minimum = parseTokenAmount(token.minimumAmount, token.decimals);
+    // Round-trip through seconds so values such as 301 / 60 survive float noise.
+    const timeoutSeconds = Math.round(draft.timeoutMinutes * 60);
     const floor = draft.type === "coinflip" ? 2 : 1;
     if (amount <= 0n ||
         amount < minimum ||
@@ -27,9 +29,10 @@ export function validateGameDraft(draft, token, capabilities) {
         draft.minPlayers < floor ||
         draft.maxPlayers < draft.minPlayers ||
         draft.maxPlayers > capabilities.maxPlayers ||
-        !Number.isInteger(draft.timeoutMinutes) ||
-        draft.timeoutMinutes * 60 < capabilities.minTimeout ||
-        draft.timeoutMinutes * 60 > capabilities.maxTimeout ||
+        !Number.isSafeInteger(timeoutSeconds) ||
+        draft.timeoutMinutes !== timeoutSeconds / 60 ||
+        timeoutSeconds < capabilities.minTimeout ||
+        timeoutSeconds > capabilities.maxTimeout ||
         (draft.isPrivate && !capabilities.privateGames))
         throw new Error("Invalid game terms");
     return amount;

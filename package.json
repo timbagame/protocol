@@ -140,7 +140,7 @@
     "check:evm-upstream": "bun run scripts/check-evm-upstream.ts"
   },
   "dependencies": {
-    "@solana/kit": "8.2.0",
+    "@solana/kit": "8.3.0",
     "viem": "2.56.3",
     "zod": "4.5.4"
   },

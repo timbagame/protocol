@@ -1,0 +1,1 @@
+{"version":3,"file":"authorization.d.ts","sourceRoot":"","sources":["../../src/evm/authorization.ts"],"names":[],"mappings":"AAEA,OAAO,EAAa,KAAK,iBAAiB,EAAE,MAAM,oBAAoB,CAAC;AACvE,OAAO,KAAK,EAAE,aAAa,EAAE,MAAM,YAAY,CAAC;AAChD,kGAAkG;AAClG,wBAAgB,0BAA0B,CACxC,UAAU,EAAE,aAAa,EACzB,QAAQ,EAAE,iBAAiB,EAC3B,KAAK,EAAE,OAAO;;;;;;;;;;;;;;;;EAoBf"}

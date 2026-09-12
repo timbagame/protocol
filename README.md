@@ -299,3 +299,25 @@ RPC transports, signing and durable transaction journals.
 economic terms and identity; consumers must still verify the current operator's
 signature before spending. Action eligibility is advisory; contract simulation
 and on-chain execution remain authoritative.
+
+## Shared Solana plans and finalized verification
+
+Version 0.13.0 adds `@timbagame/protocol/solana/plans`: transaction encoding,
+associated token accounts, wrapped-SOL setup, versioned create/join/unjoin/close
+plans, and account serialization. Pass the contract version and program address
+explicitly to `createContractAdapter(version, programId)` and
+`buildCreateGamePlan(input, version, programId)`. These helpers perform no RPC,
+signing, broadcasting, environment lookup, or persistence.
+
+`@timbagame/protocol/web` corrects `VerifiedGameSchema.randomValue` to a decimal
+u64 and adds the published commitment and transaction references.
+`FinalizedVerifiedGameSchema` requires the complete proof, and web verification
+endpoint contracts use it. `validateVerifiedGame(value, signature, programId)`
+checks the commitment, deployment-specific game PDA, ticket positions, and winner.
+It validates consistency of supplied inputs; it does not authenticate chain history.
+Oracle must still reconstruct finalized history before storing a record.
+
+Migration: publish 0.13.0 through the normal reviewed-main release workflow, then
+update oracle and web pins/lockfiles. Existing hex-valued randomValue responses
+are rejected. Older responses can use the base schema only if their random value
+is decimal; finalized endpoints require all proof fields.

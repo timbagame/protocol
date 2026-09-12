@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,
@@ -124,6 +124,10 @@
     "./solana/v0.3.0/randomness": {
       "types": "./dist/randomness/index.d.ts",
       "import": "./dist/randomness/index.js"
+    },
+    "./solana/plans": {
+      "types": "./dist/solana/plans/index.d.ts",
+      "import": "./dist/solana/plans/index.js"
     }
   },
   "scripts": {
@@ -142,7 +146,9 @@
   "dependencies": {
     "@solana/kit": "8.3.0",
     "viem": "2.56.3",
-    "zod": "4.5.4"
+    "zod": "4.5.4",
+    "@solana-program/token": "0.16.1",
+    "@solana-program/system": "0.14.1"
   },
   "devDependencies": {
     "@codama/nodes-from-anchor": "1.5.5",

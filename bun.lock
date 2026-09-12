@@ -5,6 +5,8 @@
     "": {
       "name": "@timbagame/protocol",
       "dependencies": {
+        "@solana-program/system": "0.14.1",
+        "@solana-program/token": "0.16.1",
         "@solana/kit": "8.3.0",
         "viem": "2.56.3",
         "zod": "4.5.4",
@@ -56,6 +58,10 @@
     "@scure/bip32": ["@scure/bip32@1.7.0", "", { "dependencies": { "@noble/curves": "~1.9.0", "@noble/hashes": "~1.8.0", "@scure/base": "~1.2.5" } }, "sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw=="],
 
     "@scure/bip39": ["@scure/bip39@1.6.0", "", { "dependencies": { "@noble/hashes": "~1.8.0", "@scure/base": "~1.2.5" } }, "sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A=="],
+
+    "@solana-program/system": ["@solana-program/system@0.14.1", "", { "peerDependencies": { "@solana/kit": "^8.0.0" } }, "sha512-K6ZiIrAKoJAfcwfUdsoFvfSAxeRJaRrV7BPFTJvUVRS4m3zszN+nLcdaNMMe2F1/zTriZqC+xh+Kgw6ziGUqpQ=="],
+
+    "@solana-program/token": ["@solana-program/token@0.16.1", "", { "dependencies": { "@solana-program/system": "^0.14.0" }, "peerDependencies": { "@solana/kit": "^8.0.0" } }, "sha512-X9dsvbh+VDq4SuCfvxn95P1DCvtBYHJOBiVmgBJMfW8l/lp8uSwEhy9IurpcdltnGi5kNIkCm4sk4YOXKAMiCw=="],
 
     "@solana/accounts": ["@solana/accounts@8.3.0", "", { "dependencies": { "@solana/addresses": "8.3.0", "@solana/codecs-core": "8.3.0", "@solana/codecs-strings": "8.3.0", "@solana/errors": "8.3.0", "@solana/rpc-spec": "8.3.0", "@solana/rpc-types": "8.3.0" }, "peerDependencies": { "typescript": ">=5.4.0" }, "optionalPeers": ["typescript"] }, "sha512-HNVCs4yyE5kTRHVD3ApuKuByuO85GHE6Ns7I/yMB9vXhFgZjGzFhOGi/YCjlWpIk3RqTyX7wGniHyEb49R3ELQ=="],
 

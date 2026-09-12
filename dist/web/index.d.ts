@@ -97,17 +97,62 @@ export declare const VerifiedGameSchema: z.ZodObject<{
     tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
     tokenSymbol: z.ZodString;
     tokenDecimals: z.ZodNumber;
-    randomValue: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
-    secretKey: z.ZodOptional<z.ZodString>;
+    randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+    secretKey: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "Hex32", "out">>;
+    randomHash: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "Hex32", "out">>;
+    transactionSignatures: z.ZodOptional<z.ZodArray<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>>;
     lastSlot: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
     calculationBreakdown: z.ZodObject<{
-        randomValue: z.ZodString;
+        randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
         totalTickets: z.ZodNumber;
         winnerIndex: z.ZodNumber;
         formula: z.ZodString;
     }, z.core.$strip>;
     explorerUrl: z.ZodURL;
 }, z.core.$strip>;
+/** Complete published proof; chain reconstruction remains the oracle's responsibility. */
+export declare const FinalizedVerifiedGameSchema: z.ZodObject<{
+    gameKey: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    signature: z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">;
+    timestamp: z.ZodNumber;
+    gameType: z.ZodOptional<z.ZodEnum<{
+        coinflip: "coinflip";
+        giveaway: "giveaway";
+    }>>;
+    creator: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+    isPrivate: z.ZodOptional<z.ZodBoolean>;
+    ticketAmount: z.ZodOptional<z.ZodNumber>;
+    totalAmount: z.ZodOptional<z.ZodNumber>;
+    maxTickets: z.ZodOptional<z.ZodNumber>;
+    createdAt: z.ZodOptional<z.ZodNumber>;
+    participants: z.ZodArray<z.ZodObject<{
+        address: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+        ticketCount: z.ZodNumber;
+        ticketIndices: z.ZodArray<z.ZodNumber>;
+    }, z.core.$strip>>;
+    totalTickets: z.ZodNumber;
+    winner: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    winnerTicketIndex: z.ZodNumber;
+    prizeAmount: z.ZodNumber;
+    feeAmount: z.ZodNumber;
+    tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
+    tokenSymbol: z.ZodString;
+    tokenDecimals: z.ZodNumber;
+    randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+    calculationBreakdown: z.ZodObject<{
+        randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+        totalTickets: z.ZodNumber;
+        winnerIndex: z.ZodNumber;
+        formula: z.ZodString;
+    }, z.core.$strip>;
+    explorerUrl: z.ZodURL;
+    secretKey: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+    randomHash: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+    lastSlot: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+    transactionSignatures: z.ZodArray<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
+}, z.core.$strip>;
+export type FinalizedVerifiedGame = z.output<typeof FinalizedVerifiedGameSchema>;
+export type FinalizedVerifiedGameInput = z.input<typeof FinalizedVerifiedGameSchema>;
 export declare const webContract: {
     readonly prepareGame: {
         readonly method: "POST";
@@ -273,16 +318,18 @@ export declare const webContract: {
                 tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 tokenSymbol: z.ZodString;
                 tokenDecimals: z.ZodNumber;
-                randomValue: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
-                secretKey: z.ZodOptional<z.ZodString>;
-                lastSlot: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
+                randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                 calculationBreakdown: z.ZodObject<{
-                    randomValue: z.ZodString;
+                    randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                     totalTickets: z.ZodNumber;
                     winnerIndex: z.ZodNumber;
                     formula: z.ZodString;
                 }, z.core.$strip>;
                 explorerUrl: z.ZodURL;
+                secretKey: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+                randomHash: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+                lastSlot: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+                transactionSignatures: z.ZodArray<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
             }, z.core.$strip>;
             400: z.ZodObject<{
                 error: z.ZodString;
@@ -330,16 +377,18 @@ export declare const webContract: {
                 tokenMint: z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">;
                 tokenSymbol: z.ZodString;
                 tokenDecimals: z.ZodNumber;
-                randomValue: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
-                secretKey: z.ZodOptional<z.ZodString>;
-                lastSlot: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "U64String", "out">>;
+                randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                 calculationBreakdown: z.ZodObject<{
-                    randomValue: z.ZodString;
+                    randomValue: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
                     totalTickets: z.ZodNumber;
                     winnerIndex: z.ZodNumber;
                     formula: z.ZodString;
                 }, z.core.$strip>;
                 explorerUrl: z.ZodURL;
+                secretKey: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+                randomHash: z.core.$ZodBranded<z.ZodString, "Hex32", "out">;
+                lastSlot: z.core.$ZodBranded<z.ZodString, "U64String", "out">;
+                transactionSignatures: z.ZodArray<z.core.$ZodBranded<z.ZodString, "SolanaSignature", "out">>;
             }, z.core.$strip>;
             400: z.ZodObject<{
                 error: z.ZodString;
@@ -358,4 +407,5 @@ export type SerializedGame = z.output<typeof SerializedGameSchema>;
 export type GameTokenConfig = z.output<typeof GameTokenConfigSchema>;
 export type GameConfigResponse = z.output<typeof GameConfigResponseSchema>;
 export type VerifiedGame = z.output<typeof VerifiedGameSchema>;
+export { validateVerifiedGame } from "./verification.js";
 //# sourceMappingURL=index.d.ts.map

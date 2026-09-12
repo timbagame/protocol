@@ -125,17 +125,37 @@ export const VerifiedGameSchema = z.object({
   tokenMint: SolanaAddressSchema,
   tokenSymbol: z.string().min(1),
   tokenDecimals: z.number().int().min(0).max(255),
-  randomValue: Hex32Schema,
-  secretKey: z.string().min(1).optional(),
+  randomValue: U64StringSchema,
+  secretKey: Hex32Schema.optional(),
+  randomHash: Hex32Schema.optional(),
+  transactionSignatures: z
+    .array(SolanaSignatureSchema)
+    .min(1)
+    .max(2001)
+    .optional(),
   lastSlot: U64StringSchema.optional(),
   calculationBreakdown: z.object({
-    randomValue: z.string().min(1),
+    randomValue: U64StringSchema,
     totalTickets: NonNegativeIntegerSchema,
     winnerIndex: NonNegativeIntegerSchema,
     formula: z.string().min(1),
   }),
   explorerUrl: z.url(),
 });
+
+/** Complete published proof; chain reconstruction remains the oracle's responsibility. */
+export const FinalizedVerifiedGameSchema = VerifiedGameSchema.extend({
+  secretKey: Hex32Schema,
+  randomHash: Hex32Schema,
+  lastSlot: U64StringSchema,
+  transactionSignatures: z.array(SolanaSignatureSchema).min(1).max(2001),
+});
+export type FinalizedVerifiedGame = z.output<
+  typeof FinalizedVerifiedGameSchema
+>;
+export type FinalizedVerifiedGameInput = z.input<
+  typeof FinalizedVerifiedGameSchema
+>;
 
 export const webContract = {
   prepareGame: defineEndpoint({
@@ -190,7 +210,7 @@ export const webContract = {
     authenticated: false,
     body: VerifyGameRequestSchema,
     responses: {
-      200: VerifiedGameSchema,
+      200: FinalizedVerifiedGameSchema,
       400: SimpleApiErrorSchema,
       403: SimpleApiErrorSchema,
       503: SimpleApiErrorSchema,
@@ -202,7 +222,7 @@ export const webContract = {
     authenticated: false,
     params: VerifyGameParamsSchema,
     responses: {
-      200: VerifiedGameSchema,
+      200: FinalizedVerifiedGameSchema,
       400: SimpleApiErrorSchema,
       503: SimpleApiErrorSchema,
     },
@@ -217,3 +237,5 @@ export type SerializedGame = z.output<typeof SerializedGameSchema>;
 export type GameTokenConfig = z.output<typeof GameTokenConfigSchema>;
 export type GameConfigResponse = z.output<typeof GameConfigResponseSchema>;
 export type VerifiedGame = z.output<typeof VerifiedGameSchema>;
+
+export { validateVerifiedGame } from "./verification.js";

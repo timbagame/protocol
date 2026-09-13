@@ -13,6 +13,10 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
 } from "../src/solana/plans/token-program.js";
+import {
+  deserializeGame,
+  serializeGame,
+} from "../src/solana/plans/serialized-game.js";
 
 const common = {
   creator: address("HGBiGfyR9GF36J4SMPjxsRkFuwYNuNYuzdCjgR4aw4FC"),
@@ -65,5 +69,34 @@ describe("create game plans", () => {
     expect(plan.instructions).toHaveLength(2);
     expect(initialize.accounts).toHaveLength(12);
     expect(initialize.accounts?.[5]?.address).toBe(gameToken);
+  });
+});
+
+test("round-trips game account bigint fields for transport", () => {
+  const game = {
+    address: "game-address",
+    creator: "creator-address",
+    type: "giveaway" as const,
+    tokenMint: "mint-address",
+    stakeAmount: 123_456n,
+    prizeAmount: 234_567n,
+    currentPlayers: 2,
+    minPlayers: 2,
+    maxPlayers: 4,
+    isPrivate: true,
+    createdAt: 1_700_000_000,
+    expiresAt: 1_700_003_600,
+    creationSignature: "signature",
+    lastSlot: 987_654n,
+    participantAddresses: ["player-one", "player-two"],
+  };
+
+  const serialized = serializeGame(game);
+  expect(serialized.stakeAmount).toBe("123456");
+  expect(serialized.prizeAmount).toBe("234567");
+  expect(serialized.lastSlot).toBe("987654");
+  expect(deserializeGame(serialized)).toEqual({
+    ...game,
+    creationSignature: "",
   });
 });

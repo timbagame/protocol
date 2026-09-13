@@ -1,0 +1,17 @@
+{
+  "roots": ["src"],
+  "extensions": [".ts"],
+  "exclude": [
+    "*/generated/*",
+    "*.d.ts",
+    "*.test.ts",
+    "*.spec.ts",
+    "*/tests/*",
+    "*/fixtures/*",
+    "src/contracts/v0.2.0/timba.ts",
+    "src/contracts/v0.3.0/timba.ts",
+    "src/solana/plans/types.ts",
+    "src/index.ts",
+    "src/solana/plans/index.ts"
+  ]
+}

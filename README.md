@@ -184,7 +184,3 @@ Each release is a normal pull request that bumps `version` in `package.json`. Wh
 - [timbagame/contracts](https://github.com/timbagame/contracts): the Solana and EVM programs
 - [timba.cc](https://timba.cc): play on the web and verify games
 - [@playtimbabot](https://t.me/playtimbabot): play in Telegram
-
-## License
-
-[MIT](LICENSE)

@@ -52,7 +52,7 @@ const { winnerIndex } = await calculateWinner(
 );
 ```
 
-`validateVerifiedGame` from `@timbagame/protocol/web` runs the full check on a published proof: commitment, game address, ticket positions and winner. It confirms that the supplied inputs are consistent with each other. To confirm they match chain history, compare the transaction signatures against a Solana explorer or your own RPC node.
+`validateVerifiedGame` from `@timbagame/protocol/web` runs the full check on a published proof: commitment, game address, ticket positions and winner. It only confirms that the supplied inputs are consistent with each other, so a fabricated proof could still pass. To confirm a result, take the secret, final slot and participant list from the chain itself: open the creation, join and settlement transactions the proof references in a Solana explorer or on your own RPC node, check that they belong to the same game account, and run the calculation on those values.
 
 The EVM contract uses a different, domain-separated formula. Use `calculateEvmWinner` from `@timbagame/protocol/evm/v0.1.0` for EVM games.
 
@@ -148,8 +148,8 @@ Transaction helpers only encode calls. Fetching nonces, estimating fees, signing
 
 ## Design notes
 
-- **Pure functions only.** Nothing here reads environment variables, opens RPC connections, signs, stores data or retries. Those belong to the service that uses the package.
-- **Amounts are `bigint`.** Token units never pass through floating point.
+- **No hidden side effects.** The transaction, lifecycle, amount and verification helpers are pure: they read no environment variables, open no RPC connections, and never sign, store data or retry. The one exception is the REST client from `common`, which sends HTTP requests with `fetch` (or the one you pass in).
+- **On-chain amounts are `bigint`.** Contract clients, transaction plans and game helpers keep token units exact. Some older indexer and web API fields, such as `ticketAmount`, `totalAmount` and the verified-game prize and fee, are plain JSON numbers, so treat them as display values rather than exact amounts.
 - **A missing account is not a result.** A closed Solana game account is reported as unknown until indexed evidence says whether it settled or was cancelled. Game addresses can be reused after closure, so tie that evidence to the same deployment and account lifetime.
 - **Events need canonical order.** Apply decoded events in chain order and roll back on reorgs before passing them to the membership helpers.
 

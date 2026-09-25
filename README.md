@@ -187,4 +187,4 @@ Each release is a normal pull request that bumps `version` in `package.json`. Wh
 
 ## License
 
-MIT
+[MIT](LICENSE)

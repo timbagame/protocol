@@ -1,76 +1,107 @@
-# `@timbagame/protocol`
+# @timbagame/protocol
 
-Runtime-validated HTTP contracts and versioned on-chain artifacts shared by independently deployed Timba services.
+The shared TypeScript layer behind [Timba](https://timba.cc), a platform for multiplayer coinflips and giveaways on Solana, played on the web or in Telegram.
 
-The Contracts repository remains the source of truth for the Anchor program. This package publishes immutable IDL and generated type snapshots so each consumer uses the same artifact during staged upgrades. Third-party API schemas remain with their service adapters.
+This package holds everything Timba services need to agree on:
 
-## Commands
+- Versioned Solana program interfaces (IDL, Anchor types and generated `@solana/kit` clients)
+- The EVM contract ABI, transaction builders and EIP-712 payloads
+- Runtime-validated HTTP contracts for the oracle, indexer, bot and web services
+- Pure helpers for token amounts, game lifecycle and winner verification
+
+It is also the easiest way to check a Timba game result yourself. The winner math in `randomness` is the same calculation the on-chain program performs.
+
+The programs themselves live in [timbagame/contracts](https://github.com/timbagame/contracts).
+
+## Install
+
+Releases are published to GitHub Packages. Point the `@timbagame` scope at that registry:
+
+```ini
+# .npmrc
+@timbagame:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+GitHub Packages requires a token for every install, even for public packages. Set `NODE_AUTH_TOKEN` to a GitHub token with the `read:packages` scope, then install:
 
 ```bash
-bun install
-bun run typecheck
-bun test
-bun run build
+bun add @timbagame/protocol
+# or: npm install @timbagame/protocol
 ```
 
-Import the smallest service boundary required by a consumer:
+In GitHub Actions, `NODE_AUTH_TOKEN: ${{ github.token }}` works when the workflow has `packages: read`. Never commit a token.
+
+## Verify a game result
+
+Every Timba game commits to the SHA-256 hash of a 32-byte secret before anyone joins. When the game settles, the oracle reveals the secret and the program picks the winner from that secret and the game's final Solana slot:
+
+1. Check that `sha256(secret)` matches the commitment published when the game was created.
+2. Build a 40-byte seed: the secret followed by the final slot as a little-endian u64.
+3. Hash the seed with SHA-256 to get 32 bytes of entropy.
+4. Read little-endian u64 windows from the entropy until one falls below the largest multiple of the ticket count. This rejection step keeps every ticket equally likely.
+5. The winner is at position `value % tickets` in the participant list.
 
 ```ts
-import { GenerateHashResponseSchema } from "@timbagame/protocol/oracle";
+import { calculateWinner } from "@timbagame/protocol/randomness";
+
+const { winnerIndex } = await calculateWinner(
+  secret,
+  lastSlot,
+  BigInt(tickets),
+);
 ```
 
-Select the deployed contract version explicitly. The lightweight registry does not import either IDL:
+`validateVerifiedGame` from `@timbagame/protocol/web` runs the full check on a published proof: commitment, game address, ticket positions and winner. It only confirms that the supplied inputs are consistent with each other, so a fabricated proof could still pass. To confirm a result, take the secret, final slot and participant list from the chain itself: open the creation, join and settlement transactions the proof references in a Solana explorer or on your own RPC node, check that they belong to the same game account, and run the calculation on those values.
+
+The EVM contract uses a different, domain-separated formula. Use `calculateEvmWinner` from `@timbagame/protocol/evm/v0.1.0` for EVM games.
+
+## What's inside
+
+| Import                                     | Contents                                                                 |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| `@timbagame/protocol/contracts`            | Supported Solana contract versions and their capabilities                |
+| `@timbagame/protocol/contracts/v0.2.0`     | v0.2.0 IDL and Anchor types                                              |
+| `@timbagame/protocol/contracts/v0.3.0`     | v0.3.0 IDL and Anchor types                                              |
+| `@timbagame/protocol/contracts/v0.3.0/kit` | Generated `@solana/kit` instruction builders, accounts and PDAs          |
+| `@timbagame/protocol/contracts/client`     | Pick the generated client for a runtime version, decode games            |
+| `@timbagame/protocol/contracts/events`     | Decode program events from transaction logs                              |
+| `@timbagame/protocol/solana/plans`         | Create, join, unjoin and close transaction plans, with no RPC or signing |
+| `@timbagame/protocol/randomness`           | Solana winner calculation                                                |
+| `@timbagame/protocol/evm/v0.1.0`           | EVM ABI, transaction builders, EIP-712 payloads, events and randomness   |
+| `@timbagame/protocol/games`                | Chain-neutral game lifecycle, drafts and event normalization             |
+| `@timbagame/protocol/amounts`              | Exact decimal string and bigint conversion                               |
+| `@timbagame/protocol/common`               | Typed REST client for the service contracts below                        |
+| `@timbagame/protocol/oracle`               | Oracle HTTP schemas and token policy evaluation                          |
+| `@timbagame/protocol/indexer`              | Indexer HTTP schemas                                                     |
+| `@timbagame/protocol/web`                  | Web API schemas and game proof validation                                |
+| `@timbagame/protocol/bot`                  | Bot HTTP schemas                                                         |
+
+Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path you need: the Solana entry points do not load `viem`, and the version registry loads no IDL.
+
+## Usage
+
+### Pick a contract version
+
+Two Solana program versions share one program address, so the version must come from your deployment configuration. There is deliberately no `latest` alias.
 
 ```ts
 import {
   getContractCapabilities,
   parseContractVersion,
 } from "@timbagame/protocol/contracts";
-import {
-  timbaIdlV020,
-  type TimbaV020,
-} from "@timbagame/protocol/contracts/v0.2.0";
-import {
-  fetchGame,
-  getJoinGameInstructionAsync,
-} from "@timbagame/protocol/contracts/v0.2.0/kit";
+import { getContractClient } from "@timbagame/protocol/contracts/client";
 
 const version = parseContractVersion(process.env.CONTRACT_VERSION);
 const capabilities = getContractCapabilities(version);
+const client = getContractClient(version);
 ```
 
-Import `@timbagame/protocol/contracts/v0.3.0` only in consumers that need the v0.3.0 IDL. There is intentionally no `latest` alias because both versions use the same program address and the active version must come from deployment configuration.
+Always pass the deployment's `programAddress` to PDA and instruction builders.
 
-Each version also exposes a generated `@solana/kit` client from its `/kit`
-subpath. Run `bun run generate:contracts` after updating an IDL snapshot and
-commit the generated source and package output. CI verifies that both remain in
-sync.
+### Call a service with a typed client
 
-The v0.2.0 snapshot comes from Contracts tag `v0.2.0` (`bb81f1983473a0bf580f711386ec361519e1813c`). The v0.3.0 snapshot comes from Contracts commit `6c2bb07f9299704efee3bef840bb092857e7111e`. Copy both the Anchor IDL and its generated Anchor TypeScript type together when adding a contract version, then regenerate the Kit client.
-
-Contract v0.3 consumers can read the Oracle-owned creation policy through the
-authenticated `GET /token-policies` contract:
-
-```ts
-import { createRestClient, expectStatus } from "@timbagame/protocol/common";
-import { oracleContract } from "@timbagame/protocol/oracle";
-
-const oracle = createRestClient(oracleContract, {
-  baseUrl: "https://oracle.example.com",
-  getHeaders: (endpoint) =>
-    endpoint.authenticated
-      ? { Authorization: "Bearer <service-token>" }
-      : undefined,
-});
-const result = await oracle.tokenPolicies();
-const policies = expectStatus(result, 200).data.policies;
-```
-
-`signGameTransaction` returns typed creation-policy rejections at HTTP 422.
-Generic validation, authentication, rate-limit, and service error responses keep
-their existing schemas and status codes.
-
-Create a typed REST client from the same contract used by the server:
+The same contract object describes the server and the client. Requests are validated before they are sent, and responses are validated against the schema for the status code that came back.
 
 ```ts
 import { createRestClient, expectStatus } from "@timbagame/protocol/common";
@@ -79,151 +110,25 @@ import { indexerContract } from "@timbagame/protocol/indexer";
 const indexer = createRestClient(indexerContract, {
   baseUrl: "https://indexer.example.com",
 });
-const result = await indexer.games({
-  query: { limit: 20, offset: 0 },
-});
+const result = await indexer.games({ query: { limit: 20, offset: 0 } });
 const games = expectStatus(result, 200).data.games;
 ```
 
-The client validates parameters, queries, and bodies before sending them. It validates the JSON
-response with the schema declared for the actual HTTP status. Declared error statuses remain typed;
-unexpected statuses and invalid responses throw protocol errors.
+### Handle token amounts
 
-## Private package release
+```ts
+import {
+  formatTokenAmount,
+  parseTokenAmount,
+} from "@timbagame/protocol/amounts";
 
-1. Include a semantic version bump in `package.json` with the PR's changes.
-2. Merge the reviewed PR into `main`. After CI validation succeeds, the workflow
-   automatically publishes the version privately to GitHub Packages. No manual
-   tag or GitHub Release is required.
-3. Update consumer pins after publication succeeds.
-
-Publishing only runs for `main` commits after validation. If the exact version is
-already published, it skips publishing; authentication and registry errors fail
-instead of being mistaken for a missing version. Published versions are immutable,
-so fixes require a new version. Re-running a failed workflow retries publication.
-
-In the package settings under **Manage Actions access**, grant read access to the
-consumer repositories that install it.
-
-Consumer workflows need `contents: read` and `packages: read`. Set `NODE_AUTH_TOKEN` to `${{ github.token }}` for `bun install`, and commit this token-free `.npmrc` in each consumer:
-
-```ini
-@timbagame:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+parseTokenAmount("1.5", 9); // 1500000000n
+formatTokenAmount(1500000000n, 9); // "1.5"
 ```
 
-For local installation, supply a classic personal access token with `read:packages` through the `NODE_AUTH_TOKEN` environment variable. Never commit the token.
+`parseTokenAmount` rejects extra fractional digits instead of rounding them away.
 
-## Shared client behavior (0.8.0)
-
-Use `@timbagame/protocol/amounts` for exact unsigned decimal-string and bigint
-conversion. `parseTokenAmount` trims surrounding whitespace, accepts `.5` and
-`1.`, permits zero, and rejects excess fractional digits instead of truncating.
-Decimals must be integers from 0 through 255. `formatTokenAmount` preserves all
-base units, including for zero-decimal tokens. Applications own positive-amount
-requirements, safe-number conversion, rounding for display, and error wording.
-
-Use `@timbagame/protocol/contracts/client` when a consumer supports both deployed
-versions. `getContractClient(version)` selects the generated operations;
-`decodeGame(version, bytes)` checks the account discriminator and participant
-count; `getGameTypeName` normalizes the generated game enum. Literal versions
-retain the complete generated types. Runtime version unions
-broaden only instruction-builder address literals so either version can be called;
-account-decoder overloads and RPC address inference remain intact. Import the explicit
-version's `/kit` subpath when a single-version bundle matters.
-Always pass deployment-specific `programAddress` to PDA and instruction builders.
-Game random hashes must be exactly 32 bytes; service adapters validate them before
-calling the generated PDA encoder.
-
-`@timbagame/protocol/contracts/idl` owns `getContractIdl(version)`. The lightweight
-`/contracts` capability registry still imports neither IDLs nor generated clients.
-
-### Ownership and migration
-
-- Bot, web, and Oracle use shared client/IDL selection. Bot and Oracle derive
-  Timba PDAs with generated helpers; web already did so.
-- Web maps decoded accounts to its presentation model. Bot converts Kit addresses
-  to its PublicKey boundary. Oracle retains RPC orchestration and creation policy.
-- Standard token/ATA and signer adapters remain local and use asynchronous Solana
-  helpers. They are not a Timba protocol abstraction.
-- Signing, wallet transaction setup, caching, storage, provider integrations, and
-  presentation remain in their owning services.
-
-Consumers pin the published `@timbagame/protocol@0.8.0` registry package in
-`package.json` and `bun.lock`. Install it with `bun install --frozen-lockfile` using
-the GitHub Packages authentication described above.
-
-### Shared events, randomness, and token policy
-
-`@timbagame/protocol/contracts/events` exports `decodeProgramEvent`,
-`getTrustedProgramData`, and typed event data. Decode only data from the active
-Timba invocation frame. Unknown events return null; malformed recognized layouts
-throw. Consumers choose whether malformed history should abort indexing or be
-skipped. Amounts and timestamps remain bigint. Historical PlayerUnjoined layouts
-are supported alongside the v0.2/v0.3 events.
-
-`@timbagame/protocol/randomness` exports `calculateWinner(secret, lastSlot, tickets)`
-and the pure `createWinnerSeed`/`selectWinnerFromEntropy` functions for services
-using a synchronous standard SHA-256 implementation. Seeds are 32-byte secrets
-followed by an unsigned little-endian u64 slot. Selection matches the contract's
-overlapping-window rejection sampling; secret storage remains application-owned.
-
-`evaluateTokenPolicy` from `/oracle` checks mint support, enabled status, and the
-accepted minimum, returning structured rejection codes. It does not fetch prices,
-load metadata, or produce user-facing messages. `TokenPolicyInput` describes the
-unvalidated wire input; `TokenPolicy` is the validated schema output.
-
-## Cross-repository integration
-
-The shared local-validator suite lives in the sibling `operations/integration` directory. Run `bun run test:integration --web` from `operations`; see its README for pinned toolchains, candidate protocol packages and optional manual GitHub runs. Normal CI does not run the combined system suite or require a cross-repository credential.
-
-## Cross-chain game adapters
-
-Import `observeSolanaGame`, `observeEvmGame`, `gameLifecycle`,
-`normalizeSolanaMembership`, and `normalizeEvmMembership` from
-`@timbagame/protocol/games`. These pure adapters accept decoded current Solana
-v0.3 accounts or EVM Timba tuples. Existing Solana HTTP schemas and transaction
-builders are unchanged.
-
-Game references include the chain/network, deployment, and game identifier.
-Amounts remain bigint token units. Expiry and the current Oracle buffer determine
-join, settlement, and refund eligibility; these helpers describe timing, not
-wallet authorization, token balances, or transaction success.
-
-A missing account is unknown, never automatically completed. Supply a verified
-indexed Solana terminal outcome to distinguish settlement from cancellation.
-Bind that evidence to the same network/deployment and account incarnation in your
-indexer: Solana commitment-derived PDAs can be reused after closure. Fetch errors
-must not be converted into terminal outcomes.
-
-Solana commitments are not present in the Game account; pass the indexed creation
-commitment when available. Entropy positions retain their slot/block distinction.
-Use the versioned Solana and EVM randomness verifiers below. Their formulas
-are intentionally different.
-
-Membership adapters consume decoded events. EVM refunds require the new
-`removedIndex` and `movedParticipant` event fields; a zero moved address becomes
-null. Keep events in canonical chain order and handle reorgs before applying them.
-Historical Solana event versions without swap-removal information require their
-version-specific reconstruction rules.
-
-## Versioned chain interfaces
-
-| Import                                         | Purpose                                                                  |
-| ---------------------------------------------- | ------------------------------------------------------------------------ |
-| `@timbagame/protocol/solana`                   | Existing Solana version/capability metadata                              |
-| `@timbagame/protocol/solana/v0.3.0`            | Solana IDL and Anchor types                                              |
-| `@timbagame/protocol/solana/v0.3.0/kit`        | Generated Solana transaction builders                                    |
-| `@timbagame/protocol/solana/v0.3.0/randomness` | Solana SHA-256/slot verifier                                             |
-| `@timbagame/protocol/evm`                      | EVM interface versions and deployment type                               |
-| `@timbagame/protocol/evm/v0.1.0`               | Typed ABI, transaction builders, EIP-712 payloads, randomness and events |
-| `@timbagame/protocol/evm/v0.1.0/abi`           | Raw JSON ABI                                                             |
-| `@timbagame/protocol/games`                    | Shared observations, lifecycle and normalized event types                |
-
-Existing `contracts/*` and `randomness` exports remain compatible. The new Solana
-paths are aliases, not a second copy of generated code. Solana imports do not
-load viem. EVM v0.1.0 identifies the initial, not-yet-deployed Solidity interface;
-it is separate from the protocol package version and EIP-712 domain version.
+### Build an EVM transaction
 
 ```ts
 import {
@@ -231,93 +136,55 @@ import {
   createGameTransaction,
 } from "@timbagame/protocol/evm/v0.1.0";
 
-// proxy is the configured proxy address, never the implementation address.
+// Use the proxy address, not the implementation address.
 const deployment = { chainId: 8453, address: proxy, version: "0.1.0" } as const;
-const payload = creationTypedData(deployment, request);
-const signature = await operatorWallet.signTypedData(payload);
+const signature = await operatorWallet.signTypedData(
+  creationTypedData(deployment, request),
+);
 const transaction = createGameTransaction(deployment, request, signature, true);
-// Submit with the creator's wallet on deployment.chainId.
 ```
 
-Transaction helpers only encode calls. They do not fetch nonces, estimate fees,
-sign, broadcast, retry or select an RPC. Fetch the current creator nonce and
-validate off-chain token/game policy before signing. Use `privateJoinTypedData`
-for private-entry signatures; public joins omit authorization.
-Amounts and nonces are bigint. Approval amounts are explicit; no helper silently
-grants unlimited allowances.
+Transaction helpers only encode calls. Fetching nonces, estimating fees, signing and broadcasting stay with the caller, and no helper grants an unlimited token allowance.
 
-`calculateEvmWinner` verifies the SHA-256 commitment and reproduces Solidity's
-domain-separated Keccak/rejection-sampling algorithm. Pass the stored
-`lastEntryBlock`, not an assumed RPC block height. Its result verifies selection,
-not whether settlement is currently authorized or timely. Do not expose unrevealed
-secrets through public simulation services.
+## Design notes
 
-`decodeEvmGameEvent` accepts raw logs, checks chain ID and emitting proxy, and
-rejects removed or malformed recognized logs. `normalizeSolanaGameEvent` consumes
-decoded events from trusted program logs. Both cover creation, joins, refunds,
-completion and closure. Unavailable event fields are null, not guessed. Callers
-retain transaction/block/log identities, canonical ordering and reorg rollback.
+- **No hidden side effects.** The transaction, lifecycle, amount and verification helpers are pure: they read no environment variables, open no RPC connections, and never sign, store data or retry. The one exception is the REST client from `common`, which sends HTTP requests with `fetch` (or the one you pass in).
+- **On-chain amounts are `bigint`.** Contract clients, transaction plans and game helpers keep token units exact. Some older indexer and web API fields, such as `ticketAmount`, `totalAmount` and the verified-game prize and fee, are plain JSON numbers, so treat them as display values rather than exact amounts.
+- **A missing account is not a result.** A closed Solana game account is reported as unknown until indexed evidence says whether it settled or was cancelled. Game addresses can be reused after closure, so tie that evidence to the same deployment and account lifetime.
+- **Events need canonical order.** Apply decoded events in chain order and roll back on reorgs before passing them to the membership helpers.
 
-A proxy address does not identify an immutable implementation. Maintain the
-interface version by deployment and upgrade block in the application, and select
-the versioned decoder accordingly. There is no automatic on-chain version
-discovery or hardcoded production deployment registry.
+## Development
 
-## EVM artifact maintenance
-
-The JSON ABI is copied from the public contracts artifact. `source.json` records
-its source commit and SHA-256. Generate its literal TypeScript ABI with
-`bun run generate:evm`. This preserves viem's inferred argument and event types.
-
-Before updating the pinned artifact, review interface compatibility and select
-the appropriate contract version. Update the source metadata, regenerate the
-typed ABI and distribution, then check the intended local contracts checkout:
+Requires [Bun](https://bun.sh) 1.4.2.
 
 ```bash
-bun run check:evm-upstream /path/to/contracts
-bun run generate:evm
-bun run build
+bun install
+bun run typecheck
 bun test
+bun run build
 ```
 
-Solidity-generated client vectors are committed in both repositories and tested
-against their implementations. Contracts regenerates/checks them with its
-`ClientVectors` script/test. Protocol CI verifies the committed ABI, generated
-TypeScript, distribution and vectors without cloning another repository.
-The optional upstream check compares both ABI and vectors; an offline CI run
-cannot discover unimported upstream changes.
+Generated code and the built `dist` folder are committed, and CI fails if they drift from their sources.
 
-## Shared application workflows
+| Change                         | Then run                                                                     |
+| ------------------------------ | ---------------------------------------------------------------------------- |
+| New or updated Solana IDL      | Copy the IDL and its Anchor type together, then `bun run generate:contracts` |
+| New or updated EVM ABI         | Update `src/evm/v0.1.0/source.json`, then `bun run generate:evm`             |
+| Compare EVM artifacts upstream | `bun run check:evm-upstream /path/to/contracts`                              |
+| Anything under `src`           | `bun run build`, then commit `dist`                                          |
 
-`@timbagame/protocol/games` exports `GameDraft`, `validateGameDraft`,
-`gameCapabilities`, `gamePath` and `gameReferenceKey`. These pure helpers preserve
-exact token amounts and network/deployment identity. Apps own UI, translations,
-RPC transports, signing and durable transaction journals.
+Solana IDL snapshots come from tagged commits in the contracts repository. The EVM ABI records its source commit and SHA-256 in `source.json`.
 
-`@timbagame/protocol/evm` also exports the shared HTTP schemas,
-`checkCreationAuthorization` and `evmGameActions`. Authorization checks validate
-economic terms and identity; consumers must still verify the current operator's
-signature before spending. Action eligibility is advisory; contract simulation
-and on-chain execution remain authoritative.
+## Releases
 
-## Shared Solana plans and finalized verification
+Each release is a normal pull request that bumps `version` in `package.json`. When it merges into `main` and CI passes, the release workflow publishes that version. Published versions are immutable, so any fix ships as a new version.
 
-Version 0.13.0 adds `@timbagame/protocol/solana/plans`: transaction encoding,
-associated token accounts, wrapped-SOL setup, versioned create/join/unjoin/close
-plans, and account serialization. Pass the contract version and program address
-explicitly to `createContractAdapter(version, programId)` and
-`buildCreateGamePlan(input, version, programId)`. These helpers perform no RPC,
-signing, broadcasting, environment lookup, or persistence.
+## Related
 
-`@timbagame/protocol/web` corrects `VerifiedGameSchema.randomValue` to a decimal
-u64 and adds the published commitment and transaction references.
-`FinalizedVerifiedGameSchema` requires the complete proof, and web verification
-endpoint contracts use it. `validateVerifiedGame(value, signature, programId)`
-checks the commitment, deployment-specific game PDA, ticket positions, and winner.
-It validates consistency of supplied inputs; it does not authenticate chain history.
-Oracle must still reconstruct finalized history before storing a record.
+- [timbagame/contracts](https://github.com/timbagame/contracts): the Solana and EVM programs
+- [timba.cc](https://timba.cc): play on the web and verify games
+- [@playtimbabot](https://t.me/playtimbabot): play in Telegram
 
-Migration: publish 0.13.0 through the normal reviewed-main release workflow, then
-update oracle and web pins/lockfiles. Existing hex-valued randomValue responses
-are rejected. Older responses can use the base schema only if their random value
-is decimal; finalized endpoints require all proof fields.
+## License
+
+MIT

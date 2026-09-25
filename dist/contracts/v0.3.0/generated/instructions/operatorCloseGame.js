@@ -27,25 +27,50 @@ export function getOperatorCloseGameInstructionDataCodec() {
 export async function getOperatorCloseGameInstructionAsync(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        game: { value: input.game ?? null, isWritable: true },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
-        oracle: { value: input.oracle ?? null, isWritable: false },
-        tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-        gameVault: { value: input.gameVault ?? null, isWritable: false },
-        gameVaultTokenAccount: {
-            value: input.gameVaultTokenAccount ?? null,
+        game: { value: input.game ?? null, isSigner: false, isWritable: true },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
             isWritable: true,
         },
-        tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+        tokenMint: {
+            value: input.tokenMint ?? null,
+            isSigner: false,
             isWritable: false,
         },
-        creator: { value: input.creator ?? null, isWritable: false },
+        gameVault: {
+            value: input.gameVault ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        gameVaultTokenAccount: {
+            value: input.gameVaultTokenAccount ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        tokenProgram: {
+            value: input.tokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        associatedTokenProgram: {
+            value: input.associatedTokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        creator: {
+            value: input.creator ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
         creatorTokenAccount: {
             value: input.creatorTokenAccount ?? null,
+            isSigner: false,
             isWritable: true,
         },
     };
@@ -77,7 +102,6 @@ export async function getOperatorCloseGameInstructionAsync(input, config) {
         accounts.associatedTokenProgram.value =
             "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -98,25 +122,50 @@ export async function getOperatorCloseGameInstructionAsync(input, config) {
 export function getOperatorCloseGameInstruction(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        game: { value: input.game ?? null, isWritable: true },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
-        oracle: { value: input.oracle ?? null, isWritable: false },
-        tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-        gameVault: { value: input.gameVault ?? null, isWritable: false },
-        gameVaultTokenAccount: {
-            value: input.gameVaultTokenAccount ?? null,
+        game: { value: input.game ?? null, isSigner: false, isWritable: true },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
             isWritable: true,
         },
-        tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+        tokenMint: {
+            value: input.tokenMint ?? null,
+            isSigner: false,
             isWritable: false,
         },
-        creator: { value: input.creator ?? null, isWritable: false },
+        gameVault: {
+            value: input.gameVault ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        gameVaultTokenAccount: {
+            value: input.gameVaultTokenAccount ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        tokenProgram: {
+            value: input.tokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        associatedTokenProgram: {
+            value: input.associatedTokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        creator: {
+            value: input.creator ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
         creatorTokenAccount: {
             value: input.creatorTokenAccount ?? null,
+            isSigner: false,
             isWritable: true,
         },
     };
@@ -130,7 +179,6 @@ export function getOperatorCloseGameInstruction(input, config) {
         accounts.associatedTokenProgram.value =
             "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),

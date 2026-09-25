@@ -5,7 +5,8 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type TransactionSigner, type WritableAccount, type WritableSignerAccount } from "@solana/kit";
+import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type WritableAccount, type WritableSignerAccount } from "@solana/kit";
+import { type InstructionAccountInput, type InstructionAccountInputAddress, type InstructionSignerInput, type ResolvedInstructionAccountMeta } from "@solana/kit/program-client-core";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
 import { type OracleConfig, type OracleConfigArgs } from "../types/index.js";
 export declare const INITIALIZE_ORACLE_DISCRIMINATOR: ReadonlyUint8Array;
@@ -29,30 +30,30 @@ export type InitializeOracleInstructionDataArgs = {
 export declare function getInitializeOracleInstructionDataEncoder(): FixedSizeEncoder<InitializeOracleInstructionDataArgs>;
 export declare function getInitializeOracleInstructionDataDecoder(): FixedSizeDecoder<InitializeOracleInstructionData>;
 export declare function getInitializeOracleInstructionDataCodec(): FixedSizeCodec<InitializeOracleInstructionDataArgs, InitializeOracleInstructionData>;
-export type InitializeOracleAsyncInput<TAccountOracle extends string = string, TAccountOracleOperator extends string = string, TAccountUpgradeAuthority extends string = string, TAccountProgram extends string = string, TAccountProgramData extends string = string, TAccountSystemProgram extends string = string> = {
-    oracle?: Address<TAccountOracle>;
-    oracleOperator: TransactionSigner<TAccountOracleOperator>;
-    upgradeAuthority: TransactionSigner<TAccountUpgradeAuthority>;
-    program?: Address<TAccountProgram>;
-    programData: Address<TAccountProgramData>;
-    systemProgram?: Address<TAccountSystemProgram>;
+export type InitializeOracleAsyncInput<TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput, TAccountUpgradeAuthority extends InstructionSignerInput = InstructionSignerInput, TAccountProgram extends InstructionAccountInput = InstructionAccountInput, TAccountProgramData extends InstructionAccountInput = InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput = InstructionAccountInput> = {
+    oracle?: TAccountOracle;
+    oracleOperator: TAccountOracleOperator;
+    upgradeAuthority: TAccountUpgradeAuthority;
+    program?: TAccountProgram;
+    programData: TAccountProgramData;
+    systemProgram?: TAccountSystemProgram;
     config: InitializeOracleInstructionDataArgs["config"];
 };
-export declare function getInitializeOracleInstructionAsync<TAccountOracle extends string, TAccountOracleOperator extends string, TAccountUpgradeAuthority extends string, TAccountProgram extends string, TAccountProgramData extends string, TAccountSystemProgram extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeOracleAsyncInput<TAccountOracle, TAccountOracleOperator, TAccountUpgradeAuthority, TAccountProgram, TAccountProgramData, TAccountSystemProgram>, config?: {
+export declare function getInitializeOracleInstructionAsync<TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TAccountUpgradeAuthority extends InstructionSignerInput, TAccountProgram extends InstructionAccountInput, TAccountProgramData extends InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeOracleAsyncInput<TAccountOracle, TAccountOracleOperator, TAccountUpgradeAuthority, TAccountProgram, TAccountProgramData, TAccountSystemProgram>, config?: {
     programAddress?: TProgramAddress;
-}): Promise<InitializeOracleInstruction<TProgramAddress, TAccountOracle, TAccountOracleOperator, TAccountUpgradeAuthority, TAccountProgram, TAccountProgramData, TAccountSystemProgram>>;
-export type InitializeOracleInput<TAccountOracle extends string = string, TAccountOracleOperator extends string = string, TAccountUpgradeAuthority extends string = string, TAccountProgram extends string = string, TAccountProgramData extends string = string, TAccountSystemProgram extends string = string> = {
-    oracle: Address<TAccountOracle>;
-    oracleOperator: TransactionSigner<TAccountOracleOperator>;
-    upgradeAuthority: TransactionSigner<TAccountUpgradeAuthority>;
-    program?: Address<TAccountProgram>;
-    programData: Address<TAccountProgramData>;
-    systemProgram?: Address<TAccountSystemProgram>;
+}): Promise<InitializeOracleInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>, ResolvedInstructionAccountMeta<TAccountUpgradeAuthority, InstructionAccountInputAddress<TAccountUpgradeAuthority>>, ResolvedInstructionAccountMeta<TAccountProgram, InstructionAccountInputAddress<TAccountProgram>>, ResolvedInstructionAccountMeta<TAccountProgramData, InstructionAccountInputAddress<TAccountProgramData>>, ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>>>;
+export type InitializeOracleInput<TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput, TAccountUpgradeAuthority extends InstructionSignerInput = InstructionSignerInput, TAccountProgram extends InstructionAccountInput = InstructionAccountInput, TAccountProgramData extends InstructionAccountInput = InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput = InstructionAccountInput> = {
+    oracle: TAccountOracle;
+    oracleOperator: TAccountOracleOperator;
+    upgradeAuthority: TAccountUpgradeAuthority;
+    program?: TAccountProgram;
+    programData: TAccountProgramData;
+    systemProgram?: TAccountSystemProgram;
     config: InitializeOracleInstructionDataArgs["config"];
 };
-export declare function getInitializeOracleInstruction<TAccountOracle extends string, TAccountOracleOperator extends string, TAccountUpgradeAuthority extends string, TAccountProgram extends string, TAccountProgramData extends string, TAccountSystemProgram extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeOracleInput<TAccountOracle, TAccountOracleOperator, TAccountUpgradeAuthority, TAccountProgram, TAccountProgramData, TAccountSystemProgram>, config?: {
+export declare function getInitializeOracleInstruction<TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TAccountUpgradeAuthority extends InstructionSignerInput, TAccountProgram extends InstructionAccountInput, TAccountProgramData extends InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeOracleInput<TAccountOracle, TAccountOracleOperator, TAccountUpgradeAuthority, TAccountProgram, TAccountProgramData, TAccountSystemProgram>, config?: {
     programAddress?: TProgramAddress;
-}): InitializeOracleInstruction<TProgramAddress, TAccountOracle, TAccountOracleOperator, TAccountUpgradeAuthority, TAccountProgram, TAccountProgramData, TAccountSystemProgram>;
+}): InitializeOracleInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>, ResolvedInstructionAccountMeta<TAccountUpgradeAuthority, InstructionAccountInputAddress<TAccountUpgradeAuthority>>, ResolvedInstructionAccountMeta<TAccountProgram, InstructionAccountInputAddress<TAccountProgram>>, ResolvedInstructionAccountMeta<TAccountProgramData, InstructionAccountInputAddress<TAccountProgramData>>, ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>>;
 export type ParsedInitializeOracleInstruction<TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS, TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]> = {
     programAddress: Address<TProgram>;
     accounts: {

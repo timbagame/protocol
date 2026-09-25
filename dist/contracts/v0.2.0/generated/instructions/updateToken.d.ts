@@ -5,7 +5,8 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type TransactionSigner, type WritableAccount } from "@solana/kit";
+import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type WritableAccount } from "@solana/kit";
+import { type InstructionAccountInput, type InstructionAccountInputAddress, type InstructionSignerInput, type ResolvedInstructionAccountMeta } from "@solana/kit/program-client-core";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
 import { type TokenConfig, type TokenConfigArgs } from "../types/index.js";
 export declare const UPDATE_TOKEN_DISCRIMINATOR: ReadonlyUint8Array;
@@ -27,26 +28,26 @@ export type UpdateTokenInstructionDataArgs = {
 export declare function getUpdateTokenInstructionDataEncoder(): FixedSizeEncoder<UpdateTokenInstructionDataArgs>;
 export declare function getUpdateTokenInstructionDataDecoder(): FixedSizeDecoder<UpdateTokenInstructionData>;
 export declare function getUpdateTokenInstructionDataCodec(): FixedSizeCodec<UpdateTokenInstructionDataArgs, UpdateTokenInstructionData>;
-export type UpdateTokenAsyncInput<TAccountGameToken extends string = string, TAccountTokenMint extends string = string, TAccountOracle extends string = string, TAccountOracleOperator extends string = string> = {
-    gameToken?: Address<TAccountGameToken>;
-    tokenMint: Address<TAccountTokenMint>;
-    oracle?: Address<TAccountOracle>;
-    oracleOperator: TransactionSigner<TAccountOracleOperator>;
+export type UpdateTokenAsyncInput<TAccountGameToken extends InstructionAccountInput = InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput> = {
+    gameToken?: TAccountGameToken;
+    tokenMint: TAccountTokenMint;
+    oracle?: TAccountOracle;
+    oracleOperator: TAccountOracleOperator;
     config: UpdateTokenInstructionDataArgs["config"];
 };
-export declare function getUpdateTokenInstructionAsync<TAccountGameToken extends string, TAccountTokenMint extends string, TAccountOracle extends string, TAccountOracleOperator extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateTokenAsyncInput<TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>, config?: {
+export declare function getUpdateTokenInstructionAsync<TAccountGameToken extends InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput, TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateTokenAsyncInput<TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>, config?: {
     programAddress?: TProgramAddress;
-}): Promise<UpdateTokenInstruction<TProgramAddress, TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>>;
-export type UpdateTokenInput<TAccountGameToken extends string = string, TAccountTokenMint extends string = string, TAccountOracle extends string = string, TAccountOracleOperator extends string = string> = {
-    gameToken: Address<TAccountGameToken>;
-    tokenMint: Address<TAccountTokenMint>;
-    oracle: Address<TAccountOracle>;
-    oracleOperator: TransactionSigner<TAccountOracleOperator>;
+}): Promise<UpdateTokenInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGameToken, InstructionAccountInputAddress<TAccountGameToken>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>>>;
+export type UpdateTokenInput<TAccountGameToken extends InstructionAccountInput = InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput> = {
+    gameToken: TAccountGameToken;
+    tokenMint: TAccountTokenMint;
+    oracle: TAccountOracle;
+    oracleOperator: TAccountOracleOperator;
     config: UpdateTokenInstructionDataArgs["config"];
 };
-export declare function getUpdateTokenInstruction<TAccountGameToken extends string, TAccountTokenMint extends string, TAccountOracle extends string, TAccountOracleOperator extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateTokenInput<TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>, config?: {
+export declare function getUpdateTokenInstruction<TAccountGameToken extends InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput, TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateTokenInput<TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>, config?: {
     programAddress?: TProgramAddress;
-}): UpdateTokenInstruction<TProgramAddress, TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>;
+}): UpdateTokenInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGameToken, InstructionAccountInputAddress<TAccountGameToken>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>>;
 export type ParsedUpdateTokenInstruction<TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS, TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]> = {
     programAddress: Address<TProgram>;
     accounts: {

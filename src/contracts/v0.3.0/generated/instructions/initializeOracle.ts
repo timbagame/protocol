@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
   type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/kit/program-client-core";
 import { findOraclePda } from "../pdas/index.js";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -129,29 +132,32 @@ export function getInitializeOracleInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type InitializeOracleAsyncInput<
-  TAccountOracle extends string = string,
-  TAccountOracleOperator extends string = string,
-  TAccountUpgradeAuthority extends string = string,
-  TAccountProgram extends string = string,
-  TAccountProgramData extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountUpgradeAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  oracle?: Address<TAccountOracle>;
-  oracleOperator: TransactionSigner<TAccountOracleOperator>;
-  upgradeAuthority: TransactionSigner<TAccountUpgradeAuthority>;
-  program?: Address<TAccountProgram>;
-  programData: Address<TAccountProgramData>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  oracle?: TAccountOracle;
+  oracleOperator: TAccountOracleOperator;
+  upgradeAuthority: TAccountUpgradeAuthority;
+  program?: TAccountProgram;
+  programData: TAccountProgramData;
+  systemProgram?: TAccountSystemProgram;
   config: InitializeOracleInstructionDataArgs["config"];
 };
 
 export async function getInitializeOracleInstructionAsync<
-  TAccountOracle extends string,
-  TAccountOracleOperator extends string,
-  TAccountUpgradeAuthority extends string,
-  TAccountProgram extends string,
-  TAccountProgramData extends string,
-  TAccountSystemProgram extends string,
+  TAccountOracle extends InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput,
+  TAccountUpgradeAuthority extends InstructionSignerInput,
+  TAccountProgram extends InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
 >(
   input: InitializeOracleAsyncInput<
@@ -166,28 +172,66 @@ export async function getInitializeOracleInstructionAsync<
 ): Promise<
   InitializeOracleInstruction<
     TProgramAddress,
-    TAccountOracle,
-    TAccountOracleOperator,
-    TAccountUpgradeAuthority,
-    TAccountProgram,
-    TAccountProgramData,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOracle,
+      InstructionAccountInputAddress<TAccountOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOperator,
+      InstructionAccountInputAddress<TAccountOracleOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpgradeAuthority,
+      InstructionAccountInputAddress<TAccountUpgradeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >
 > {
   // Program address.
   const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
 
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+
   // Original accounts.
   const originalAccounts = {
-    oracle: { value: input.oracle ?? null, isWritable: true },
-    oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
+    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
+    oracleOperator: {
+      value: input.oracleOperator ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
     upgradeAuthority: {
       value: input.upgradeAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    program: { value: input.program ?? null, isWritable: false },
-    programData: { value: input.programData ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    programData: {
+      value: input.programData ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -210,7 +254,6 @@ export async function getInitializeOracleInstructionAsync<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("oracle", accounts.oracle),
@@ -226,39 +269,60 @@ export async function getInitializeOracleInstructionAsync<
     programAddress,
   } as InitializeOracleInstruction<
     TProgramAddress,
-    TAccountOracle,
-    TAccountOracleOperator,
-    TAccountUpgradeAuthority,
-    TAccountProgram,
-    TAccountProgramData,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOracle,
+      InstructionAccountInputAddress<TAccountOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOperator,
+      InstructionAccountInputAddress<TAccountOracleOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpgradeAuthority,
+      InstructionAccountInputAddress<TAccountUpgradeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 
 export type InitializeOracleInput<
-  TAccountOracle extends string = string,
-  TAccountOracleOperator extends string = string,
-  TAccountUpgradeAuthority extends string = string,
-  TAccountProgram extends string = string,
-  TAccountProgramData extends string = string,
-  TAccountSystemProgram extends string = string,
+  TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountUpgradeAuthority extends InstructionSignerInput =
+    InstructionSignerInput,
+  TAccountProgram extends InstructionAccountInput = InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput = InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput =
+    InstructionAccountInput,
 > = {
-  oracle: Address<TAccountOracle>;
-  oracleOperator: TransactionSigner<TAccountOracleOperator>;
-  upgradeAuthority: TransactionSigner<TAccountUpgradeAuthority>;
-  program?: Address<TAccountProgram>;
-  programData: Address<TAccountProgramData>;
-  systemProgram?: Address<TAccountSystemProgram>;
+  oracle: TAccountOracle;
+  oracleOperator: TAccountOracleOperator;
+  upgradeAuthority: TAccountUpgradeAuthority;
+  program?: TAccountProgram;
+  programData: TAccountProgramData;
+  systemProgram?: TAccountSystemProgram;
   config: InitializeOracleInstructionDataArgs["config"];
 };
 
 export function getInitializeOracleInstruction<
-  TAccountOracle extends string,
-  TAccountOracleOperator extends string,
-  TAccountUpgradeAuthority extends string,
-  TAccountProgram extends string,
-  TAccountProgramData extends string,
-  TAccountSystemProgram extends string,
+  TAccountOracle extends InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput,
+  TAccountUpgradeAuthority extends InstructionSignerInput,
+  TAccountProgram extends InstructionAccountInput,
+  TAccountProgramData extends InstructionAccountInput,
+  TAccountSystemProgram extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
 >(
   input: InitializeOracleInput<
@@ -272,27 +336,65 @@ export function getInitializeOracleInstruction<
   config?: { programAddress?: TProgramAddress },
 ): InitializeOracleInstruction<
   TProgramAddress,
-  TAccountOracle,
-  TAccountOracleOperator,
-  TAccountUpgradeAuthority,
-  TAccountProgram,
-  TAccountProgramData,
-  TAccountSystemProgram
+  ResolvedInstructionAccountMeta<
+    TAccountOracle,
+    InstructionAccountInputAddress<TAccountOracle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOracleOperator,
+    InstructionAccountInputAddress<TAccountOracleOperator>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountUpgradeAuthority,
+    InstructionAccountInputAddress<TAccountUpgradeAuthority>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgram,
+    InstructionAccountInputAddress<TAccountProgram>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountProgramData,
+    InstructionAccountInputAddress<TAccountProgramData>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountSystemProgram,
+    InstructionAccountInputAddress<TAccountSystemProgram>
+  >
 > {
   // Program address.
   const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
 
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+
   // Original accounts.
   const originalAccounts = {
-    oracle: { value: input.oracle ?? null, isWritable: true },
-    oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
+    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
+    oracleOperator: {
+      value: input.oracleOperator ?? null,
+      isSigner: true,
+      isWritable: true,
+    },
     upgradeAuthority: {
       value: input.upgradeAuthority ?? null,
+      isSigner: true,
       isWritable: false,
     },
-    program: { value: input.program ?? null, isWritable: false },
-    programData: { value: input.programData ?? null, isWritable: false },
-    systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+    program: {
+      value: input.program ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    programData: {
+      value: input.programData ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    systemProgram: {
+      value: input.systemProgram ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -312,7 +414,6 @@ export function getInitializeOracleInstruction<
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("oracle", accounts.oracle),
@@ -328,12 +429,30 @@ export function getInitializeOracleInstruction<
     programAddress,
   } as InitializeOracleInstruction<
     TProgramAddress,
-    TAccountOracle,
-    TAccountOracleOperator,
-    TAccountUpgradeAuthority,
-    TAccountProgram,
-    TAccountProgramData,
-    TAccountSystemProgram
+    ResolvedInstructionAccountMeta<
+      TAccountOracle,
+      InstructionAccountInputAddress<TAccountOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOperator,
+      InstructionAccountInputAddress<TAccountOracleOperator>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountUpgradeAuthority,
+      InstructionAccountInputAddress<TAccountUpgradeAuthority>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgram,
+      InstructionAccountInputAddress<TAccountProgram>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountProgramData,
+      InstructionAccountInputAddress<TAccountProgramData>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountSystemProgram,
+      InstructionAccountInputAddress<TAccountSystemProgram>
+    >
   >);
 }
 

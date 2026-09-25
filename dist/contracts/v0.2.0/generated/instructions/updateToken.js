@@ -34,12 +34,26 @@ export function getUpdateTokenInstructionDataCodec() {
 export async function getUpdateTokenInstructionAsync(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        gameToken: { value: input.gameToken ?? null, isWritable: true },
-        tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-        oracle: { value: input.oracle ?? null, isWritable: false },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: false },
+        gameToken: {
+            value: input.gameToken ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        tokenMint: {
+            value: input.tokenMint ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: false,
+        },
     };
     const accounts = originalAccounts;
     // Original args.
@@ -53,7 +67,6 @@ export async function getUpdateTokenInstructionAsync(input, config) {
     if (!accounts.oracle.value) {
         accounts.oracle.value = await findOraclePda({ programAddress });
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("gameToken", accounts.gameToken),
@@ -68,17 +81,30 @@ export async function getUpdateTokenInstructionAsync(input, config) {
 export function getUpdateTokenInstruction(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        gameToken: { value: input.gameToken ?? null, isWritable: true },
-        tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-        oracle: { value: input.oracle ?? null, isWritable: false },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: false },
+        gameToken: {
+            value: input.gameToken ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        tokenMint: {
+            value: input.tokenMint ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: false,
+        },
     };
     const accounts = originalAccounts;
     // Original args.
     const args = { ...input };
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("gameToken", accounts.gameToken),

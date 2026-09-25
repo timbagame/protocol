@@ -37,27 +37,56 @@ export function getCompleteGameInstructionDataCodec() {
 export async function getCompleteGameInstructionAsync(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        game: { value: input.game ?? null, isWritable: true },
-        tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-        gameToken: { value: input.gameToken ?? null, isWritable: true },
-        gameVault: { value: input.gameVault ?? null, isWritable: false },
-        gameTokenAccount: {
-            value: input.gameTokenAccount ?? null,
-            isWritable: true,
-        },
-        tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
+        game: { value: input.game ?? null, isSigner: false, isWritable: true },
+        tokenMint: {
+            value: input.tokenMint ?? null,
+            isSigner: false,
             isWritable: false,
         },
-        oracle: { value: input.oracle ?? null, isWritable: false },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: false },
-        winner: { value: input.winner ?? null, isWritable: false },
-        creator: { value: input.creator ?? null, isWritable: true },
+        gameToken: {
+            value: input.gameToken ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        gameVault: {
+            value: input.gameVault ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        gameTokenAccount: {
+            value: input.gameTokenAccount ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        tokenProgram: {
+            value: input.tokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        associatedTokenProgram: {
+            value: input.associatedTokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: false,
+        },
+        winner: { value: input.winner ?? null, isSigner: false, isWritable: false },
+        creator: {
+            value: input.creator ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
         winnerTokenAccount: {
             value: input.winnerTokenAccount ?? null,
+            isSigner: false,
             isWritable: true,
         },
     };
@@ -101,7 +130,6 @@ export async function getCompleteGameInstructionAsync(input, config) {
     if (!accounts.oracle.value) {
         accounts.oracle.value = await findOraclePda({ programAddress });
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -124,27 +152,56 @@ export async function getCompleteGameInstructionAsync(input, config) {
 export function getCompleteGameInstruction(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        game: { value: input.game ?? null, isWritable: true },
-        tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-        gameToken: { value: input.gameToken ?? null, isWritable: true },
-        gameVault: { value: input.gameVault ?? null, isWritable: false },
-        gameTokenAccount: {
-            value: input.gameTokenAccount ?? null,
-            isWritable: true,
-        },
-        tokenProgram: { value: input.tokenProgram ?? null, isWritable: false },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
+        game: { value: input.game ?? null, isSigner: false, isWritable: true },
+        tokenMint: {
+            value: input.tokenMint ?? null,
+            isSigner: false,
             isWritable: false,
         },
-        oracle: { value: input.oracle ?? null, isWritable: false },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: false },
-        winner: { value: input.winner ?? null, isWritable: false },
-        creator: { value: input.creator ?? null, isWritable: true },
+        gameToken: {
+            value: input.gameToken ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        gameVault: {
+            value: input.gameVault ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        gameTokenAccount: {
+            value: input.gameTokenAccount ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
+        tokenProgram: {
+            value: input.tokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        associatedTokenProgram: {
+            value: input.associatedTokenProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: false,
+        },
+        winner: { value: input.winner ?? null, isSigner: false, isWritable: false },
+        creator: {
+            value: input.creator ?? null,
+            isSigner: false,
+            isWritable: true,
+        },
         winnerTokenAccount: {
             value: input.winnerTokenAccount ?? null,
+            isSigner: false,
             isWritable: true,
         },
     };
@@ -160,7 +217,6 @@ export function getCompleteGameInstruction(input, config) {
         accounts.associatedTokenProgram.value =
             "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),

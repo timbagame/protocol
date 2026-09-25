@@ -48,6 +48,6 @@ jobs:
 
       - name: Publish package
         if: steps.version.outputs.publish == 'true'
-        run: npm publish --access restricted
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}

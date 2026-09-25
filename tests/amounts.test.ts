@@ -57,4 +57,37 @@ describe("exact token amounts", () => {
     }
     expect(() => formatTokenAmount(-1n, 9)).toThrow(TokenAmountError);
   });
+
+  test("accepts exactly the same formats as the previous pattern", () => {
+    const previous = /^(?:\d+\.?\d*|\.\d+)$/;
+    const alphabet = ["0", "1", "9", ".", " ", "a", "-"];
+    const inputs = [""];
+    for (let length = 1; length <= 5; length += 1) {
+      for (const prefix of inputs.filter(
+        (input) => input.length === length - 1,
+      )) {
+        for (const char of alphabet) inputs.push(prefix + char);
+      }
+    }
+    for (const input of inputs) {
+      const accepted = (() => {
+        try {
+          parseTokenAmount(input, 255);
+          return true;
+        } catch {
+          return false;
+        }
+      })();
+      expect(accepted).toBe(previous.test(input.trim()));
+    }
+  });
+
+  test("handles long runs of zeros in linear time", () => {
+    const zeros = "0".repeat(100_000);
+    const started = performance.now();
+    expect(() => parseTokenAmount(`${zeros}x`, 18)).toThrow(TokenAmountError);
+    expect(parseTokenAmount(`${zeros}.5`, 1)).toBe(5n);
+    expect(formatTokenAmount(10n ** 250n, 255)).toBe("0.00001");
+    expect(performance.now() - started).toBeLessThan(1_000);
+  });
 });

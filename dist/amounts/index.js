@@ -16,7 +16,7 @@ function assertDecimals(decimals) {
 export function parseTokenAmount(value, decimals) {
     assertDecimals(decimals);
     const normalized = value.trim();
-    if (!/^(?:\d+\.?\d*|\.\d+)$/.test(normalized)) {
+    if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(normalized)) {
         throw new TokenAmountError("format", "Invalid amount format");
     }
     const [whole = "", fraction = ""] = normalized.split(".");
@@ -35,7 +35,14 @@ export function formatTokenAmount(value, decimals) {
         return value.toString();
     const padded = value.toString().padStart(decimals + 1, "0");
     const whole = padded.slice(0, -decimals);
-    const fraction = padded.slice(-decimals).replace(/0+$/, "");
+    const fraction = trimTrailingZeros(padded.slice(-decimals));
     return fraction ? `${whole}.${fraction}` : whole;
+}
+/** Linear-time trailing zero trim; avoids a backtracking regular expression. */
+function trimTrailingZeros(digits) {
+    let end = digits.length;
+    while (end > 0 && digits[end - 1] === "0")
+        end -= 1;
+    return digits.slice(0, end);
 }
 //# sourceMappingURL=index.js.map

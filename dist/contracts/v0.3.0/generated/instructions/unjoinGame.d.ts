@@ -5,7 +5,8 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type TransactionSigner, type WritableAccount } from "@solana/kit";
+import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type WritableAccount } from "@solana/kit";
+import { type InstructionAccountInput, type InstructionAccountInputAddress, type InstructionSignerInput, type ResolvedInstructionAccountMeta } from "@solana/kit/program-client-core";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
 export declare const UNJOIN_GAME_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getUnjoinGameDiscriminatorBytes(): ReadonlyUint8Array;
@@ -29,36 +30,36 @@ export type UnjoinGameInstructionDataArgs = {};
 export declare function getUnjoinGameInstructionDataEncoder(): FixedSizeEncoder<UnjoinGameInstructionDataArgs>;
 export declare function getUnjoinGameInstructionDataDecoder(): FixedSizeDecoder<UnjoinGameInstructionData>;
 export declare function getUnjoinGameInstructionDataCodec(): FixedSizeCodec<UnjoinGameInstructionDataArgs, UnjoinGameInstructionData>;
-export type UnjoinGameAsyncInput<TAccountGame extends string = string, TAccountPlayer extends string = string, TAccountAuthority extends string = string, TAccountOracle extends string = string, TAccountTokenMint extends string = string, TAccountGameVault extends string = string, TAccountGameVaultTokenAccount extends string = string, TAccountTokenProgram extends string = string, TAccountAssociatedTokenProgram extends string = string, TAccountPlayerTokenAccount extends string = string> = {
-    game: Address<TAccountGame>;
-    player: Address<TAccountPlayer>;
-    authority: TransactionSigner<TAccountAuthority>;
-    oracle?: Address<TAccountOracle>;
-    tokenMint: Address<TAccountTokenMint>;
-    gameVault?: Address<TAccountGameVault>;
-    gameVaultTokenAccount?: Address<TAccountGameVaultTokenAccount>;
-    tokenProgram?: Address<TAccountTokenProgram>;
-    associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-    playerTokenAccount: Address<TAccountPlayerTokenAccount>;
+export type UnjoinGameAsyncInput<TAccountGame extends InstructionAccountInput = InstructionAccountInput, TAccountPlayer extends InstructionAccountInput = InstructionAccountInput, TAccountAuthority extends InstructionSignerInput = InstructionSignerInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountGameVault extends InstructionAccountInput = InstructionAccountInput, TAccountGameVaultTokenAccount extends InstructionAccountInput = InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountPlayerTokenAccount extends InstructionAccountInput = InstructionAccountInput> = {
+    game: TAccountGame;
+    player: TAccountPlayer;
+    authority: TAccountAuthority;
+    oracle?: TAccountOracle;
+    tokenMint: TAccountTokenMint;
+    gameVault?: TAccountGameVault;
+    gameVaultTokenAccount?: TAccountGameVaultTokenAccount;
+    tokenProgram?: TAccountTokenProgram;
+    associatedTokenProgram?: TAccountAssociatedTokenProgram;
+    playerTokenAccount: TAccountPlayerTokenAccount;
 };
-export declare function getUnjoinGameInstructionAsync<TAccountGame extends string, TAccountPlayer extends string, TAccountAuthority extends string, TAccountOracle extends string, TAccountTokenMint extends string, TAccountGameVault extends string, TAccountGameVaultTokenAccount extends string, TAccountTokenProgram extends string, TAccountAssociatedTokenProgram extends string, TAccountPlayerTokenAccount extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UnjoinGameAsyncInput<TAccountGame, TAccountPlayer, TAccountAuthority, TAccountOracle, TAccountTokenMint, TAccountGameVault, TAccountGameVaultTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountPlayerTokenAccount>, config?: {
+export declare function getUnjoinGameInstructionAsync<TAccountGame extends InstructionAccountInput, TAccountPlayer extends InstructionAccountInput, TAccountAuthority extends InstructionSignerInput, TAccountOracle extends InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput, TAccountGameVault extends InstructionAccountInput, TAccountGameVaultTokenAccount extends InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput, TAccountPlayerTokenAccount extends InstructionAccountInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UnjoinGameAsyncInput<TAccountGame, TAccountPlayer, TAccountAuthority, TAccountOracle, TAccountTokenMint, TAccountGameVault, TAccountGameVaultTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountPlayerTokenAccount>, config?: {
     programAddress?: TProgramAddress;
-}): Promise<UnjoinGameInstruction<TProgramAddress, TAccountGame, TAccountPlayer, TAccountAuthority, TAccountOracle, TAccountTokenMint, TAccountGameVault, TAccountGameVaultTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountPlayerTokenAccount>>;
-export type UnjoinGameInput<TAccountGame extends string = string, TAccountPlayer extends string = string, TAccountAuthority extends string = string, TAccountOracle extends string = string, TAccountTokenMint extends string = string, TAccountGameVault extends string = string, TAccountGameVaultTokenAccount extends string = string, TAccountTokenProgram extends string = string, TAccountAssociatedTokenProgram extends string = string, TAccountPlayerTokenAccount extends string = string> = {
-    game: Address<TAccountGame>;
-    player: Address<TAccountPlayer>;
-    authority: TransactionSigner<TAccountAuthority>;
-    oracle: Address<TAccountOracle>;
-    tokenMint: Address<TAccountTokenMint>;
-    gameVault: Address<TAccountGameVault>;
-    gameVaultTokenAccount: Address<TAccountGameVaultTokenAccount>;
-    tokenProgram?: Address<TAccountTokenProgram>;
-    associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-    playerTokenAccount: Address<TAccountPlayerTokenAccount>;
+}): Promise<UnjoinGameInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGame, InstructionAccountInputAddress<TAccountGame>>, ResolvedInstructionAccountMeta<TAccountPlayer, InstructionAccountInputAddress<TAccountPlayer>>, ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountGameVault, InstructionAccountInputAddress<TAccountGameVault>>, ResolvedInstructionAccountMeta<TAccountGameVaultTokenAccount, InstructionAccountInputAddress<TAccountGameVaultTokenAccount>>, ResolvedInstructionAccountMeta<TAccountTokenProgram, InstructionAccountInputAddress<TAccountTokenProgram>>, ResolvedInstructionAccountMeta<TAccountAssociatedTokenProgram, InstructionAccountInputAddress<TAccountAssociatedTokenProgram>>, ResolvedInstructionAccountMeta<TAccountPlayerTokenAccount, InstructionAccountInputAddress<TAccountPlayerTokenAccount>>>>;
+export type UnjoinGameInput<TAccountGame extends InstructionAccountInput = InstructionAccountInput, TAccountPlayer extends InstructionAccountInput = InstructionAccountInput, TAccountAuthority extends InstructionSignerInput = InstructionSignerInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountGameVault extends InstructionAccountInput = InstructionAccountInput, TAccountGameVaultTokenAccount extends InstructionAccountInput = InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountPlayerTokenAccount extends InstructionAccountInput = InstructionAccountInput> = {
+    game: TAccountGame;
+    player: TAccountPlayer;
+    authority: TAccountAuthority;
+    oracle: TAccountOracle;
+    tokenMint: TAccountTokenMint;
+    gameVault: TAccountGameVault;
+    gameVaultTokenAccount: TAccountGameVaultTokenAccount;
+    tokenProgram?: TAccountTokenProgram;
+    associatedTokenProgram?: TAccountAssociatedTokenProgram;
+    playerTokenAccount: TAccountPlayerTokenAccount;
 };
-export declare function getUnjoinGameInstruction<TAccountGame extends string, TAccountPlayer extends string, TAccountAuthority extends string, TAccountOracle extends string, TAccountTokenMint extends string, TAccountGameVault extends string, TAccountGameVaultTokenAccount extends string, TAccountTokenProgram extends string, TAccountAssociatedTokenProgram extends string, TAccountPlayerTokenAccount extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UnjoinGameInput<TAccountGame, TAccountPlayer, TAccountAuthority, TAccountOracle, TAccountTokenMint, TAccountGameVault, TAccountGameVaultTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountPlayerTokenAccount>, config?: {
+export declare function getUnjoinGameInstruction<TAccountGame extends InstructionAccountInput, TAccountPlayer extends InstructionAccountInput, TAccountAuthority extends InstructionSignerInput, TAccountOracle extends InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput, TAccountGameVault extends InstructionAccountInput, TAccountGameVaultTokenAccount extends InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput, TAccountPlayerTokenAccount extends InstructionAccountInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UnjoinGameInput<TAccountGame, TAccountPlayer, TAccountAuthority, TAccountOracle, TAccountTokenMint, TAccountGameVault, TAccountGameVaultTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountPlayerTokenAccount>, config?: {
     programAddress?: TProgramAddress;
-}): UnjoinGameInstruction<TProgramAddress, TAccountGame, TAccountPlayer, TAccountAuthority, TAccountOracle, TAccountTokenMint, TAccountGameVault, TAccountGameVaultTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountPlayerTokenAccount>;
+}): UnjoinGameInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGame, InstructionAccountInputAddress<TAccountGame>>, ResolvedInstructionAccountMeta<TAccountPlayer, InstructionAccountInputAddress<TAccountPlayer>>, ResolvedInstructionAccountMeta<TAccountAuthority, InstructionAccountInputAddress<TAccountAuthority>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountGameVault, InstructionAccountInputAddress<TAccountGameVault>>, ResolvedInstructionAccountMeta<TAccountGameVaultTokenAccount, InstructionAccountInputAddress<TAccountGameVaultTokenAccount>>, ResolvedInstructionAccountMeta<TAccountTokenProgram, InstructionAccountInputAddress<TAccountTokenProgram>>, ResolvedInstructionAccountMeta<TAccountAssociatedTokenProgram, InstructionAccountInputAddress<TAccountAssociatedTokenProgram>>, ResolvedInstructionAccountMeta<TAccountPlayerTokenAccount, InstructionAccountInputAddress<TAccountPlayerTokenAccount>>>;
 export type ParsedUnjoinGameInstruction<TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS, TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]> = {
     programAddress: Address<TProgram>;
     accounts: {

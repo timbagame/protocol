@@ -32,17 +32,36 @@ export function getInitializeOracleInstructionDataCodec() {
 export async function getInitializeOracleInstructionAsync(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        oracle: { value: input.oracle ?? null, isWritable: true },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: true,
+        },
         upgradeAuthority: {
             value: input.upgradeAuthority ?? null,
+            isSigner: true,
             isWritable: false,
         },
-        program: { value: input.program ?? null, isWritable: false },
-        programData: { value: input.programData ?? null, isWritable: false },
-        systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+        program: {
+            value: input.program ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        programData: {
+            value: input.programData ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        systemProgram: {
+            value: input.systemProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
     };
     const accounts = originalAccounts;
     // Original args.
@@ -59,7 +78,6 @@ export async function getInitializeOracleInstructionAsync(input, config) {
         accounts.systemProgram.value =
             "11111111111111111111111111111111";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("oracle", accounts.oracle),
@@ -76,17 +94,36 @@ export async function getInitializeOracleInstructionAsync(input, config) {
 export function getInitializeOracleInstruction(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        oracle: { value: input.oracle ?? null, isWritable: true },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: true,
+        },
         upgradeAuthority: {
             value: input.upgradeAuthority ?? null,
+            isSigner: true,
             isWritable: false,
         },
-        program: { value: input.program ?? null, isWritable: false },
-        programData: { value: input.programData ?? null, isWritable: false },
-        systemProgram: { value: input.systemProgram ?? null, isWritable: false },
+        program: {
+            value: input.program ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        programData: {
+            value: input.programData ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        systemProgram: {
+            value: input.systemProgram ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
     };
     const accounts = originalAccounts;
     // Original args.
@@ -100,7 +137,6 @@ export function getInitializeOracleInstruction(input, config) {
         accounts.systemProgram.value =
             "11111111111111111111111111111111";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("oracle", accounts.oracle),

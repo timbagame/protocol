@@ -29,13 +29,16 @@ import {
   type ReadonlyAccount,
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
-  type TransactionSigner,
   type WritableAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
+  type InstructionAccountInput,
+  type InstructionAccountInputAddress,
+  type InstructionSignerInput,
   type ResolvedInstructionAccount,
+  type ResolvedInstructionAccountMeta,
 } from "@solana/kit/program-client-core";
 import { findGameTokenPda, findOraclePda } from "../pdas/index.js";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
@@ -119,23 +122,24 @@ export function getUpdateTokenInstructionDataCodec(): FixedSizeCodec<
 }
 
 export type UpdateTokenAsyncInput<
-  TAccountGameToken extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountOracle extends string = string,
-  TAccountOracleOperator extends string = string,
+  TAccountGameToken extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
-  gameToken?: Address<TAccountGameToken>;
-  tokenMint: Address<TAccountTokenMint>;
-  oracle?: Address<TAccountOracle>;
-  oracleOperator: TransactionSigner<TAccountOracleOperator>;
+  gameToken?: TAccountGameToken;
+  tokenMint: TAccountTokenMint;
+  oracle?: TAccountOracle;
+  oracleOperator: TAccountOracleOperator;
   config: UpdateTokenInstructionDataArgs["config"];
 };
 
 export async function getUpdateTokenInstructionAsync<
-  TAccountGameToken extends string,
-  TAccountTokenMint extends string,
-  TAccountOracle extends string,
-  TAccountOracleOperator extends string,
+  TAccountGameToken extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountOracle extends InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
 >(
   input: UpdateTokenAsyncInput<
@@ -148,21 +152,48 @@ export async function getUpdateTokenInstructionAsync<
 ): Promise<
   UpdateTokenInstruction<
     TProgramAddress,
-    TAccountGameToken,
-    TAccountTokenMint,
-    TAccountOracle,
-    TAccountOracleOperator
+    ResolvedInstructionAccountMeta<
+      TAccountGameToken,
+      InstructionAccountInputAddress<TAccountGameToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracle,
+      InstructionAccountInputAddress<TAccountOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOperator,
+      InstructionAccountInputAddress<TAccountOracleOperator>
+    >
   >
 > {
   // Program address.
   const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
 
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+
   // Original accounts.
   const originalAccounts = {
-    gameToken: { value: input.gameToken ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    oracle: { value: input.oracle ?? null, isWritable: false },
-    oracleOperator: { value: input.oracleOperator ?? null, isWritable: false },
+    gameToken: {
+      value: input.gameToken ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+    oracleOperator: {
+      value: input.oracleOperator ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -188,7 +219,6 @@ export async function getUpdateTokenInstructionAsync<
     accounts.oracle.value = await findOraclePda({ programAddress });
   }
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("gameToken", accounts.gameToken),
@@ -202,31 +232,44 @@ export async function getUpdateTokenInstructionAsync<
     programAddress,
   } as UpdateTokenInstruction<
     TProgramAddress,
-    TAccountGameToken,
-    TAccountTokenMint,
-    TAccountOracle,
-    TAccountOracleOperator
+    ResolvedInstructionAccountMeta<
+      TAccountGameToken,
+      InstructionAccountInputAddress<TAccountGameToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracle,
+      InstructionAccountInputAddress<TAccountOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOperator,
+      InstructionAccountInputAddress<TAccountOracleOperator>
+    >
   >);
 }
 
 export type UpdateTokenInput<
-  TAccountGameToken extends string = string,
-  TAccountTokenMint extends string = string,
-  TAccountOracle extends string = string,
-  TAccountOracleOperator extends string = string,
+  TAccountGameToken extends InstructionAccountInput = InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput =
+    InstructionSignerInput,
 > = {
-  gameToken: Address<TAccountGameToken>;
-  tokenMint: Address<TAccountTokenMint>;
-  oracle: Address<TAccountOracle>;
-  oracleOperator: TransactionSigner<TAccountOracleOperator>;
+  gameToken: TAccountGameToken;
+  tokenMint: TAccountTokenMint;
+  oracle: TAccountOracle;
+  oracleOperator: TAccountOracleOperator;
   config: UpdateTokenInstructionDataArgs["config"];
 };
 
 export function getUpdateTokenInstruction<
-  TAccountGameToken extends string,
-  TAccountTokenMint extends string,
-  TAccountOracle extends string,
-  TAccountOracleOperator extends string,
+  TAccountGameToken extends InstructionAccountInput,
+  TAccountTokenMint extends InstructionAccountInput,
+  TAccountOracle extends InstructionAccountInput,
+  TAccountOracleOperator extends InstructionSignerInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
 >(
   input: UpdateTokenInput<
@@ -238,20 +281,47 @@ export function getUpdateTokenInstruction<
   config?: { programAddress?: TProgramAddress },
 ): UpdateTokenInstruction<
   TProgramAddress,
-  TAccountGameToken,
-  TAccountTokenMint,
-  TAccountOracle,
-  TAccountOracleOperator
+  ResolvedInstructionAccountMeta<
+    TAccountGameToken,
+    InstructionAccountInputAddress<TAccountGameToken>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountTokenMint,
+    InstructionAccountInputAddress<TAccountTokenMint>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOracle,
+    InstructionAccountInputAddress<TAccountOracle>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountOracleOperator,
+    InstructionAccountInputAddress<TAccountOracleOperator>
+  >
 > {
   // Program address.
   const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
 
+  // Account meta helper.
+  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
+
   // Original accounts.
   const originalAccounts = {
-    gameToken: { value: input.gameToken ?? null, isWritable: true },
-    tokenMint: { value: input.tokenMint ?? null, isWritable: false },
-    oracle: { value: input.oracle ?? null, isWritable: false },
-    oracleOperator: { value: input.oracleOperator ?? null, isWritable: false },
+    gameToken: {
+      value: input.gameToken ?? null,
+      isSigner: false,
+      isWritable: true,
+    },
+    tokenMint: {
+      value: input.tokenMint ?? null,
+      isSigner: false,
+      isWritable: false,
+    },
+    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
+    oracleOperator: {
+      value: input.oracleOperator ?? null,
+      isSigner: true,
+      isWritable: false,
+    },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -261,7 +331,6 @@ export function getUpdateTokenInstruction<
   // Original args.
   const args = { ...input };
 
-  const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
       getAccountMeta("gameToken", accounts.gameToken),
@@ -275,10 +344,22 @@ export function getUpdateTokenInstruction<
     programAddress,
   } as UpdateTokenInstruction<
     TProgramAddress,
-    TAccountGameToken,
-    TAccountTokenMint,
-    TAccountOracle,
-    TAccountOracleOperator
+    ResolvedInstructionAccountMeta<
+      TAccountGameToken,
+      InstructionAccountInputAddress<TAccountGameToken>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountTokenMint,
+      InstructionAccountInputAddress<TAccountTokenMint>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracle,
+      InstructionAccountInputAddress<TAccountOracle>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountOracleOperator,
+      InstructionAccountInputAddress<TAccountOracleOperator>
+    >
   >);
 }
 

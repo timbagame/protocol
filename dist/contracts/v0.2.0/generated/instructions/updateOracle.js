@@ -34,15 +34,19 @@ export function getUpdateOracleInstructionDataCodec() {
 export async function getUpdateOracleInstructionAsync(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        oracle: { value: input.oracle ?? null, isWritable: true },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
         oldOracleOperator: {
             value: input.oldOracleOperator ?? null,
+            isSigner: true,
             isWritable: false,
         },
         newOracleOperator: {
             value: input.newOracleOperator ?? null,
+            isSigner: true,
             isWritable: false,
         },
     };
@@ -53,7 +57,6 @@ export async function getUpdateOracleInstructionAsync(input, config) {
     if (!accounts.oracle.value) {
         accounts.oracle.value = await findOraclePda({ programAddress });
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("oracle", accounts.oracle),
@@ -67,22 +70,25 @@ export async function getUpdateOracleInstructionAsync(input, config) {
 export function getUpdateOracleInstruction(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        oracle: { value: input.oracle ?? null, isWritable: true },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
         oldOracleOperator: {
             value: input.oldOracleOperator ?? null,
+            isSigner: true,
             isWritable: false,
         },
         newOracleOperator: {
             value: input.newOracleOperator ?? null,
+            isSigner: true,
             isWritable: false,
         },
     };
     const accounts = originalAccounts;
     // Original args.
     const args = { ...input };
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("oracle", accounts.oracle),

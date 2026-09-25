@@ -29,16 +29,31 @@ export function getCloseOracleInstructionDataCodec() {
 export async function getCloseOracleInstructionAsync(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        oracle: { value: input.oracle ?? null, isWritable: true },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: true,
+        },
         upgradeAuthority: {
             value: input.upgradeAuthority ?? null,
+            isSigner: true,
             isWritable: false,
         },
-        program: { value: input.program ?? null, isWritable: false },
-        programData: { value: input.programData ?? null, isWritable: false },
+        program: {
+            value: input.program ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        programData: {
+            value: input.programData ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
     };
     const accounts = originalAccounts;
     // Resolve default values.
@@ -49,7 +64,6 @@ export async function getCloseOracleInstructionAsync(input, config) {
         accounts.program.value =
             "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("oracle", accounts.oracle),
@@ -65,16 +79,31 @@ export async function getCloseOracleInstructionAsync(input, config) {
 export function getCloseOracleInstruction(input, config) {
     // Program address.
     const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    // Account meta helper.
+    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
     const originalAccounts = {
-        oracle: { value: input.oracle ?? null, isWritable: true },
-        oracleOperator: { value: input.oracleOperator ?? null, isWritable: true },
+        oracle: { value: input.oracle ?? null, isSigner: false, isWritable: true },
+        oracleOperator: {
+            value: input.oracleOperator ?? null,
+            isSigner: true,
+            isWritable: true,
+        },
         upgradeAuthority: {
             value: input.upgradeAuthority ?? null,
+            isSigner: true,
             isWritable: false,
         },
-        program: { value: input.program ?? null, isWritable: false },
-        programData: { value: input.programData ?? null, isWritable: false },
+        program: {
+            value: input.program ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
+        programData: {
+            value: input.programData ?? null,
+            isSigner: false,
+            isWritable: false,
+        },
     };
     const accounts = originalAccounts;
     // Resolve default values.
@@ -82,7 +111,6 @@ export function getCloseOracleInstruction(input, config) {
         accounts.program.value =
             "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5";
     }
-    const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     return Object.freeze({
         accounts: [
             getAccountMeta("oracle", accounts.oracle),

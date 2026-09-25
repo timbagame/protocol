@@ -5,7 +5,8 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type TransactionSigner, type WritableAccount, type WritableSignerAccount } from "@solana/kit";
+import { type AccountMeta, type AccountSignerMeta, type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type Instruction, type InstructionWithAccounts, type InstructionWithData, type ReadonlyAccount, type ReadonlySignerAccount, type ReadonlyUint8Array, type WritableAccount, type WritableSignerAccount } from "@solana/kit";
+import { type InstructionAccountInput, type InstructionAccountInputAddress, type InstructionSignerInput, type ResolvedInstructionAccountMeta } from "@solana/kit/program-client-core";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
 import { type GameType, type GameTypeArgs } from "../types/index.js";
 export declare const INITIALIZE_GAME_DISCRIMINATOR: ReadonlyUint8Array;
@@ -59,19 +60,19 @@ export type InitializeGameInstructionDataArgs = {
 export declare function getInitializeGameInstructionDataEncoder(): FixedSizeEncoder<InitializeGameInstructionDataArgs>;
 export declare function getInitializeGameInstructionDataDecoder(): FixedSizeDecoder<InitializeGameInstructionData>;
 export declare function getInitializeGameInstructionDataCodec(): FixedSizeCodec<InitializeGameInstructionDataArgs, InitializeGameInstructionData>;
-export type InitializeGameAsyncInput<TAccountGame extends string = string, TAccountCreator extends string = string, TAccountOracle extends string = string, TAccountOracleOperator extends string = string, TAccountTokenMint extends string = string, TAccountGameToken extends string = string, TAccountGameVault extends string = string, TAccountGameTokenAccount extends string = string, TAccountTokenProgram extends string = string, TAccountAssociatedTokenProgram extends string = string, TAccountCreatorTokenAccount extends string = string, TAccountSystemProgram extends string = string> = {
-    game?: Address<TAccountGame>;
-    creator: TransactionSigner<TAccountCreator>;
-    oracle?: Address<TAccountOracle>;
-    oracleOperator: TransactionSigner<TAccountOracleOperator>;
-    tokenMint: Address<TAccountTokenMint>;
-    gameToken?: Address<TAccountGameToken>;
-    gameVault?: Address<TAccountGameVault>;
-    gameTokenAccount?: Address<TAccountGameTokenAccount>;
-    tokenProgram?: Address<TAccountTokenProgram>;
-    associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-    creatorTokenAccount: Address<TAccountCreatorTokenAccount>;
-    systemProgram?: Address<TAccountSystemProgram>;
+export type InitializeGameAsyncInput<TAccountGame extends InstructionAccountInput = InstructionAccountInput, TAccountCreator extends InstructionSignerInput = InstructionSignerInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountGameToken extends InstructionAccountInput = InstructionAccountInput, TAccountGameVault extends InstructionAccountInput = InstructionAccountInput, TAccountGameTokenAccount extends InstructionAccountInput = InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountCreatorTokenAccount extends InstructionAccountInput = InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput = InstructionAccountInput> = {
+    game?: TAccountGame;
+    creator: TAccountCreator;
+    oracle?: TAccountOracle;
+    oracleOperator: TAccountOracleOperator;
+    tokenMint: TAccountTokenMint;
+    gameToken?: TAccountGameToken;
+    gameVault?: TAccountGameVault;
+    gameTokenAccount?: TAccountGameTokenAccount;
+    tokenProgram?: TAccountTokenProgram;
+    associatedTokenProgram?: TAccountAssociatedTokenProgram;
+    creatorTokenAccount: TAccountCreatorTokenAccount;
+    systemProgram?: TAccountSystemProgram;
     gameType: InitializeGameInstructionDataArgs["gameType"];
     amount: InitializeGameInstructionDataArgs["amount"];
     maxTickets: InitializeGameInstructionDataArgs["maxTickets"];
@@ -80,22 +81,22 @@ export type InitializeGameAsyncInput<TAccountGame extends string = string, TAcco
     isPrivate: InitializeGameInstructionDataArgs["isPrivate"];
     randomHash: InitializeGameInstructionDataArgs["randomHash"];
 };
-export declare function getInitializeGameInstructionAsync<TAccountGame extends string, TAccountCreator extends string, TAccountOracle extends string, TAccountOracleOperator extends string, TAccountTokenMint extends string, TAccountGameToken extends string, TAccountGameVault extends string, TAccountGameTokenAccount extends string, TAccountTokenProgram extends string, TAccountAssociatedTokenProgram extends string, TAccountCreatorTokenAccount extends string, TAccountSystemProgram extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeGameAsyncInput<TAccountGame, TAccountCreator, TAccountOracle, TAccountOracleOperator, TAccountTokenMint, TAccountGameToken, TAccountGameVault, TAccountGameTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountCreatorTokenAccount, TAccountSystemProgram>, config?: {
+export declare function getInitializeGameInstructionAsync<TAccountGame extends InstructionAccountInput, TAccountCreator extends InstructionSignerInput, TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TAccountTokenMint extends InstructionAccountInput, TAccountGameToken extends InstructionAccountInput, TAccountGameVault extends InstructionAccountInput, TAccountGameTokenAccount extends InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput, TAccountCreatorTokenAccount extends InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeGameAsyncInput<TAccountGame, TAccountCreator, TAccountOracle, TAccountOracleOperator, TAccountTokenMint, TAccountGameToken, TAccountGameVault, TAccountGameTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountCreatorTokenAccount, TAccountSystemProgram>, config?: {
     programAddress?: TProgramAddress;
-}): Promise<InitializeGameInstruction<TProgramAddress, TAccountGame, TAccountCreator, TAccountOracle, TAccountOracleOperator, TAccountTokenMint, TAccountGameToken, TAccountGameVault, TAccountGameTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountCreatorTokenAccount, TAccountSystemProgram>>;
-export type InitializeGameInput<TAccountGame extends string = string, TAccountCreator extends string = string, TAccountOracle extends string = string, TAccountOracleOperator extends string = string, TAccountTokenMint extends string = string, TAccountGameToken extends string = string, TAccountGameVault extends string = string, TAccountGameTokenAccount extends string = string, TAccountTokenProgram extends string = string, TAccountAssociatedTokenProgram extends string = string, TAccountCreatorTokenAccount extends string = string, TAccountSystemProgram extends string = string> = {
-    game: Address<TAccountGame>;
-    creator: TransactionSigner<TAccountCreator>;
-    oracle: Address<TAccountOracle>;
-    oracleOperator: TransactionSigner<TAccountOracleOperator>;
-    tokenMint: Address<TAccountTokenMint>;
-    gameToken: Address<TAccountGameToken>;
-    gameVault: Address<TAccountGameVault>;
-    gameTokenAccount: Address<TAccountGameTokenAccount>;
-    tokenProgram?: Address<TAccountTokenProgram>;
-    associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
-    creatorTokenAccount: Address<TAccountCreatorTokenAccount>;
-    systemProgram?: Address<TAccountSystemProgram>;
+}): Promise<InitializeGameInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGame, InstructionAccountInputAddress<TAccountGame>>, ResolvedInstructionAccountMeta<TAccountCreator, InstructionAccountInputAddress<TAccountCreator>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountGameToken, InstructionAccountInputAddress<TAccountGameToken>>, ResolvedInstructionAccountMeta<TAccountGameVault, InstructionAccountInputAddress<TAccountGameVault>>, ResolvedInstructionAccountMeta<TAccountGameTokenAccount, InstructionAccountInputAddress<TAccountGameTokenAccount>>, ResolvedInstructionAccountMeta<TAccountTokenProgram, InstructionAccountInputAddress<TAccountTokenProgram>>, ResolvedInstructionAccountMeta<TAccountAssociatedTokenProgram, InstructionAccountInputAddress<TAccountAssociatedTokenProgram>>, ResolvedInstructionAccountMeta<TAccountCreatorTokenAccount, InstructionAccountInputAddress<TAccountCreatorTokenAccount>>, ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>>>;
+export type InitializeGameInput<TAccountGame extends InstructionAccountInput = InstructionAccountInput, TAccountCreator extends InstructionSignerInput = InstructionSignerInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountGameToken extends InstructionAccountInput = InstructionAccountInput, TAccountGameVault extends InstructionAccountInput = InstructionAccountInput, TAccountGameTokenAccount extends InstructionAccountInput = InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput = InstructionAccountInput, TAccountCreatorTokenAccount extends InstructionAccountInput = InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput = InstructionAccountInput> = {
+    game: TAccountGame;
+    creator: TAccountCreator;
+    oracle: TAccountOracle;
+    oracleOperator: TAccountOracleOperator;
+    tokenMint: TAccountTokenMint;
+    gameToken: TAccountGameToken;
+    gameVault: TAccountGameVault;
+    gameTokenAccount: TAccountGameTokenAccount;
+    tokenProgram?: TAccountTokenProgram;
+    associatedTokenProgram?: TAccountAssociatedTokenProgram;
+    creatorTokenAccount: TAccountCreatorTokenAccount;
+    systemProgram?: TAccountSystemProgram;
     gameType: InitializeGameInstructionDataArgs["gameType"];
     amount: InitializeGameInstructionDataArgs["amount"];
     maxTickets: InitializeGameInstructionDataArgs["maxTickets"];
@@ -104,9 +105,9 @@ export type InitializeGameInput<TAccountGame extends string = string, TAccountCr
     isPrivate: InitializeGameInstructionDataArgs["isPrivate"];
     randomHash: InitializeGameInstructionDataArgs["randomHash"];
 };
-export declare function getInitializeGameInstruction<TAccountGame extends string, TAccountCreator extends string, TAccountOracle extends string, TAccountOracleOperator extends string, TAccountTokenMint extends string, TAccountGameToken extends string, TAccountGameVault extends string, TAccountGameTokenAccount extends string, TAccountTokenProgram extends string, TAccountAssociatedTokenProgram extends string, TAccountCreatorTokenAccount extends string, TAccountSystemProgram extends string, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeGameInput<TAccountGame, TAccountCreator, TAccountOracle, TAccountOracleOperator, TAccountTokenMint, TAccountGameToken, TAccountGameVault, TAccountGameTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountCreatorTokenAccount, TAccountSystemProgram>, config?: {
+export declare function getInitializeGameInstruction<TAccountGame extends InstructionAccountInput, TAccountCreator extends InstructionSignerInput, TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TAccountTokenMint extends InstructionAccountInput, TAccountGameToken extends InstructionAccountInput, TAccountGameVault extends InstructionAccountInput, TAccountGameTokenAccount extends InstructionAccountInput, TAccountTokenProgram extends InstructionAccountInput, TAccountAssociatedTokenProgram extends InstructionAccountInput, TAccountCreatorTokenAccount extends InstructionAccountInput, TAccountSystemProgram extends InstructionAccountInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: InitializeGameInput<TAccountGame, TAccountCreator, TAccountOracle, TAccountOracleOperator, TAccountTokenMint, TAccountGameToken, TAccountGameVault, TAccountGameTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountCreatorTokenAccount, TAccountSystemProgram>, config?: {
     programAddress?: TProgramAddress;
-}): InitializeGameInstruction<TProgramAddress, TAccountGame, TAccountCreator, TAccountOracle, TAccountOracleOperator, TAccountTokenMint, TAccountGameToken, TAccountGameVault, TAccountGameTokenAccount, TAccountTokenProgram, TAccountAssociatedTokenProgram, TAccountCreatorTokenAccount, TAccountSystemProgram>;
+}): InitializeGameInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGame, InstructionAccountInputAddress<TAccountGame>>, ResolvedInstructionAccountMeta<TAccountCreator, InstructionAccountInputAddress<TAccountCreator>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountGameToken, InstructionAccountInputAddress<TAccountGameToken>>, ResolvedInstructionAccountMeta<TAccountGameVault, InstructionAccountInputAddress<TAccountGameVault>>, ResolvedInstructionAccountMeta<TAccountGameTokenAccount, InstructionAccountInputAddress<TAccountGameTokenAccount>>, ResolvedInstructionAccountMeta<TAccountTokenProgram, InstructionAccountInputAddress<TAccountTokenProgram>>, ResolvedInstructionAccountMeta<TAccountAssociatedTokenProgram, InstructionAccountInputAddress<TAccountAssociatedTokenProgram>>, ResolvedInstructionAccountMeta<TAccountCreatorTokenAccount, InstructionAccountInputAddress<TAccountCreatorTokenAccount>>, ResolvedInstructionAccountMeta<TAccountSystemProgram, InstructionAccountInputAddress<TAccountSystemProgram>>>;
 export type ParsedInitializeGameInstruction<TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS, TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]> = {
     programAddress: Address<TProgram>;
     accounts: {

@@ -504,6 +504,25 @@ describe("web contracts", () => {
         timeoutSeconds: 60,
       }),
     ).toThrow();
+    const giveaway = {
+      creator: ADDRESS,
+      tokenMint: OTHER_ADDRESS,
+      type: "giveaway" as const,
+      amount: "1",
+      minPlayers: 1,
+      maxPlayers: 1,
+      timeoutSeconds: 60,
+    };
+    expect(CreateGameRequestSchema.parse(giveaway).minPlayers).toBe(1);
+    const inverted = CreateGameRequestSchema.safeParse({
+      ...giveaway,
+      minPlayers: 3,
+      maxPlayers: 2,
+    });
+    expect(inverted.success).toBe(false);
+    expect(inverted.error?.issues.map((issue) => issue.path)).toEqual([
+      ["maxPlayers"],
+    ]);
   });
 
   test("parses a prepared transaction response", () => {

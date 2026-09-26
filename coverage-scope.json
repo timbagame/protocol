@@ -1,19 +1,30 @@
 {
-  "roots": ["src"],
+  "roots": ["src", "scripts"],
   "extensions": [".ts"],
   "exclude": [
-    "*/generated/*",
     "*.d.ts",
     "*.test.ts",
-    "*.spec.ts",
     "*/tests/*",
     "*/fixtures/*",
+    "src/contracts/v0.2.0/generated/*",
+    "src/contracts/v0.3.0/generated/*",
     "src/contracts/v0.2.0/timba.ts",
     "src/contracts/v0.3.0/timba.ts",
     "src/solana/plans/types.ts",
-    "src/bot/index.ts",
-    "src/evm/index.ts",
-    "src/index.ts",
-    "src/solana/plans/index.ts"
-  ]
+    "scripts/generate-contract-clients.ts",
+    "scripts/generate-evm.ts"
+  ],
+  "excludeReasons": {
+    "*.d.ts": "Declaration files emit no JavaScript.",
+    "*.test.ts": "Tests are not product code.",
+    "*/tests/*": "Test helpers are not product code.",
+    "*/fixtures/*": "Static test fixtures.",
+    "src/contracts/v0.2.0/generated/*": "Codama output regenerated and diffed by check:generated; wire formats pinned in tests/generated-codecs.test.ts and client.test.ts.",
+    "src/contracts/v0.3.0/generated/*": "Codama output regenerated and diffed by check:generated; wire formats pinned in tests/generated-codecs.test.ts and client.test.ts.",
+    "src/contracts/v0.2.0/timba.ts": "Type-only Anchor IDL helper; emits no JavaScript.",
+    "src/contracts/v0.3.0/timba.ts": "Type-only Anchor IDL helper; emits no JavaScript.",
+    "src/solana/plans/types.ts": "Type-only interfaces; emits no JavaScript.",
+    "scripts/generate-contract-clients.ts": "Code generator entrypoint; its output is verified byte-for-byte by the check:generated CI step.",
+    "scripts/generate-evm.ts": "Code generator entrypoint; its output is verified byte-for-byte by the check:generated CI step."
+  }
 }

@@ -53,7 +53,7 @@ const SERVICE = {
   },
 };
 
-describe("Oracle contract", () => {
+describe("oracle endpoint declarations", () => {
   test("declares auth and rate-limit responses for every protected endpoint", () => {
     for (const endpoint of Object.values(oracleContract)) {
       if (!endpoint.authenticated) continue;

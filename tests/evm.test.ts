@@ -1,6 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, spyOn, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import * as viem from "viem";
 import {
   encodeAbiParameters,
   encodeEventTopics,
@@ -135,6 +136,10 @@ test("handles rejection sampling and enforces native input bounds", () => {
   expect(selected.winnerIndex).toBeLessThan(3);
   for (const count of [0, 1001, 1.5])
     expect(() => selectEvmWinnerFromEntropy(zero, count)).toThrow();
+  for (const entropy of ["0x12", `0x${"zz".repeat(32)}`] as Hex[])
+    expect(() => selectEvmWinnerFromEntropy(entropy, 2)).toThrow(
+      "Entropy must be 32 bytes",
+    );
   expect(() => commitmentFor("0x12")).toThrow();
   expect(() =>
     calculateEvmWinner(deployment, id, secret, request.commitment, -1n, 2),
@@ -276,4 +281,55 @@ test("ignores other emitters and rejects wrong-chain, removed and malformed logs
     decodeEvmGameEvent(deployment, { ...valid, data: "0x" }),
   ).toThrow();
   expect(decodeEvmGameEvent(deployment, { ...valid, topics: [] })).toBeNull();
+});
+test("gives up after 32 rejected rounds like the contract", () => {
+  const zero = ("0x" + "00".repeat(32)) as Hex;
+  // Every rehash stays below 2^256 mod 3, which real keccak output never does.
+  const keccak = spyOn(viem, "keccak256").mockReturnValue(zero);
+  try {
+    expect(() => selectEvmWinnerFromEntropy(zero, 3)).toThrow(
+      "Unable to generate unbiased randomness",
+    );
+    expect(keccak).toHaveBeenCalledTimes(32);
+    expect(keccak.mock.calls[31]?.[0]).toBe(
+      encodeAbiParameters(parseAbiParameters("bytes32,uint256"), [zero, 31n]),
+    );
+  } finally {
+    keccak.mockRestore();
+  }
+  expect(selectEvmWinnerFromEntropy(zero, 3).randomValue).not.toBe(0n);
+});
+test("ignores contract events that are not tied to a game", () => {
+  const ownership = log(
+    encodeEventTopics({
+      abi: timbaAbi,
+      eventName: "OwnershipTransferred",
+      args: { previousOwner: request.creator, newOwner: player },
+    }) as Hex[],
+    "0x",
+  );
+  expect(decodeEvmGameEvent(deployment, ownership)).toBeNull();
+  const initialized = log(
+    encodeEventTopics({ abi: timbaAbi, eventName: "Initialized" }) as Hex[],
+    encodeAbiParameters(parseAbiParameters("uint64"), [1n]),
+  );
+  expect(decodeEvmGameEvent(deployment, initialized)).toBeNull();
+});
+test("ignores game events the normalizer does not know yet", () => {
+  const topics = encodeEventTopics({
+    abi: timbaAbi,
+    eventName: "GameClosed",
+    args: { gameId: id, creator: request.creator },
+  }) as Hex[];
+  // Simulates a future ABI revision adding another game-scoped event.
+  const decode = spyOn(viem, "decodeEventLog").mockReturnValue({
+    eventName: "GameRenamed",
+    args: { gameId: id },
+  } as unknown as ReturnType<typeof viem.decodeEventLog>);
+  try {
+    expect(decodeEvmGameEvent(deployment, log(topics, "0x"))).toBeNull();
+    expect(decode).toHaveBeenCalledTimes(1);
+  } finally {
+    decode.mockRestore();
+  }
 });

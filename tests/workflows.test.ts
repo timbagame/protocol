@@ -62,6 +62,24 @@ describe("shared game workflows", () => {
     );
     expect(gamePath(a)).toContain("chainId=1&deployment=0xABC");
   });
+  test("Solana identity keeps network and deployment case-sensitive", () => {
+    const a = {
+      chain: "solana" as const,
+      network: "devnet" as const,
+      deployment: "Program1",
+      gameId: "Game/1",
+    };
+    expect(gameReferenceKey(a)).toBe(
+      JSON.stringify(["solana", "devnet", "Program1", "Game/1"]),
+    );
+    expect(gameReferenceKey(a)).not.toBe(
+      gameReferenceKey({ ...a, network: "mainnet-beta" }),
+    );
+    expect(gameReferenceKey(a)).not.toBe(
+      gameReferenceKey({ ...a, deployment: "program1" }),
+    );
+    expect(gamePath(a)).toBe("/play/games/Game%2F1");
+  });
   test("unconfirmed failure is still pending", () => {
     expect(transactionProgress({ success: false, confirmations: 1 }, 2)).toBe(
       "submitted",

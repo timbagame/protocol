@@ -77,6 +77,11 @@ for (const version of ["0.2.0", "0.3.0"] as const) {
       badType.fill(0, 0, 8);
       expect(() => decodeGame(version, badType)).toThrow();
       expect(() => decodeGame(version, new Uint8Array())).toThrow();
+      const oracle = gameAccount();
+      oracle.set(getContractClient(version).ORACLE_DISCRIMINATOR, 0);
+      expect(() => decodeGame(version, oracle)).toThrow(
+        "Account is not a Timba game",
+      );
     });
 
     test("derives contract addresses with an explicit program override", async () => {

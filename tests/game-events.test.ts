@@ -117,3 +117,14 @@ test("rejects mismatched game identity and ignores non-game events", () => {
     }),
   ).toBeNull();
 });
+test("ignores game events it does not recognize instead of guessing a shape", () => {
+  // Untyped callers can hand over events from a newer program than this package knows.
+  const unknown = {
+    name: "GameRenamed",
+    data: { gameKey: key, name: "renamed" },
+  } as unknown as Parameters<typeof normalizeSolanaGameEvent>[1];
+  expect(normalizeSolanaGameEvent(reference, unknown)).toBeNull();
+  expect(() =>
+    normalizeSolanaGameEvent({ ...reference, gameId: "wrong" }, unknown),
+  ).toThrow("Event belongs to another game");
+});

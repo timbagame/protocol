@@ -50,6 +50,32 @@ describe("shared Timba events", () => {
     invalid[88] = 2;
     expect(() => decodeProgramEvent(invalid)).toThrow();
   });
+  test("decodes player joins and rejects joins with a truncated layout", () => {
+    const bytes = Buffer.alloc(104);
+    bytes.set(EVENT_DISCRIMINATORS.PlayerJoined);
+    bytes.set(getAddressEncoder().encode(address(program)), 8);
+    bytes.set(getAddressEncoder().encode(address(other)), 40);
+    bytes.writeBigUInt64LE(0xffff_ffff_ffff_ffffn, 72);
+    bytes.writeUInt32LE(3, 80);
+    bytes.writeUInt32LE(2, 84);
+    bytes.writeBigUInt64LE(999n, 88);
+    bytes.writeBigUInt64LE(1_700_000_000n, 96);
+    expect(decodeProgramEvent(bytes)).toEqual({
+      name: "PlayerJoined",
+      data: {
+        gameKey: address(program),
+        player: address(other),
+        totalAmount: 0xffff_ffff_ffff_ffffn,
+        ticketsCount: 3,
+        ticketIndex: 2,
+        lastSlot: 999n,
+        timestamp: 1_700_000_000n,
+      },
+    });
+    expect(() => decodeProgramEvent(bytes.subarray(0, 103))).toThrow(
+      "Invalid Timba event length",
+    );
+  });
   test("filters CPI, unrelated, and unframed logs", () => {
     const data = `Program data: ${completed().toString("base64")}`;
     const logs = [

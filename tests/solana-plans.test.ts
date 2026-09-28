@@ -62,6 +62,18 @@ describe("create game plans", () => {
     expect(initialize.data).toHaveLength(66);
   });
 
+  test("rejects oracle commitments that are not 32 bytes", async () => {
+    for (const length of [0, 31, 33]) {
+      await expect(
+        buildCreateGamePlan(
+          { ...common, randomHash: Buffer.alloc(length, 7) },
+          "0.3.0",
+          PROGRAM_ID,
+        ),
+      ).rejects.toThrow("Oracle commitment must be 32 bytes");
+    }
+  });
+
   test("uses the v0.2 GameToken initialization account", async () => {
     const plan = await buildCreateGamePlan(common, "0.2.0", PROGRAM_ID);
     const initialize = plan.instructions[1]!;

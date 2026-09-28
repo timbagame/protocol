@@ -1,6 +1,6 @@
 import { isAbsolute, relative, resolve } from "path";
 
-const THRESHOLD = 95;
+const THRESHOLD = 100;
 
 type CoverageConfig = {
   roots: string[];
@@ -138,7 +138,7 @@ export async function checkCoverage(
   };
 }
 
-async function main(args: string[]): Promise<number> {
+export async function main(args: string[]): Promise<number> {
   const [configPath, ...reports] = args;
   if (!configPath || reports.length === 0) {
     console.error(
@@ -167,6 +167,4 @@ async function main(args: string[]): Promise<number> {
   }
 }
 
-if (import.meta.main) {
-  process.exitCode = await main(process.argv.slice(2));
-}
+if (import.meta.main) process.exitCode = await main(process.argv.slice(2));

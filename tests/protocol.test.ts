@@ -183,6 +183,36 @@ describe("typed REST client", () => {
     expect(await requests[0]?.json()).toEqual({ amount: 7 });
   });
 
+  test("layers per-request headers between client defaults and endpoint headers", async () => {
+    const requests: Request[] = [];
+    const client = createRestClient(contract, {
+      baseUrl: "https://service.test",
+      headers: { "X-Client": "default", "X-Trace": "default" },
+      getHeaders: () => ({ Authorization: "Bearer endpoint" }),
+      fetch: async (input, init) => {
+        requests.push(new Request(input, init));
+        return Response.json({ success: true, amount: 1 });
+      },
+    });
+
+    await client.update({
+      params: { gameId: "game" },
+      query: { fresh: false },
+      body: { amount: 1 },
+      request: {
+        headers: {
+          "X-Trace": "per-request",
+          Authorization: "Bearer caller",
+        },
+      },
+    });
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0]?.headers.get("x-client")).toBe("default");
+    expect(requests[0]?.headers.get("x-trace")).toBe("per-request");
+    expect(requests[0]?.headers.get("authorization")).toBe("Bearer endpoint");
+  });
+
   test("rejects invalid input before making a request", async () => {
     let called = false;
     const client = createRestClient(contract, {

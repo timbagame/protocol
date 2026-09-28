@@ -43,7 +43,7 @@ jobs:
 
       - name: Test coverage gate
         run: bun test scripts/check-coverage.test.ts
-      - name: Enforce 95% line coverage
+      - name: Enforce 100% line coverage
         run: bun run scripts/check-coverage.ts coverage-scope.json coverage/lcov.info
       - name: Upload coverage
         if: always()

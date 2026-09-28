@@ -7,7 +7,11 @@ import {
   getTransactionEncoder,
   generateKeyPairSigner,
 } from "@solana/kit";
-import { createLegacyTransaction } from "../src/solana/plans/transaction.js";
+import {
+  createLegacyTransaction,
+  decodeTransactionBase64,
+  encodeTransactionBase64,
+} from "../src/solana/plans/transaction.js";
 import { findGameTokenPda } from "../src/contracts/v0.2.0/generated/index.js";
 import { findGameVaultPda } from "../src/contracts/v0.3.0/generated/index.js";
 const PROGRAM_ID = address("BPFLoaderUpgradeab1e11111111111111111111111");
@@ -119,6 +123,37 @@ describe("Timba contract adapter", () => {
     expect(plan.instructions[2]?.programAddress).toBe(TOKEN_PROGRAM_ID);
   });
 
+  test("rejects native SOL joins without a positive stake", async () => {
+    const join = {
+      game: GAME,
+      player: CREATOR,
+      tokenMint: SOL_MINT,
+    };
+    for (const input of [
+      join,
+      { ...join, tokenAmount: 0n },
+      { ...join, tokenAmount: -1n },
+    ]) {
+      await expect(adapterV030.buildJoinPlan(input)).rejects.toThrow(
+        "SOL joins require a positive stake amount",
+      );
+    }
+    // Refunds return wrapped SOL, so they never need a stake to wrap.
+    const unjoin = await adapterV030.buildUnjoinPlan({
+      game: GAME,
+      player: CREATOR,
+      authority: CREATOR,
+      tokenMint: SOL_MINT,
+    });
+    expect(unjoin.instructions).toHaveLength(2);
+  });
+
+  test("reports whether a player already holds a ticket", async () => {
+    const game = adapterV030.decodeGame(GAME, gameAccount());
+    expect(await adapterV030.hasParticipant(game, CREATOR)).toBeTrue();
+    expect(await adapterV030.hasParticipant(game, MINT)).toBeFalse();
+  });
+
   test("lets the creator refund another participant before closing", async () => {
     const participant = address("6HqDqk25HSbzsk1HJ8PMzhzD5ZNY9LqZhpGwbCLyzvC6");
     const unjoin = await adapterV030.buildUnjoinPlan({
@@ -179,6 +214,19 @@ describe("Timba contract adapter", () => {
     expect(
       getTransactionEncoder().encode(transaction).length,
     ).toBeLessThanOrEqual(1232);
+
+    const encoded = encodeTransactionBase64(transaction);
+    expect(encoded).toBe(
+      Buffer.from(getTransactionEncoder().encode(transaction)).toString(
+        "base64",
+      ),
+    );
+    const decoded = decodeTransactionBase64(encoded);
+    expect(new Uint8Array(decoded.messageBytes)).toEqual(
+      new Uint8Array(transaction.messageBytes),
+    );
+    expect(decoded.signatures).toEqual(transaction.signatures);
+    expect(encodeTransactionBase64(decoded)).toBe(encoded);
   });
 
   test("uses the v0.2 GameToken join account", async () => {

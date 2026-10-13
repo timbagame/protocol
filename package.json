@@ -146,7 +146,7 @@
   "dependencies": {
     "@solana/kit": "8.4.0",
     "viem": "2.57.4",
-    "zod": "4.6.5",
+    "zod": "4.6.6",
     "@solana-program/token": "0.17.0",
     "@solana-program/system": "0.15.0"
   },

@@ -5,9 +5,9 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type ProgramDerivedAddress } from "@solana/kit";
+import { type Address, type HasAddress, type ProgramDerivedAddress } from "@solana/kit";
 export type GameVaultSeeds = {
-    tokenMint: Address;
+    tokenMint: Address | HasAddress;
 };
 export declare function findGameVaultPda(seeds: GameVaultSeeds, config?: {
     programAddress?: Address | undefined;

@@ -23,6 +23,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 
@@ -42,7 +43,12 @@ export type TokenClosedEvent = {
   tokenMint: Address;
 };
 
-export type TokenClosedEventArgs = TokenClosedEvent;
+export type TokenClosedEventArgs = {
+  /** Operator closing the token */
+  operator: Address | HasAddress;
+  /** Token mint that was removed */
+  tokenMint: Address | HasAddress;
+};
 
 /** Gets the encoder for {@link TokenClosedEventArgs} event data. */
 export function getTokenClosedEventEncoder(): FixedSizeEncoder<TokenClosedEventArgs> {

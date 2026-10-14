@@ -11,11 +11,12 @@ import {
   getBytesEncoder,
   getProgramDerivedAddress,
   type Address,
+  type HasAddress,
   type ProgramDerivedAddress,
 } from "@solana/kit";
 
 export type GameTokenSeeds = {
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
 };
 
 export async function findGameTokenPda(

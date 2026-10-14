@@ -5,14 +5,17 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const ORACLE_CLOSED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getOracleClosedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type OracleClosedEvent = {
     /** Operator that authorized the closure and receives the reclaimed rent */
     operator: Address;
 };
-export type OracleClosedEventArgs = OracleClosedEvent;
+export type OracleClosedEventArgs = {
+    /** Operator that authorized the closure and receives the reclaimed rent */
+    operator: Address | HasAddress;
+};
 /** Gets the encoder for {@link OracleClosedEventArgs} event data. */
 export declare function getOracleClosedEventEncoder(): FixedSizeEncoder<OracleClosedEventArgs>;
 /** Gets the decoder for {@link OracleClosedEvent} event data. */

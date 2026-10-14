@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type Codec, type Decoder, type EncodedAccount, type Encoder, type FetchAccountConfig, type FetchAccountsConfig, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
+import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type Codec, type Decoder, type EncodedAccount, type Encoder, type FetchAccountConfig, type FetchAccountsConfig, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
 import { type GameType, type GameTypeArgs } from "../types/index.js";
 export declare const GAME_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getGameDiscriminatorBytes(): ReadonlyUint8Array;
@@ -40,7 +40,7 @@ export type Game = {
 };
 export type GameArgs = {
     /** Creator of the game */
-    creator: Address;
+    creator: Address | HasAddress;
     /** Type of game being played */
     gameType: GameTypeArgs;
     /** Amount each player must contribute */
@@ -52,7 +52,7 @@ export type GameArgs = {
     /** Current number of tickets (total participations) */
     ticketsCount: number;
     /** Token mint used for this game */
-    tokenMint: Address;
+    tokenMint: Address | HasAddress;
     /** Timestamp when game was created */
     createdAt: number | bigint;
     /** Timeout duration in seconds */
@@ -64,7 +64,7 @@ export type GameArgs = {
     /** Total accumulated prize */
     totalAmount: number | bigint;
     /** Exact participant public keys in canonical current-vector order */
-    participants: Array<Address>;
+    participants: Array<Address | HasAddress>;
 };
 /** Gets the encoder for {@link GameArgs} account data. */
 export declare function getGameEncoder(): Encoder<GameArgs>;

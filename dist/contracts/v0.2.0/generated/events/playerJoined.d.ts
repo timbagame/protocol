@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const PLAYER_JOINED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getPlayerJoinedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type PlayerJoinedEvent = {
@@ -26,9 +26,9 @@ export type PlayerJoinedEvent = {
 };
 export type PlayerJoinedEventArgs = {
     /** Game that was joined */
-    gameKey: Address;
+    gameKey: Address | HasAddress;
     /** Player who joined */
-    player: Address;
+    player: Address | HasAddress;
     /** Total prize amount after join */
     totalAmount: number | bigint;
     /** Total number of tickets after join */

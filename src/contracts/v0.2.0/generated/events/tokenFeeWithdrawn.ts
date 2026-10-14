@@ -25,6 +25,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 
@@ -48,9 +49,9 @@ export type TokenFeeWithdrawnEvent = {
 
 export type TokenFeeWithdrawnEventArgs = {
   /** Operator that withdrew the fees */
-  operator: Address;
+  operator: Address | HasAddress;
   /** Token mint of the withdrawn fees */
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
   /** Amount of fees withdrawn */
   amount: number | bigint;
 };

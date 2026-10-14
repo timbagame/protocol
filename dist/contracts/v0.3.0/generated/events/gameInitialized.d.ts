@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 import { type GameType, type GameTypeArgs } from "../types/index.js";
 export declare const GAME_INITIALIZED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getGameInitializedEventDiscriminatorBytes(): ReadonlyUint8Array;
@@ -35,9 +35,9 @@ export type GameInitializedEvent = {
 };
 export type GameInitializedEventArgs = {
     /** Game account address */
-    gameKey: Address;
+    gameKey: Address | HasAddress;
     /** Game creator */
-    creator: Address;
+    creator: Address | HasAddress;
     /** Type of game created */
     gameType: GameTypeArgs;
     /** Amount per player (or total prize for giveaways) */
@@ -49,7 +49,7 @@ export type GameInitializedEventArgs = {
     /** Minimum tickets required */
     minTickets: number;
     /** Token mint used for the game */
-    tokenMint: Address;
+    tokenMint: Address | HasAddress;
     /** Whether game is private */
     isPrivate: boolean;
     /** Game creation timestamp */

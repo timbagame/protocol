@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const TOKEN_INITIALIZED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getTokenInitializedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type TokenInitializedEvent = {
@@ -18,7 +18,7 @@ export type TokenInitializedEvent = {
 };
 export type TokenInitializedEventArgs = {
     /** Token mint address */
-    tokenMint: Address;
+    tokenMint: Address | HasAddress;
     /** Minimum amount required for games */
     minAmount: number | bigint;
     /** Whether token is enabled */

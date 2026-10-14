@@ -23,6 +23,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 
@@ -40,7 +41,10 @@ export type OracleClosedEvent = {
   operator: Address;
 };
 
-export type OracleClosedEventArgs = OracleClosedEvent;
+export type OracleClosedEventArgs = {
+  /** Operator that authorized the closure and receives the reclaimed rent */
+  operator: Address | HasAddress;
+};
 
 /** Gets the encoder for {@link OracleClosedEventArgs} event data. */
 export function getOracleClosedEventEncoder(): FixedSizeEncoder<OracleClosedEventArgs> {

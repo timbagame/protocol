@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const ORACLE_UPDATED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getOracleUpdatedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type OracleUpdatedEvent = {
@@ -26,9 +26,9 @@ export type OracleUpdatedEvent = {
 };
 export type OracleUpdatedEventArgs = {
     /** Previous operator */
-    oldOperator: Address;
+    oldOperator: Address | HasAddress;
     /** New operator */
-    newOperator: Address;
+    newOperator: Address | HasAddress;
     /** Updated fee percentage */
     feePercentage: number;
     /** Updated buffer time */

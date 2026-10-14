@@ -27,6 +27,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 
@@ -50,7 +51,7 @@ export type TokenUpdatedEvent = {
 
 export type TokenUpdatedEventArgs = {
   /** Token mint address */
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
   /** Updated minimum amount */
   minAmount: number | bigint;
   /** Updated enabled status */

@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const TOKEN_CLOSED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getTokenClosedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type TokenClosedEvent = {
@@ -14,7 +14,12 @@ export type TokenClosedEvent = {
     /** Token mint that was removed */
     tokenMint: Address;
 };
-export type TokenClosedEventArgs = TokenClosedEvent;
+export type TokenClosedEventArgs = {
+    /** Operator closing the token */
+    operator: Address | HasAddress;
+    /** Token mint that was removed */
+    tokenMint: Address | HasAddress;
+};
 /** Gets the encoder for {@link TokenClosedEventArgs} event data. */
 export declare function getTokenClosedEventEncoder(): FixedSizeEncoder<TokenClosedEventArgs>;
 /** Gets the decoder for {@link TokenClosedEvent} event data. */

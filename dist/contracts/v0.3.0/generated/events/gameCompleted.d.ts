@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const GAME_COMPLETED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getGameCompletedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type GameCompletedEvent = {
@@ -24,9 +24,9 @@ export type GameCompletedEvent = {
 };
 export type GameCompletedEventArgs = {
     /** Game that was completed */
-    gameKey: Address;
+    gameKey: Address | HasAddress;
     /** Winner of the game */
-    winner: Address;
+    winner: Address | HasAddress;
     /** Total number of tickets that participated */
     ticketsCount: number;
     /** Amount awarded to the winner */

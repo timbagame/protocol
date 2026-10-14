@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type EncodedAccount, type FetchAccountConfig, type FetchAccountsConfig, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
+import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type EncodedAccount, type FetchAccountConfig, type FetchAccountsConfig, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
 export declare const ORACLE_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getOracleDiscriminatorBytes(): ReadonlyUint8Array;
 export type Oracle = {
@@ -25,7 +25,7 @@ export type Oracle = {
 };
 export type OracleArgs = {
     /** Operator that can update oracle settings and claim fees */
-    operator: Address;
+    operator: Address | HasAddress;
     /** Percentage of game amount taken as fee (0-10) */
     feePercentage: number;
     /** Buffer time in seconds after game timeout before cancellation is allowed */

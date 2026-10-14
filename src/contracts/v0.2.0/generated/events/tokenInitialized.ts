@@ -27,6 +27,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type ReadonlyUint8Array,
 } from "@solana/kit";
 
@@ -50,7 +51,7 @@ export type TokenInitializedEvent = {
 
 export type TokenInitializedEventArgs = {
   /** Token mint address */
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
   /** Minimum amount required for games */
   minAmount: number | bigint;
   /** Whether token is enabled */

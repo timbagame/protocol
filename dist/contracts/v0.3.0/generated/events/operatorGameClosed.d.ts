@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const OPERATOR_GAME_CLOSED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getOperatorGameClosedEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type OperatorGameClosedEvent = {
@@ -24,11 +24,11 @@ export type OperatorGameClosedEvent = {
 };
 export type OperatorGameClosedEventArgs = {
     /** Game that was closed */
-    gameKey: Address;
+    gameKey: Address | HasAddress;
     /** Original game creator */
-    creator: Address;
+    creator: Address | HasAddress;
     /** Oracle operator that performed the cleanup */
-    operator: Address;
+    operator: Address | HasAddress;
     /** Giveaway funds returned to the creator */
     refundedAmount: number | bigint;
     /** Game account rent returned to the operator */

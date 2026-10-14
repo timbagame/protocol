@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 export declare const TOKEN_FEE_WITHDRAWN_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getTokenFeeWithdrawnEventDiscriminatorBytes(): ReadonlyUint8Array;
 export type TokenFeeWithdrawnEvent = {
@@ -18,9 +18,9 @@ export type TokenFeeWithdrawnEvent = {
 };
 export type TokenFeeWithdrawnEventArgs = {
     /** Operator that withdrew the fees */
-    operator: Address;
+    operator: Address | HasAddress;
     /** Token mint of the withdrawn fees */
-    tokenMint: Address;
+    tokenMint: Address | HasAddress;
     /** Amount of fees withdrawn */
     amount: number | bigint;
 };

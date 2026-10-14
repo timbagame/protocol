@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type EncodedAccount, type FetchAccountConfig, type FetchAccountsConfig, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
+import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type EncodedAccount, type FetchAccountConfig, type FetchAccountsConfig, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
 export declare const GAME_TOKEN_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getGameTokenDiscriminatorBytes(): ReadonlyUint8Array;
 export type GameToken = {
@@ -23,7 +23,7 @@ export type GameToken = {
 };
 export type GameTokenArgs = {
     /** Token mint for this game token configuration */
-    tokenMint: Address;
+    tokenMint: Address | HasAddress;
     /** Vault bump seed for PDA token transfers */
     vaultBump: number;
     /** Minimum amount required to participate in games */

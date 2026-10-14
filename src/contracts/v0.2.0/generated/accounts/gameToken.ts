@@ -36,6 +36,7 @@ import {
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
   type ReadonlyUint8Array,
@@ -65,7 +66,7 @@ export type GameToken = {
 
 export type GameTokenArgs = {
   /** Token mint for this game token configuration */
-  tokenMint: Address;
+  tokenMint: Address | HasAddress;
   /** Vault bump seed for PDA token transfers */
   vaultBump: number;
   /** Minimum amount required to participate in games */

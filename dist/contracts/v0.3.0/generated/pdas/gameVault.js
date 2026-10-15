@@ -7,7 +7,10 @@
  */
 import { getAddressEncoder, getBytesEncoder, getProgramDerivedAddress, } from "@solana/kit";
 export async function findGameVaultPda(seeds, config = {}) {
-    const { programAddress = "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5", } = config;
+    const { programAddress: programAddressInput = "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5", } = config;
+    const programAddress = typeof programAddressInput === "string"
+        ? programAddressInput
+        : programAddressInput.address;
     return await getProgramDerivedAddress({
         programAddress,
         seeds: [

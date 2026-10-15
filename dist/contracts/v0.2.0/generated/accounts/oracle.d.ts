@@ -45,9 +45,9 @@ export declare function getOracleDecoder(): FixedSizeDecoder<Oracle>;
 export declare function getOracleCodec(): FixedSizeCodec<OracleArgs, Oracle>;
 export declare function decodeOracle<TAddress extends string = string>(encodedAccount: EncodedAccount<TAddress>): Account<Oracle, TAddress>;
 export declare function decodeOracle<TAddress extends string = string>(encodedAccount: MaybeEncodedAccount<TAddress>): MaybeAccount<Oracle, TAddress>;
-export declare function fetchOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress>, config?: FetchAccountConfig): Promise<Account<Oracle, TAddress>>;
-export declare function fetchMaybeOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Oracle, TAddress>>;
-export declare function fetchAllOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<Account<Oracle>[]>;
-export declare function fetchAllMaybeOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<MaybeAccount<Oracle>[]>;
+export declare function fetchOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<Oracle, TAddress>>;
+export declare function fetchMaybeOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Oracle, TAddress>>;
+export declare function fetchAllOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<Oracle>[]>;
+export declare function fetchAllMaybeOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<Oracle>[]>;
 export declare function getOracleSize(): number;
 //# sourceMappingURL=oracle.d.ts.map

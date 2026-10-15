@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type ClientWithRpc, type ClientWithTransactionPlanning, type ClientWithTransactionSending, type ExtendedClient, type GetAccountInfoApi, type GetMultipleAccountsApi, type Instruction, type InstructionWithData, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type ClientWithRpc, type ClientWithTransactionPlanning, type ClientWithTransactionSending, type ExtendedClient, type GetAccountInfoApi, type GetMultipleAccountsApi, type HasAddress, type Instruction, type InstructionWithData, type ReadonlyUint8Array } from "@solana/kit";
 import { type SelfFetchFunctions, type SelfPlanAndSendFunctions } from "@solana/kit/program-client-core";
 import { getGameCodec, getGameTokenCodec, getOracleCodec, type Game, type GameArgs, type GameToken, type GameTokenArgs, type Oracle, type OracleArgs } from "../accounts/index.js";
 import { getCloseGameInstructionAsync, getCloseTokenInstructionAsync, getCompleteGameInstructionAsync, getInitializeGameInstructionAsync, getInitializeOracleInstructionAsync, getInitializeTokenInstructionAsync, getJoinGameInstructionAsync, getUnjoinGameInstructionAsync, getUpdateOracleInstructionAsync, getUpdateTokenInstructionAsync, getWithdrawTokenFeeInstructionAsync, type CloseGameAsyncInput, type CloseTokenAsyncInput, type CompleteGameAsyncInput, type InitializeGameAsyncInput, type InitializeOracleAsyncInput, type InitializeTokenAsyncInput, type JoinGameAsyncInput, type ParsedCloseGameInstruction, type ParsedCloseTokenInstruction, type ParsedCompleteGameInstruction, type ParsedInitializeGameInstruction, type ParsedInitializeOracleInstruction, type ParsedInitializeTokenInstruction, type ParsedJoinGameInstruction, type ParsedUnjoinGameInstruction, type ParsedUpdateOracleInstruction, type ParsedUpdateTokenInstruction, type ParsedWithdrawTokenFeeInstruction, type UnjoinGameAsyncInput, type UpdateOracleAsyncInput, type UpdateTokenAsyncInput, type WithdrawTokenFeeAsyncInput } from "../instructions/index.js";
@@ -89,17 +89,39 @@ export type TimbaPluginAccounts = {
     oracle: ReturnType<typeof getOracleCodec> & SelfFetchFunctions<OracleArgs, Oracle>;
 };
 export type TimbaPluginInstructions = {
-    closeGame: (input: CloseGameAsyncInput) => ReturnType<typeof getCloseGameInstructionAsync> & SelfPlanAndSendFunctions;
-    closeToken: (input: CloseTokenAsyncInput) => ReturnType<typeof getCloseTokenInstructionAsync> & SelfPlanAndSendFunctions;
-    completeGame: (input: CompleteGameAsyncInput) => ReturnType<typeof getCompleteGameInstructionAsync> & SelfPlanAndSendFunctions;
-    initializeGame: (input: InitializeGameAsyncInput) => ReturnType<typeof getInitializeGameInstructionAsync> & SelfPlanAndSendFunctions;
-    initializeOracle: (input: InitializeOracleAsyncInput) => ReturnType<typeof getInitializeOracleInstructionAsync> & SelfPlanAndSendFunctions;
-    initializeToken: (input: InitializeTokenAsyncInput) => ReturnType<typeof getInitializeTokenInstructionAsync> & SelfPlanAndSendFunctions;
-    joinGame: (input: JoinGameAsyncInput) => ReturnType<typeof getJoinGameInstructionAsync> & SelfPlanAndSendFunctions;
-    unjoinGame: (input: UnjoinGameAsyncInput) => ReturnType<typeof getUnjoinGameInstructionAsync> & SelfPlanAndSendFunctions;
-    updateOracle: (input: UpdateOracleAsyncInput) => ReturnType<typeof getUpdateOracleInstructionAsync> & SelfPlanAndSendFunctions;
-    updateToken: (input: UpdateTokenAsyncInput) => ReturnType<typeof getUpdateTokenInstructionAsync> & SelfPlanAndSendFunctions;
-    withdrawTokenFee: (input: WithdrawTokenFeeAsyncInput) => ReturnType<typeof getWithdrawTokenFeeInstructionAsync> & SelfPlanAndSendFunctions;
+    closeGame: (input: CloseGameAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getCloseGameInstructionAsync> & SelfPlanAndSendFunctions;
+    closeToken: (input: CloseTokenAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getCloseTokenInstructionAsync> & SelfPlanAndSendFunctions;
+    completeGame: (input: CompleteGameAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getCompleteGameInstructionAsync> & SelfPlanAndSendFunctions;
+    initializeGame: (input: InitializeGameAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getInitializeGameInstructionAsync> & SelfPlanAndSendFunctions;
+    initializeOracle: (input: InitializeOracleAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getInitializeOracleInstructionAsync> & SelfPlanAndSendFunctions;
+    initializeToken: (input: InitializeTokenAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getInitializeTokenInstructionAsync> & SelfPlanAndSendFunctions;
+    joinGame: (input: JoinGameAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getJoinGameInstructionAsync> & SelfPlanAndSendFunctions;
+    unjoinGame: (input: UnjoinGameAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getUnjoinGameInstructionAsync> & SelfPlanAndSendFunctions;
+    updateOracle: (input: UpdateOracleAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getUpdateOracleInstructionAsync> & SelfPlanAndSendFunctions;
+    updateToken: (input: UpdateTokenAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getUpdateTokenInstructionAsync> & SelfPlanAndSendFunctions;
+    withdrawTokenFee: (input: WithdrawTokenFeeAsyncInput, config?: {
+        programAddress?: Address | HasAddress;
+    }) => ReturnType<typeof getWithdrawTokenFeeInstructionAsync> & SelfPlanAndSendFunctions;
 };
 export type TimbaPluginPdas = {
     oracle: typeof findOraclePda;
@@ -108,7 +130,9 @@ export type TimbaPluginPdas = {
     game: typeof findGamePda;
 };
 export type TimbaPluginRequirements = ClientWithRpc<GetAccountInfoApi & GetMultipleAccountsApi> & ClientWithTransactionPlanning & ClientWithTransactionSending;
-export declare function timbaProgram(): <T extends TimbaPluginRequirements>(client: T) => ExtendedClient<T, {
+export declare function timbaProgram(config?: {
+    programAddress?: Address | HasAddress;
+}): <T extends TimbaPluginRequirements>(client: T) => ExtendedClient<T, {
     timba: TimbaPlugin;
 }>;
 //# sourceMappingURL=timba.d.ts.map

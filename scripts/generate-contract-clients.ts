@@ -42,7 +42,13 @@ for (const version of contractVersions) {
 
   for await (const generatedFile of generatedFiles) {
     const source = await Bun.file(generatedFile).text();
-    const nodeEsmSource = source.replaceAll(
+    // Generated program plugins forward `config.programAddress`, which may be
+    // undefined, to instruction builders; allow it under exactOptionalPropertyTypes.
+    const exactOptionalSource = source.replaceAll(
+      "programAddress?: TProgramAddress | { readonly address: TProgramAddress };",
+      "programAddress?:\n      | TProgramAddress\n      | { readonly address: TProgramAddress }\n      | undefined;",
+    );
+    const nodeEsmSource = exactOptionalSource.replaceAll(
       /(from\s+["'])(\.\.?\/[^"']+)(["'])/g,
       (_match, prefix: string, specifier: string, suffix: string) => {
         const target = specifier.split("/").at(-1);

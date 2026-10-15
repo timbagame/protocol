@@ -188,7 +188,10 @@ export async function getWithdrawTokenFeeInstructionAsync<
     TAccountOracleOperator,
     TAccountOracleOperatorTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): Promise<
   WithdrawTokenFeeInstruction<
     TProgramAddress,
@@ -231,7 +234,11 @@ export async function getWithdrawTokenFeeInstructionAsync<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -454,7 +461,10 @@ export function getWithdrawTokenFeeInstruction<
     TAccountOracleOperator,
     TAccountOracleOperatorTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): WithdrawTokenFeeInstruction<
   TProgramAddress,
   ResolvedInstructionAccountMeta<
@@ -495,7 +505,11 @@ export function getWithdrawTokenFeeInstruction<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

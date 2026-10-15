@@ -5,11 +5,11 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type ProgramDerivedAddress, type ReadonlyUint8Array } from "@solana/kit";
+import { type Address, type HasAddress, type ProgramDerivedAddress, type ReadonlyUint8Array } from "@solana/kit";
 export type GameSeeds = {
     randomHash: ReadonlyUint8Array;
 };
 export declare function findGamePda(seeds: GameSeeds, config?: {
-    programAddress?: Address | undefined;
+    programAddress?: Address | HasAddress | undefined;
 }): Promise<ProgramDerivedAddress>;
 //# sourceMappingURL=game.d.ts.map

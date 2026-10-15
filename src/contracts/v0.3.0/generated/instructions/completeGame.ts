@@ -231,7 +231,10 @@ export async function getCompleteGameInstructionAsync<
     TAccountWinnerTokenAccount,
     TAccountOracleOperatorTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): Promise<
   CompleteGameInstruction<
     TProgramAddress,
@@ -286,7 +289,11 @@ export async function getCompleteGameInstructionAsync<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -552,7 +559,10 @@ export function getCompleteGameInstruction<
     TAccountWinnerTokenAccount,
     TAccountOracleOperatorTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): CompleteGameInstruction<
   TProgramAddress,
   ResolvedInstructionAccountMeta<
@@ -605,7 +615,11 @@ export function getCompleteGameInstruction<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

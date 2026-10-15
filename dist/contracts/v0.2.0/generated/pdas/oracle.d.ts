@@ -5,8 +5,8 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type ProgramDerivedAddress } from "@solana/kit";
+import { type Address, type HasAddress, type ProgramDerivedAddress } from "@solana/kit";
 export declare function findOraclePda(config?: {
-    programAddress?: Address | undefined;
+    programAddress?: Address | HasAddress | undefined;
 }): Promise<ProgramDerivedAddress>;
 //# sourceMappingURL=oracle.d.ts.map

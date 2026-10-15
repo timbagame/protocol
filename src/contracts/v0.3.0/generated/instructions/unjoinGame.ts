@@ -187,7 +187,10 @@ export async function getUnjoinGameInstructionAsync<
     TAccountAssociatedTokenProgram,
     TAccountPlayerTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): Promise<
   UnjoinGameInstruction<
     TProgramAddress,
@@ -234,7 +237,11 @@ export async function getUnjoinGameInstructionAsync<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -448,7 +455,10 @@ export function getUnjoinGameInstruction<
     TAccountAssociatedTokenProgram,
     TAccountPlayerTokenAccount
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): UnjoinGameInstruction<
   TProgramAddress,
   ResolvedInstructionAccountMeta<
@@ -493,7 +503,11 @@ export function getUnjoinGameInstruction<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

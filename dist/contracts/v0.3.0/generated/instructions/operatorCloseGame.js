@@ -26,7 +26,10 @@ export function getOperatorCloseGameInstructionDataCodec() {
 }
 export async function getOperatorCloseGameInstructionAsync(input, config) {
     // Program address.
-    const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === "string"
+        ? programAddressInput
+        : programAddressInput.address;
     // Account meta helper.
     const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
@@ -121,7 +124,10 @@ export async function getOperatorCloseGameInstructionAsync(input, config) {
 }
 export function getOperatorCloseGameInstruction(input, config) {
     // Program address.
-    const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === "string"
+        ? programAddressInput
+        : programAddressInput.address;
     // Account meta helper.
     const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.

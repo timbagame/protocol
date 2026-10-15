@@ -31,7 +31,10 @@ export function getInitializeOracleInstructionDataCodec() {
 }
 export async function getInitializeOracleInstructionAsync(input, config) {
     // Program address.
-    const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === "string"
+        ? programAddressInput
+        : programAddressInput.address;
     // Account meta helper.
     const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.
@@ -93,7 +96,10 @@ export async function getInitializeOracleInstructionAsync(input, config) {
 }
 export function getInitializeOracleInstruction(input, config) {
     // Program address.
-    const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === "string"
+        ? programAddressInput
+        : programAddressInput.address;
     // Account meta helper.
     const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
     // Original accounts.

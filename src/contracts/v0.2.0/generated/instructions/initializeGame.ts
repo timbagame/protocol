@@ -280,7 +280,10 @@ export async function getInitializeGameInstructionAsync<
     TAccountCreatorTokenAccount,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): Promise<
   InitializeGameInstruction<
     TProgramAddress,
@@ -335,7 +338,11 @@ export async function getInitializeGameInstructionAsync<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
@@ -617,7 +624,10 @@ export function getInitializeGameInstruction<
     TAccountCreatorTokenAccount,
     TAccountSystemProgram
   >,
-  config?: { programAddress?: TProgramAddress },
+  config?: {
+    programAddress?:
+      TProgramAddress | { readonly address: TProgramAddress } | undefined;
+  },
 ): InitializeGameInstruction<
   TProgramAddress,
   ResolvedInstructionAccountMeta<
@@ -670,7 +680,11 @@ export function getInitializeGameInstruction<
   >
 > {
   // Program address.
-  const programAddress = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+  const programAddress =
+    typeof programAddressInput === "string"
+      ? programAddressInput
+      : programAddressInput.address;
 
   // Account meta helper.
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");

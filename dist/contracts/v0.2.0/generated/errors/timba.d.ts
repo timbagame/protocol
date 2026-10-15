@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { type Address, type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM, type SolanaError } from "@solana/kit";
+import { type Address, type HasAddress, type SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM, type SolanaError } from "@solana/kit";
 /** UnauthorizedOperator: Unauthorized access */
 export declare const TIMBA_ERROR__UNAUTHORIZED_OPERATOR = 7000;
 /** UnauthorizedPlayer: Unauthorized access */
@@ -72,7 +72,9 @@ export declare function isTimbaError<TProgramErrorCode extends TimbaError>(error
     instructions: Record<number, {
         programAddress: Address;
     }>;
-}, code?: TProgramErrorCode): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> & Readonly<{
+}, code?: TProgramErrorCode, config?: {
+    programAddress?: Address | HasAddress;
+}): error is SolanaError<typeof SOLANA_ERROR__INSTRUCTION_ERROR__CUSTOM> & Readonly<{
     context: Readonly<{
         code: TProgramErrorCode;
     }>;

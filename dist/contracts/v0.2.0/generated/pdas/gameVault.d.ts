@@ -10,6 +10,6 @@ export type GameVaultSeeds = {
     tokenMint: Address | HasAddress;
 };
 export declare function findGameVaultPda(seeds: GameVaultSeeds, config?: {
-    programAddress?: Address | undefined;
+    programAddress?: Address | HasAddress | undefined;
 }): Promise<ProgramDerivedAddress>;
 //# sourceMappingURL=gameVault.d.ts.map

@@ -126,7 +126,7 @@ export function decodeGameToken<TAddress extends string = string>(
 
 export async function fetchGameToken<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<GameToken, TAddress>> {
   const maybeAccount = await fetchMaybeGameToken(rpc, address, config);
@@ -136,16 +136,20 @@ export async function fetchGameToken<TAddress extends string = string>(
 
 export async function fetchMaybeGameToken<TAddress extends string = string>(
   rpc: Parameters<typeof fetchEncodedAccount>[0],
-  address: Address<TAddress>,
+  address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<GameToken, TAddress>> {
-  const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+  const maybeAccount = await fetchEncodedAccount(
+    rpc,
+    typeof address === "string" ? address : address.address,
+    config,
+  );
   return decodeGameToken(maybeAccount);
 }
 
 export async function fetchAllGameToken(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GameToken>[]> {
   const maybeAccounts = await fetchAllMaybeGameToken(rpc, addresses, config);
@@ -155,10 +159,14 @@ export async function fetchAllGameToken(
 
 export async function fetchAllMaybeGameToken(
   rpc: Parameters<typeof fetchEncodedAccounts>[0],
-  addresses: Array<Address>,
+  addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GameToken>[]> {
-  const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+  const maybeAccounts = await fetchEncodedAccounts(
+    rpc,
+    addresses.map((a) => (typeof a === "string" ? a : a.address)),
+    config,
+  );
   return maybeAccounts.map((maybeAccount) => decodeGameToken(maybeAccount));
 }
 

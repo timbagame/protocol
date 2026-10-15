@@ -108,7 +108,11 @@ export function getTimbaErrorMessage(code) {
     }
     return "Error message not available in production bundles.";
 }
-export function isTimbaError(error, transactionMessage, code) {
-    return isProgramError(error, transactionMessage, TIMBA_PROGRAM_ADDRESS, code);
+export function isTimbaError(error, transactionMessage, code, config = {}) {
+    const programAddressInput = config.programAddress ?? TIMBA_PROGRAM_ADDRESS;
+    const programAddress = typeof programAddressInput === "string"
+        ? programAddressInput
+        : programAddressInput.address;
+    return isProgramError(error, transactionMessage, programAddress, code);
 }
 //# sourceMappingURL=timba.js.map

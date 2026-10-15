@@ -41,9 +41,9 @@ export declare function getGameTokenDecoder(): FixedSizeDecoder<GameToken>;
 export declare function getGameTokenCodec(): FixedSizeCodec<GameTokenArgs, GameToken>;
 export declare function decodeGameToken<TAddress extends string = string>(encodedAccount: EncodedAccount<TAddress>): Account<GameToken, TAddress>;
 export declare function decodeGameToken<TAddress extends string = string>(encodedAccount: MaybeEncodedAccount<TAddress>): MaybeAccount<GameToken, TAddress>;
-export declare function fetchGameToken<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress>, config?: FetchAccountConfig): Promise<Account<GameToken, TAddress>>;
-export declare function fetchMaybeGameToken<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<GameToken, TAddress>>;
-export declare function fetchAllGameToken(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<Account<GameToken>[]>;
-export declare function fetchAllMaybeGameToken(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<MaybeAccount<GameToken>[]>;
+export declare function fetchGameToken<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<GameToken, TAddress>>;
+export declare function fetchMaybeGameToken<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<GameToken, TAddress>>;
+export declare function fetchAllGameToken(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<GameToken>[]>;
+export declare function fetchAllMaybeGameToken(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<GameToken>[]>;
 export declare function getGameTokenSize(): number;
 //# sourceMappingURL=gameToken.d.ts.map

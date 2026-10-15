@@ -36,7 +36,9 @@ export type UpdateTokenAsyncInput<TAccountGameToken extends InstructionAccountIn
     config: UpdateTokenInstructionDataArgs["config"];
 };
 export declare function getUpdateTokenInstructionAsync<TAccountGameToken extends InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput, TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateTokenAsyncInput<TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>, config?: {
-    programAddress?: TProgramAddress;
+    programAddress?: TProgramAddress | {
+        readonly address: TProgramAddress;
+    } | undefined;
 }): Promise<UpdateTokenInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGameToken, InstructionAccountInputAddress<TAccountGameToken>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>>>;
 export type UpdateTokenInput<TAccountGameToken extends InstructionAccountInput = InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput, TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput = InstructionSignerInput> = {
     gameToken: TAccountGameToken;
@@ -46,7 +48,9 @@ export type UpdateTokenInput<TAccountGameToken extends InstructionAccountInput =
     config: UpdateTokenInstructionDataArgs["config"];
 };
 export declare function getUpdateTokenInstruction<TAccountGameToken extends InstructionAccountInput, TAccountTokenMint extends InstructionAccountInput, TAccountOracle extends InstructionAccountInput, TAccountOracleOperator extends InstructionSignerInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateTokenInput<TAccountGameToken, TAccountTokenMint, TAccountOracle, TAccountOracleOperator>, config?: {
-    programAddress?: TProgramAddress;
+    programAddress?: TProgramAddress | {
+        readonly address: TProgramAddress;
+    } | undefined;
 }): UpdateTokenInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountGameToken, InstructionAccountInputAddress<TAccountGameToken>>, ResolvedInstructionAccountMeta<TAccountTokenMint, InstructionAccountInputAddress<TAccountTokenMint>>, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOracleOperator, InstructionAccountInputAddress<TAccountOracleOperator>>>;
 export type ParsedUpdateTokenInstruction<TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS, TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]> = {
     programAddress: Address<TProgram>;

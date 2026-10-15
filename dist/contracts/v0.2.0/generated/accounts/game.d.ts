@@ -74,8 +74,8 @@ export declare function getGameDecoder(): Decoder<Game>;
 export declare function getGameCodec(): Codec<GameArgs, Game>;
 export declare function decodeGame<TAddress extends string = string>(encodedAccount: EncodedAccount<TAddress>): Account<Game, TAddress>;
 export declare function decodeGame<TAddress extends string = string>(encodedAccount: MaybeEncodedAccount<TAddress>): MaybeAccount<Game, TAddress>;
-export declare function fetchGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress>, config?: FetchAccountConfig): Promise<Account<Game, TAddress>>;
-export declare function fetchMaybeGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Game, TAddress>>;
-export declare function fetchAllGame(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<Account<Game>[]>;
-export declare function fetchAllMaybeGame(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<MaybeAccount<Game>[]>;
+export declare function fetchGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<Game, TAddress>>;
+export declare function fetchMaybeGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Game, TAddress>>;
+export declare function fetchAllGame(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<Game>[]>;
+export declare function fetchAllMaybeGame(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<Game>[]>;
 //# sourceMappingURL=game.d.ts.map

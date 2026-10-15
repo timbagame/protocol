@@ -34,7 +34,9 @@ export type UpdateOracleAsyncInput<TAccountOracle extends InstructionAccountInpu
     config: UpdateOracleInstructionDataArgs["config"];
 };
 export declare function getUpdateOracleInstructionAsync<TAccountOracle extends InstructionAccountInput, TAccountOldOracleOperator extends InstructionSignerInput, TAccountNewOracleOperator extends InstructionSignerInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateOracleAsyncInput<TAccountOracle, TAccountOldOracleOperator, TAccountNewOracleOperator>, config?: {
-    programAddress?: TProgramAddress;
+    programAddress?: TProgramAddress | {
+        readonly address: TProgramAddress;
+    } | undefined;
 }): Promise<UpdateOracleInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOldOracleOperator, InstructionAccountInputAddress<TAccountOldOracleOperator>>, ResolvedInstructionAccountMeta<TAccountNewOracleOperator, InstructionAccountInputAddress<TAccountNewOracleOperator>>>>;
 export type UpdateOracleInput<TAccountOracle extends InstructionAccountInput = InstructionAccountInput, TAccountOldOracleOperator extends InstructionSignerInput = InstructionSignerInput, TAccountNewOracleOperator extends InstructionSignerInput = InstructionSignerInput> = {
     oracle: TAccountOracle;
@@ -43,7 +45,9 @@ export type UpdateOracleInput<TAccountOracle extends InstructionAccountInput = I
     config: UpdateOracleInstructionDataArgs["config"];
 };
 export declare function getUpdateOracleInstruction<TAccountOracle extends InstructionAccountInput, TAccountOldOracleOperator extends InstructionSignerInput, TAccountNewOracleOperator extends InstructionSignerInput, TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS>(input: UpdateOracleInput<TAccountOracle, TAccountOldOracleOperator, TAccountNewOracleOperator>, config?: {
-    programAddress?: TProgramAddress;
+    programAddress?: TProgramAddress | {
+        readonly address: TProgramAddress;
+    } | undefined;
 }): UpdateOracleInstruction<TProgramAddress, ResolvedInstructionAccountMeta<TAccountOracle, InstructionAccountInputAddress<TAccountOracle>>, ResolvedInstructionAccountMeta<TAccountOldOracleOperator, InstructionAccountInputAddress<TAccountOldOracleOperator>>, ResolvedInstructionAccountMeta<TAccountNewOracleOperator, InstructionAccountInputAddress<TAccountNewOracleOperator>>>;
 export type ParsedUpdateOracleInstruction<TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS, TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[]> = {
     programAddress: Address<TProgram>;

@@ -10,6 +10,6 @@ export type GameTokenSeeds = {
     tokenMint: Address | HasAddress;
 };
 export declare function findGameTokenPda(seeds: GameTokenSeeds, config?: {
-    programAddress?: Address | undefined;
+    programAddress?: Address | HasAddress | undefined;
 }): Promise<ProgramDerivedAddress>;
 //# sourceMappingURL=gameToken.d.ts.map

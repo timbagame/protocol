@@ -23,6 +23,7 @@ import {
   type ExtendedClient,
   type GetAccountInfoApi,
   type GetMultipleAccountsApi,
+  type HasAddress,
   type Instruction,
   type InstructionWithData,
   type ReadonlyUint8Array,
@@ -585,46 +586,57 @@ export type TimbaPluginAccounts = {
 export type TimbaPluginInstructions = {
   closeGame: (
     input: CloseGameAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseGameInstructionAsync> &
     SelfPlanAndSendFunctions;
   closeToken: (
     input: CloseTokenAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCloseTokenInstructionAsync> &
     SelfPlanAndSendFunctions;
   completeGame: (
     input: CompleteGameAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getCompleteGameInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeGame: (
     input: InitializeGameAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeGameInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeOracle: (
     input: InitializeOracleAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeOracleInstructionAsync> &
     SelfPlanAndSendFunctions;
   initializeToken: (
     input: InitializeTokenAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getInitializeTokenInstructionAsync> &
     SelfPlanAndSendFunctions;
   joinGame: (
     input: JoinGameAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getJoinGameInstructionAsync> &
     SelfPlanAndSendFunctions;
   unjoinGame: (
     input: UnjoinGameAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUnjoinGameInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateOracle: (
     input: UpdateOracleAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateOracleInstructionAsync> &
     SelfPlanAndSendFunctions;
   updateToken: (
     input: UpdateTokenAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getUpdateTokenInstructionAsync> &
     SelfPlanAndSendFunctions;
   withdrawTokenFee: (
     input: WithdrawTokenFeeAsyncInput,
+    config?: { programAddress?: Address | HasAddress },
   ) => ReturnType<typeof getWithdrawTokenFeeInstructionAsync> &
     SelfPlanAndSendFunctions;
 };
@@ -642,7 +654,9 @@ export type TimbaPluginRequirements = ClientWithRpc<
   ClientWithTransactionPlanning &
   ClientWithTransactionSending;
 
-export function timbaProgram() {
+export function timbaProgram(
+  config: { programAddress?: Address | HasAddress } = {},
+) {
   return <T extends TimbaPluginRequirements>(
     client: T,
   ): ExtendedClient<T, { timba: TimbaPlugin }> => {
@@ -654,67 +668,116 @@ export function timbaProgram() {
           oracle: addSelfFetchFunctions(client, getOracleCodec()),
         },
         instructions: {
-          closeGame: (input) =>
+          closeGame: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseGameInstructionAsync(input),
+              getCloseGameInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          closeToken: (input) =>
+          closeToken: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCloseTokenInstructionAsync(input),
+              getCloseTokenInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          completeGame: (input) =>
+          completeGame: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getCompleteGameInstructionAsync(input),
+              getCompleteGameInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeGame: (input) =>
+          initializeGame: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeGameInstructionAsync(input),
+              getInitializeGameInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeOracle: (input) =>
+          initializeOracle: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeOracleInstructionAsync(input),
+              getInitializeOracleInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          initializeToken: (input) =>
+          initializeToken: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getInitializeTokenInstructionAsync(input),
+              getInitializeTokenInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          joinGame: (input) =>
+          joinGame: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getJoinGameInstructionAsync(input),
+              getJoinGameInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          unjoinGame: (input) =>
+          unjoinGame: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUnjoinGameInstructionAsync(input),
+              getUnjoinGameInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateOracle: (input) =>
+          updateOracle: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateOracleInstructionAsync(input),
+              getUpdateOracleInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          updateToken: (input) =>
+          updateToken: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getUpdateTokenInstructionAsync(input),
+              getUpdateTokenInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
-          withdrawTokenFee: (input) =>
+          withdrawTokenFee: (input, instructionConfig) =>
             addSelfPlanAndSendFunctions(
               client,
-              getWithdrawTokenFeeInstructionAsync(input),
+              getWithdrawTokenFeeInstructionAsync(input, {
+                programAddress:
+                  instructionConfig?.programAddress ?? config.programAddress,
+              }),
             ),
         },
         pdas: {
-          oracle: findOraclePda,
-          gameToken: findGameTokenPda,
-          gameVault: findGameVaultPda,
-          game: findGamePda,
+          oracle: (pdaConfig) =>
+            findOraclePda({
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          gameToken: (seeds, pdaConfig) =>
+            findGameTokenPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          gameVault: (seeds, pdaConfig) =>
+            findGameVaultPda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
+          game: (seeds, pdaConfig) =>
+            findGamePda(seeds, {
+              programAddress:
+                pdaConfig?.programAddress ?? config.programAddress,
+            }),
         },
         identifyAccount: identifyTimbaAccount,
         identifyInstruction: identifyTimbaInstruction,

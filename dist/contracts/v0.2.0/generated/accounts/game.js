@@ -64,7 +64,7 @@ export async function fetchGame(rpc, address, config) {
     return maybeAccount;
 }
 export async function fetchMaybeGame(rpc, address, config) {
-    const maybeAccount = await fetchEncodedAccount(rpc, address, config);
+    const maybeAccount = await fetchEncodedAccount(rpc, typeof address === "string" ? address : address.address, config);
     return decodeGame(maybeAccount);
 }
 export async function fetchAllGame(rpc, addresses, config) {
@@ -73,7 +73,7 @@ export async function fetchAllGame(rpc, addresses, config) {
     return maybeAccounts;
 }
 export async function fetchAllMaybeGame(rpc, addresses, config) {
-    const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
+    const maybeAccounts = await fetchEncodedAccounts(rpc, addresses.map((a) => (typeof a === "string" ? a : a.address)), config);
     return maybeAccounts.map((maybeAccount) => decodeGame(maybeAccount));
 }
 //# sourceMappingURL=game.js.map

@@ -147,8 +147,8 @@
     "@solana/kit": "8.5.0",
     "viem": "2.57.7",
     "zod": "4.6.7",
-    "@solana-program/token": "0.17.0",
-    "@solana-program/system": "0.15.0"
+    "@solana-program/token": "0.18.0",
+    "@solana-program/system": "0.16.0"
   },
   "devDependencies": {
     "@codama/nodes-from-anchor": "1.5.6",

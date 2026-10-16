@@ -1,6 +1,6 @@
 {
   "name": "@timbagame/protocol",
-  "version": "0.14.2",
+  "version": "0.15.0",
   "description": "Shared HTTP contracts and versioned on-chain artifacts for Timba services",
   "type": "module",
   "sideEffects": false,
@@ -137,6 +137,8 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "generate:contracts": "bun run scripts/generate-contract-clients.ts",
+    "generate:rust-fixtures": "bun run scripts/generate-rust-fixtures.ts",
+    "check:rust-fixtures": "bun run scripts/generate-rust-fixtures.ts --check",
     "prepack": "bun run build",
     "test": "bun test",
     "typecheck": "tsc --noEmit",

@@ -83,11 +83,11 @@ Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path y
 
 `crates/timba-protocol` is the same protocol in Rust: addresses and PDAs, legacy transactions, the v0.2.0 and v0.3.0 instruction and account codecs, program events, transaction plans, winner randomness, token amounts and the chain-neutral game rules. It reads the same IDLs as the TypeScript clients, and fixtures generated from this package check its builders byte for byte.
 
-The crate is not on crates.io. Depend on a pinned commit:
+The crate is not on crates.io. Depend on a release tag:
 
 ```toml
 [dependencies]
-timba-protocol = { git = "https://github.com/timbagame/protocol", rev = "<commit>" }
+timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.15.0" }
 ```
 
 Its version always matches `package.json`.
@@ -95,7 +95,7 @@ Its version always matches `package.json`.
 The `evm` feature adds EVM contract v0.1.0: alloy bindings from `src/evm/v0.1.0/timba.json`, typed-data digests, game IDs, contract calls, winner selection, event decoding and the EVM HTTP validators.
 
 ```toml
-timba-protocol = { git = "https://github.com/timbagame/protocol", rev = "<commit>", features = ["evm"] }
+timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.15.0", features = ["evm"] }
 ```
 
 ## Usage
@@ -198,7 +198,7 @@ Solana IDL snapshots come from tagged commits in the contracts repository. The E
 
 ## Releases
 
-Each release is a normal pull request that bumps `version` in `package.json` and in `Cargo.toml` (a test keeps them equal). When it merges into `main` and CI passes, the release workflow publishes that version. Published versions are immutable, so any fix ships as a new version.
+Each release is a normal pull request that bumps `version` in `package.json` and in `Cargo.toml` (a test keeps them equal). When it merges into `main` and CI passes, the release workflow publishes that version to GitHub Packages and creates the matching `v<version>` GitHub release and tag on the published commit, so Rust users can pin `tag = "v<version>"`. Published versions are immutable, so any fix ships as a new version.
 
 ## Related
 

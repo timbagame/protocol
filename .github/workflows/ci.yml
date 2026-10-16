@@ -113,12 +113,14 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all --check
       - name: Lint
-        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+        run: |
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
       - name: Tests with coverage
         run: |
           python3 scripts/test-check-rust-coverage.py
           mkdir -p coverage
-          cargo llvm-cov --workspace --locked --lcov --output-path coverage/rust.lcov
+          cargo llvm-cov --workspace --all-features --locked --lcov --output-path coverage/rust.lcov
           cargo llvm-cov report --summary-only
           python3 scripts/check-rust-coverage.py coverage/rust.lcov coverage-scope.rust.json
       - name: Upload coverage

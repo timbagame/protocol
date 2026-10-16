@@ -11,7 +11,7 @@ jobs:
     if: github.repository == 'timbagame/protocol' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-26.04
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -50,4 +50,24 @@ jobs:
         if: steps.version.outputs.publish == 'true'
         run: npm publish --access public
         env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+
+      - name: Create GitHub release
+        # Tags the commit npm recorded for this version, so a rerun or the next push to main
+        # backfills a release that is missing, even when npm skipped the publish.
+        run: |
+          version=$(jq -r .version package.json)
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "v$version is already released; skipping"
+            exit 0
+          fi
+          head=$(npm view "@timbagame/protocol@$version" gitHead --registry=https://npm.pkg.github.com)
+          if ! [[ "$head" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "@timbagame/protocol@$version has no recorded commit" >&2
+            exit 1
+          fi
+          git merge-base --is-ancestor "$head" refs/remotes/origin/main
+          gh release create "v$version" --target "$head" --title "v$version" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
           NODE_AUTH_TOKEN: ${{ github.token }}

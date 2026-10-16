@@ -2,3 +2,7 @@ node_modules/
 *.tgz
 
 /coverage/
+
+# Rust
+/target/
+__pycache__/

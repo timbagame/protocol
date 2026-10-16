@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+env:
+  CARGO_LLVM_COV_VERSION: "0.9.1" # cargo-llvm-cov
+  CARGO_AUDIT_VERSION: "0.22.2" # cargo-audit
+  CARGO_TERM_COLOR: always
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -58,6 +63,72 @@ jobs:
       - name: Check generated package
         run: git diff --exit-code -- dist
 
+  rust:
+    name: Rust crate
+    if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.3
+      - name: Restore Bun cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ runner.os }}-${{ hashFiles('bun.lock', 'package.json') }}
+          restore-keys: |
+            bun-install-${{ runner.os }}-
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Check parity fixtures
+        run: bun run check:rust-fixtures
+      - name: Install Rust toolchain
+        # Installs the channel and components pinned in rust-toolchain.toml.
+        run: rustup toolchain install
+      - name: Restore Cargo cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml') }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml') }}-
+      - name: Install Cargo tools
+        run: |
+          # A cache hit restores ~/.cargo/bin, so only install when the pinned version is missing.
+          cargo llvm-cov --version 2>/dev/null | grep -qF "$CARGO_LLVM_COV_VERSION" \
+            || cargo install cargo-llvm-cov --locked --force --version "$CARGO_LLVM_COV_VERSION"
+          cargo audit --version 2>/dev/null | grep -qF "$CARGO_AUDIT_VERSION" \
+            || cargo install cargo-audit --locked --force --version "$CARGO_AUDIT_VERSION"
+      - name: Audit dependencies
+        run: cargo audit
+      - name: Check formatting
+        run: cargo fmt --all --check
+      - name: Lint
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Tests with coverage
+        run: |
+          python3 scripts/test-check-rust-coverage.py
+          mkdir -p coverage
+          cargo llvm-cov --workspace --locked --lcov --output-path coverage/rust.lcov
+          cargo llvm-cov report --summary-only
+          python3 scripts/check-rust-coverage.py coverage/rust.lcov coverage-scope.rust.json
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: rust-coverage
+          path: coverage/rust.lcov
+          if-no-files-found: error
+
   publish:
     if: >-
       !cancelled() && (github.event_name == 'push' && github.ref == 'refs/heads/main') && needs.validate.result == 'skipped'
@@ -73,6 +144,7 @@ jobs:
     if: ${{ always() && github.event_name == 'pull_request' }}
     needs:
       - validate
+      - rust
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions: {}

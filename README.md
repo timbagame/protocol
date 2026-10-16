@@ -79,6 +79,19 @@ The EVM contract uses a different, domain-separated formula. Use `calculateEvmWi
 
 Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path you need: the Solana entry points do not load `viem`, and the version registry loads no IDL.
 
+## Rust crate
+
+`crates/timba-protocol` is the same protocol in Rust: addresses and PDAs, legacy transactions, the v0.2.0 and v0.3.0 instruction and account codecs, program events, transaction plans, winner randomness and token amounts. It reads the same IDLs as the TypeScript clients, and fixtures generated from this package check its builders byte for byte.
+
+The crate is not on crates.io. Depend on a pinned commit:
+
+```toml
+[dependencies]
+timba-protocol = { git = "https://github.com/timbagame/protocol", rev = "<commit>" }
+```
+
+Its version always matches `package.json`.
+
 ## Usage
 
 ### Pick a contract version
@@ -155,13 +168,14 @@ Transaction helpers only encode calls. Fetching nonces, estimating fees, signing
 
 ## Development
 
-Requires [Bun](https://bun.sh) 1.4.2.
+Requires [Bun](https://bun.sh) 1.4.3, plus the Rust toolchain in `rust-toolchain.toml` for the crate.
 
 ```bash
 bun install
 bun run typecheck
 bun test
 bun run build
+cargo test
 ```
 
 Generated code and the built `dist` folder are committed, and CI fails if they drift from their sources.
@@ -172,12 +186,13 @@ Generated code and the built `dist` folder are committed, and CI fails if they d
 | New or updated EVM ABI         | Update `src/evm/v0.1.0/source.json`, then `bun run generate:evm`             |
 | Compare EVM artifacts upstream | `bun run check:evm-upstream /path/to/contracts`                              |
 | Anything under `src`           | `bun run build`, then commit `dist`                                          |
+| Solana plans, codecs or IDLs   | `bun run generate:rust-fixtures`, then commit the fixtures                   |
 
 Solana IDL snapshots come from tagged commits in the contracts repository. The EVM ABI records its source commit and SHA-256 in `source.json`.
 
 ## Releases
 
-Each release is a normal pull request that bumps `version` in `package.json`. When it merges into `main` and CI passes, the release workflow publishes that version. Published versions are immutable, so any fix ships as a new version.
+Each release is a normal pull request that bumps `version` in `package.json` and in `Cargo.toml` (a test keeps them equal). When it merges into `main` and CI passes, the release workflow publishes that version. Published versions are immutable, so any fix ships as a new version.
 
 ## Related
 

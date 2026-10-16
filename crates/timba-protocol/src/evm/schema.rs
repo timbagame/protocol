@@ -2,7 +2,8 @@
 //!
 //! The TypeScript service validates with zod; these helpers apply the same
 //! rules (strict objects, integer bounds, canonical decimal uint256 strings,
-//! checksummed addresses) and report the first failing path.
+//! checksummed addresses) and report the first failing path. The primitives are
+//! public so services can validate their own configuration the same way.
 
 use alloy_primitives::{Address, Bytes, B256, U256};
 use serde::Serialize;
@@ -20,11 +21,11 @@ pub struct SchemaError {
 
 pub type SchemaResult<T> = Result<T, SchemaError>;
 
-pub(crate) fn fail<T>(path: &str, message: impl Into<String>) -> SchemaResult<T> {
+pub fn fail<T>(path: &str, message: impl Into<String>) -> SchemaResult<T> {
     Err(SchemaError { path: path.to_string(), message: message.into() })
 }
 
-pub(crate) fn join(path: &str, key: &str) -> String {
+pub fn join(path: &str, key: &str) -> String {
     if path.is_empty() {
         key.to_string()
     } else {
@@ -33,7 +34,7 @@ pub(crate) fn join(path: &str, key: &str) -> String {
 }
 
 /// `z.strictObject`: an object with no keys outside `allowed`.
-pub(crate) fn strict_object<'a>(
+pub fn strict_object<'a>(
     value: &'a Value,
     path: &str,
     allowed: &[&str],
@@ -48,7 +49,7 @@ pub(crate) fn strict_object<'a>(
 }
 
 /// A present field (zod treats a missing key as `undefined`).
-pub(crate) fn required<'a>(object: &'a Map<String, Value>, path: &str, key: &str) -> SchemaResult<&'a Value> {
+pub fn required<'a>(object: &'a Map<String, Value>, path: &str, key: &str) -> SchemaResult<&'a Value> {
     match object.get(key) {
         Some(value) => Ok(value),
         None => fail(&join(path, key), "Invalid input: expected value, received undefined"),
@@ -56,7 +57,7 @@ pub(crate) fn required<'a>(object: &'a Map<String, Value>, path: &str, key: &str
 }
 
 /// `z.number().int().min(min).max(max)`; zod integers are always safe integers.
-pub(crate) fn integer(value: &Value, path: &str, min: i64, max: i64) -> SchemaResult<i64> {
+pub fn integer(value: &Value, path: &str, min: i64, max: i64) -> SchemaResult<i64> {
     let Some(number) = value.as_number() else {
         return fail(path, "Invalid input: expected number");
     };
@@ -80,11 +81,11 @@ pub(crate) fn integer(value: &Value, path: &str, min: i64, max: i64) -> SchemaRe
     Ok(integer)
 }
 
-pub(crate) fn string<'a>(value: &'a Value, path: &str) -> SchemaResult<&'a str> {
+pub fn string<'a>(value: &'a Value, path: &str) -> SchemaResult<&'a str> {
     value.as_str().map_or_else(|| fail(path, "Invalid input: expected string"), Ok)
 }
 
-pub(crate) fn boolean(value: &Value, path: &str) -> SchemaResult<bool> {
+pub fn boolean(value: &Value, path: &str) -> SchemaResult<bool> {
     value.as_bool().map_or_else(|| fail(path, "Invalid input: expected boolean"), Ok)
 }
 
@@ -125,19 +126,19 @@ pub fn parse_uint(text: &str) -> Option<U256> {
 }
 
 /// `addressSchema`: transforms to the checksummed address.
-pub(crate) fn address(value: &Value, path: &str) -> SchemaResult<Address> {
+pub fn address(value: &Value, path: &str) -> SchemaResult<Address> {
     let text = string(value, path)?;
     parse_address(text).map_or_else(|| fail(path, "Invalid string: must match pattern"), Ok)
 }
 
 /// `uintSchema`: decimal uint256 strings only; JSON numbers are rejected.
-pub(crate) fn uint(value: &Value, path: &str) -> SchemaResult<U256> {
+pub fn uint(value: &Value, path: &str) -> SchemaResult<U256> {
     let text = string(value, path)?;
     parse_uint(text).map_or_else(|| fail(path, "Invalid uint256 decimal string"), Ok)
 }
 
 /// `hexSignature`: non-empty even-length hex of at most 8194 characters.
-pub(crate) fn hex_signature(value: &Value, path: &str) -> SchemaResult<Bytes> {
+pub fn hex_signature(value: &Value, path: &str) -> SchemaResult<Bytes> {
     let text = string(value, path)?;
     if text.len() > 8194 {
         return fail(path, "Too big: expected string to have <=8194 characters");

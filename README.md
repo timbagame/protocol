@@ -81,7 +81,7 @@ Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path y
 
 ## Rust crate
 
-`crates/timba-protocol` is the same protocol in Rust: addresses and PDAs, legacy transactions, the v0.2.0 and v0.3.0 instruction and account codecs, program events, transaction plans, winner randomness and token amounts. It reads the same IDLs as the TypeScript clients, and fixtures generated from this package check its builders byte for byte.
+`crates/timba-protocol` is the same protocol in Rust: addresses and PDAs, legacy transactions, the v0.2.0 and v0.3.0 instruction and account codecs, program events, transaction plans, winner randomness, token amounts and the chain-neutral game rules. It reads the same IDLs as the TypeScript clients, and fixtures generated from this package check its builders byte for byte.
 
 The crate is not on crates.io. Depend on a pinned commit:
 
@@ -91,6 +91,12 @@ timba-protocol = { git = "https://github.com/timbagame/protocol", rev = "<commit
 ```
 
 Its version always matches `package.json`.
+
+The `evm` feature adds EVM contract v0.1.0: alloy bindings from `src/evm/v0.1.0/timba.json`, typed-data digests, game IDs, contract calls, winner selection, event decoding and the EVM HTTP validators.
+
+```toml
+timba-protocol = { git = "https://github.com/timbagame/protocol", rev = "<commit>", features = ["evm"] }
+```
 
 ## Usage
 

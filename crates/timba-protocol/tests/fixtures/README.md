@@ -3,10 +3,12 @@
 These JSON files come from this repository's TypeScript package, so the Rust
 crate is checked byte for byte against it.
 
-| Fixture         | Covers                                                     | Checked by            |
-| --------------- | ---------------------------------------------------------- | --------------------- |
-| `plans.json`    | Create, join, unjoin and close plans for v0.2.0 and v0.3.0 | `tests/kit_parity.rs` |
-| `complete.json` | `completeGame` instructions for v0.2.0 and v0.3.0          | `tests/kit_parity.rs` |
+| Fixture         | Covers                                                     | Checked by              |
+| --------------- | ---------------------------------------------------------- | ----------------------- |
+| `plans.json`    | Create, join, unjoin and close plans for v0.2.0 and v0.3.0 | `tests/kit_parity.rs`   |
+| `complete.json` | `completeGame` instructions for v0.2.0 and v0.3.0          | `tests/kit_parity.rs`   |
+| `evm.json`      | EVM v0.1.0 identifiers, digests, calls, winners and events | `tests/evm_parity.rs`   |
+| `games.json`    | Token amounts, game reference keys and paths, game drafts  | `tests/games_parity.rs` |
 
 `scripts/generate-rust-fixtures.ts` writes them from `src/`. After changing
 the TypeScript package, regenerate them and commit the result:

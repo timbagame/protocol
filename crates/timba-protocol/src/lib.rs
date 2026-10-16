@@ -4,12 +4,17 @@
 //! v0.2.0 and v0.3.0 Timba program IDLs. The IDLs are read from the TypeScript
 //! package's `src/contracts`, and fixtures generated from that package check
 //! every builder byte for byte (see `tests/fixtures/README.md`).
+//!
+//! The `evm` feature adds EVM contract v0.1.0, built on alloy.
 
 pub mod address;
 pub mod amounts;
 pub mod codec;
 pub mod contracts;
 pub mod events;
+#[cfg(feature = "evm")]
+pub mod evm;
+pub mod games;
 pub mod instruction;
 pub mod plans;
 pub mod randomness;

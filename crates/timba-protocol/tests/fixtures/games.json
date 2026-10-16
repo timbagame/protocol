@@ -1,0 +1,554 @@
+{
+  "amounts": [
+    { "value": "1.5", "decimals": 6, "ok": "1500000" },
+    { "value": " 1.5\n", "decimals": 6, "ok": "1500000" },
+    { "value": ".5", "decimals": 1, "ok": "5" },
+    { "value": "1.", "decimals": 0, "ok": "1" },
+    { "value": "0.000", "decimals": 255, "ok": "0" },
+    { "value": "﻿2 ", "decimals": 0, "ok": "2" },
+    {
+      "value": "1",
+      "decimals": 0,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    { "value": "007.10", "decimals": 2, "ok": "710" },
+    {
+      "value": "340282366920938463463374607431768211455",
+      "decimals": 0,
+      "ok": "340282366920938463463374607431768211455"
+    },
+    {
+      "value": "1.1234567",
+      "decimals": 6,
+      "error": "This token supports 6 decimal places",
+      "code": "precision"
+    },
+    {
+      "value": "",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": ".",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "-1",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "1e3",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "1.2.3",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "+1",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "1 2",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "١",
+      "decimals": 6,
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "value": "1",
+      "decimals": 256,
+      "error": "Decimals must be an integer between 0 and 255",
+      "code": "decimals"
+    }
+  ],
+  "references": [
+    {
+      "reference": {
+        "chain": "solana",
+        "network": "mainnet-beta",
+        "deployment": "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5",
+        "gameId": "Game Id/é&?"
+      },
+      "key": "[\"solana\",\"mainnet-beta\",\"32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5\",\"Game Id/é&?\"]",
+      "path": "/play/games/Game%20Id%2F%C3%A9%26%3F"
+    },
+    {
+      "reference": {
+        "chain": "evm",
+        "chainId": "8453",
+        "deployment": "0xAbCdEf0123456789aBcDeF0123456789AbCdEf01",
+        "gameId": "0xAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAb"
+      },
+      "key": "[\"evm\",\"8453\",\"0xabcdef0123456789abcdef0123456789abcdef01\",\"0xabababababababababababababababababababababababababababababababab\"]",
+      "path": "/play/games/0xAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAbAb?chainId=8453&deployment=0xAbCdEf0123456789aBcDeF0123456789AbCdEf01"
+    }
+  ],
+  "drafts": [
+    {
+      "name": "valid",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "301 seconds",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 5.016666666666667
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "fractional seconds",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 1.001
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "below minimum",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "0.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "zero",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "0",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "bad amount",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "abc",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "name": "precision",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "1.1234567",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "This token supports 6 decimal places",
+      "code": "precision"
+    },
+    {
+      "name": "coinflip floor",
+      "chain": "solana",
+      "draft": {
+        "type": "coinflip",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 2,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "coinflip",
+      "chain": "solana",
+      "draft": {
+        "type": "coinflip",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 2,
+        "maxPlayers": 2,
+        "timeoutMinutes": 60
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "fractional players",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1.5,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "max below min",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 5,
+        "maxPlayers": 4,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "too many players",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 101,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "short timeout",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 4
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "one minute",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 1
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "long timeout",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 1441
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "infinite timeout",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": null
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "private",
+      "chain": "solana",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60,
+        "isPrivate": true
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "valid",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "301 seconds",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 5.016666666666667
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "fractional seconds",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 1.001
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "below minimum",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "0.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "zero",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "0",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "bad amount",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "abc",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid amount format",
+      "code": "format"
+    },
+    {
+      "name": "precision",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "1.1234567",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "This token supports 6 decimal places",
+      "code": "precision"
+    },
+    {
+      "name": "coinflip floor",
+      "chain": "evm",
+      "draft": {
+        "type": "coinflip",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 2,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "coinflip",
+      "chain": "evm",
+      "draft": {
+        "type": "coinflip",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 2,
+        "maxPlayers": 2,
+        "timeoutMinutes": 60
+      },
+      "ok": "2500000"
+    },
+    {
+      "name": "fractional players",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1.5,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "max below min",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 5,
+        "maxPlayers": 4,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "too many players",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 101,
+        "timeoutMinutes": 60
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "short timeout",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 4
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "one minute",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 1
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "long timeout",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 1441
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "infinite timeout",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": null
+      },
+      "error": "Invalid game terms"
+    },
+    {
+      "name": "private",
+      "chain": "evm",
+      "draft": {
+        "type": "giveaway",
+        "tokenMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "amount": "2.5",
+        "minPlayers": 1,
+        "maxPlayers": 10,
+        "timeoutMinutes": 60,
+        "isPrivate": true
+      },
+      "ok": "2500000"
+    }
+  ]
+}

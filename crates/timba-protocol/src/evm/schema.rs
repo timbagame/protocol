@@ -34,11 +34,7 @@ pub fn join(path: &str, key: &str) -> String {
 }
 
 /// `z.strictObject`: an object with no keys outside `allowed`.
-pub fn strict_object<'a>(
-    value: &'a Value,
-    path: &str,
-    allowed: &[&str],
-) -> SchemaResult<&'a Map<String, Value>> {
+pub fn strict_object<'a>(value: &'a Value, path: &str, allowed: &[&str]) -> SchemaResult<&'a Map<String, Value>> {
     let Some(object) = value.as_object() else {
         return fail(path, "Invalid input: expected object");
     };
@@ -96,9 +92,7 @@ fn is_hex(text: &str) -> bool {
 /// `/^0x[0-9a-fA-F]{40}$/` (any casing accepted, like viem's non-strict `getAddress`).
 pub fn parse_address(text: &str) -> Option<Address> {
     let digits = text.strip_prefix("0x")?;
-    if digits.len() != 40 || !is_hex(digits) {
-        return None;
-    }
+    // Fails unless `digits` is exactly 40 hex digits.
     let mut bytes = [0u8; 20];
     hex::decode_to_slice(digits, &mut bytes).ok()?;
     Some(Address::from(bytes))
@@ -107,9 +101,7 @@ pub fn parse_address(text: &str) -> Option<Address> {
 /// `/^0x[0-9a-fA-F]{64}$/`.
 pub fn parse_bytes32(text: &str) -> Option<B256> {
     let digits = text.strip_prefix("0x")?;
-    if digits.len() != 64 || !is_hex(digits) {
-        return None;
-    }
+    // Fails unless `digits` is exactly 64 hex digits.
     let mut bytes = [0u8; 32];
     hex::decode_to_slice(digits, &mut bytes).ok()?;
     Some(B256::from(bytes))
@@ -332,6 +324,15 @@ mod tests {
             "n: Invalid input: expected int, received number"
         );
         assert_eq!(integer(&json!(MAX_SAFE_INTEGER), "n", 0, i64::MAX), Ok(MAX_SAFE_INTEGER));
+        assert_eq!(integer(&json!(1), "n", 1, 9), Ok(1));
+        assert_eq!(integer(&json!(9), "n", 1, 9), Ok(9));
+        assert_eq!(parse_address(&format!("0x{}", "zz".repeat(20))), None);
+        assert_eq!(parse_bytes32(&format!("0x{}", "ab".repeat(31))), None);
+        assert!(hex_signature(&json!(format!("0x{}", "ab".repeat(4096))), "proof").is_ok());
+        assert_eq!(
+            message(hex_signature(&json!("0xzz"), "proof").map(|_| ())),
+            "proof: Invalid string: must match pattern"
+        );
         assert_eq!(message(integer(&json!(0), "n", 1, 9).map(|_| ())), "n: Too small: expected number to be >=1");
         assert_eq!(message(integer(&json!(10), "n", 1, 9).map(|_| ())), "n: Too big: expected number to be <=9");
         assert_eq!(parse_address("0x12"), None);
@@ -367,6 +368,7 @@ mod tests {
             assert!(parse_intent(&with(&valid, key, value)).is_err(), "{key} accepted");
         }
         assert!(parse_intent(&with(&valid, "amount", json!(overflow))).is_ok());
+        assert_eq!(parse_intent(&with(&valid, "gameType", json!(1))).unwrap().game_type, 1);
         assert!(parse_intent(&with(&valid, "timeout", json!(3600.0))).is_ok());
     }
 
@@ -405,7 +407,12 @@ mod tests {
         assert!(tokens(&json!([]), "tokens").is_err());
         let zero = json!([{ "address": a, "symbol": "A", "decimals": 18, "minimumAmount": "0" }]);
         assert!(tokens(&zero, "tokens").is_err());
-        let symbol = json!([{ "address": a, "symbol": "A B", "decimals": 18, "minimumAmount": "1" }]);
-        assert!(tokens(&symbol, "tokens").is_err());
+        let symbol = |symbol: &str| json!([{ "address": a, "symbol": symbol, "decimals": 18, "minimumAmount": "1" }]);
+        for bad in ["A B", "", "ABCDEFGHIJKLMNOPQ"] {
+            assert!(tokens(&symbol(bad), "tokens").is_err(), "{bad:?}");
+        }
+        for good in ["ABCDEFGHIJKLMNOP", "w_e-th"] {
+            assert!(tokens(&symbol(good), "tokens").is_ok(), "{good}");
+        }
     }
 }

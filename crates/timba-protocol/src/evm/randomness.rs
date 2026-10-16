@@ -67,6 +67,14 @@ mod tests {
     use super::*;
 
     #[test]
+    fn accepts_entropy_at_the_threshold() {
+        // 2^256 % 3 == 1: entropy 1 is the smallest unbiased value.
+        let one = B256::with_last_byte(1);
+        let winner = select_with(one, 3, |_, _| unreachable!()).unwrap();
+        assert_eq!((winner.random_value, winner.winner_index), (U256::from(1), 1));
+    }
+
+    #[test]
     fn gives_up_after_32_biased_rounds() {
         // 2^256 % 3 == 1, so zero entropy is always rejected.
         let error = select_with(B256::ZERO, 3, |_, _| B256::ZERO).unwrap_err();

@@ -73,6 +73,8 @@ fn domain_rejects_unsupported_deployments() {
         let chain = EvmDeployment { chain_id, ..deployment() };
         assert_eq!(close_game_transaction(&chain, GAME).unwrap_err().to_string(), "Invalid EVM chain ID");
     }
+    let largest = EvmDeployment { chain_id: 9_007_199_254_740_991, ..deployment() };
+    assert!(close_game_transaction(&largest, GAME).is_ok());
     assert!(creation_digest(&unsupported, &request()).is_err());
     assert!(private_join_digest(&unsupported, GAME, player(), U256::ZERO).is_err());
     assert!(token_approval_transaction(&unsupported, Address::ZERO, U256::ZERO).is_err());
@@ -223,6 +225,8 @@ fn game_actions_follow_permissions_and_timing() {
     let ready = game(1, 1, vec![player(), creator()]);
     assert_eq!(actions(&ready, Some(player()), 105), all(false, true, false, false, false));
     assert_eq!(actions(&ready, Some(player()), 110), all(false, true, false, true, false));
+    // An open giveaway with players cannot be closed before it is recoverable.
+    assert!(!actions(&giveaway, Some(creator()), 50).close);
     let full = game(1, 0, vec![player(), creator(), Address::ZERO]);
     assert!(!actions(&full, None, 50).join);
     let closed = game(3, 0, vec![]);

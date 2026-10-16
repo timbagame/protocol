@@ -73,6 +73,27 @@ fn draft_validation_matches_typescript() {
 }
 
 #[test]
+fn draft_validation_accepts_values_on_every_bound() {
+    let draft = GameDraft {
+        game_type: GameType::Giveaway,
+        token_mint: String::new(),
+        amount: "1".into(),
+        min_players: 1.0,
+        max_players: 100.0,
+        timeout_minutes: 1440.0,
+        is_private: false,
+    };
+    let solana = game_capabilities(Chain::Solana);
+    assert_eq!(validate_game_draft(&draft, 6, "1", &solana).unwrap(), 1_000_000);
+    let one_minute = GameDraft { timeout_minutes: 1.0, ..draft.clone() };
+    assert!(validate_game_draft(&one_minute, 6, "1", &solana).is_ok());
+    let below = GameDraft { amount: "0.999999".into(), ..draft.clone() };
+    assert!(validate_game_draft(&below, 6, "1", &solana).is_err());
+    let huge = GameDraft { timeout_minutes: 1e300, ..draft };
+    assert!(validate_game_draft(&huge, 6, "1", &solana).is_err());
+}
+
+#[test]
 fn draft_validation_reports_a_bad_minimum() {
     let draft = GameDraft {
         game_type: GameType::Giveaway,

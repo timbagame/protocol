@@ -259,8 +259,8 @@ pub fn validate_game_draft(
         || draft.min_players < floor
         || draft.max_players < draft.min_players
         || draft.max_players > f64::from(capabilities.max_players)
+        // Number.isSafeInteger: the timeout bounds below already rule out unsafe magnitudes.
         || !is_integer(timeout_seconds)
-        || timeout_seconds.abs() > 9_007_199_254_740_991.0
         || draft.timeout_minutes != timeout_seconds / 60.0
         || timeout_seconds < f64::from(capabilities.min_timeout)
         || timeout_seconds > f64::from(capabilities.max_timeout)

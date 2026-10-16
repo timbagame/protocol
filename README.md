@@ -1,6 +1,6 @@
 # @timbagame/protocol
 
-The shared TypeScript layer behind [Timba](https://timba.cc), a platform for multiplayer coinflips and giveaways on Solana, played on the web or in Telegram.
+The shared TypeScript and Rust layer behind [Timba](https://timba.cc), a platform for multiplayer coinflips and giveaways on Solana, played on the web or in Telegram.
 
 This package holds everything Timba services need to agree on:
 
@@ -8,6 +8,7 @@ This package holds everything Timba services need to agree on:
 - The EVM contract ABI, transaction builders and EIP-712 payloads
 - Runtime-validated HTTP contracts for the oracle, indexer, bot and web services
 - Pure helpers for token amounts, game lifecycle and winner verification
+- A Rust crate with the same codecs and rules, checked byte for byte against the TypeScript package
 
 It is also the easiest way to check a Timba game result yourself. The winner math in `randomness` is the same calculation the on-chain program performs.
 
@@ -52,9 +53,16 @@ const { winnerIndex } = await calculateWinner(
 );
 ```
 
+The same calculation in Rust:
+
+```rust
+let winner = timba_protocol::randomness::calculate_winner(&secret, last_slot, tickets)?;
+println!("{}", winner.winner_index);
+```
+
 `validateVerifiedGame` from `@timbagame/protocol/web` runs the full check on a published proof: commitment, game address, ticket positions and winner. It only confirms that the supplied inputs are consistent with each other, so a fabricated proof could still pass. To confirm a result, take the secret, final slot and participant list from the chain itself: open the creation, join and settlement transactions the proof references in a Solana explorer or on your own RPC node, check that they belong to the same game account, and run the calculation on those values.
 
-The EVM contract uses a different, domain-separated formula. Use `calculateEvmWinner` from `@timbagame/protocol/evm/v0.1.0` for EVM games.
+The EVM contract uses a different, domain-separated formula. Use `calculateEvmWinner` from `@timbagame/protocol/evm/v0.1.0` (Rust: `timba_protocol::evm::randomness::calculate_evm_winner`) for EVM games.
 
 ## What's inside
 
@@ -81,22 +89,28 @@ Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path y
 
 ## Rust crate
 
-`crates/timba-protocol` is the same protocol in Rust: addresses and PDAs, legacy transactions, the v0.2.0 and v0.3.0 instruction and account codecs, program events, transaction plans, winner randomness, token amounts and the chain-neutral game rules. It reads the same IDLs as the TypeScript clients, and fixtures generated from this package check its builders byte for byte.
+`crates/timba-protocol` is the same protocol in Rust. It reads the same IDLs and ABI as the TypeScript clients, and fixtures generated from this package check it byte for byte.
 
-The crate is not on crates.io. Depend on a release tag:
+| Module                              | Contents                                                                |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| `address`, `transaction`            | Solana addresses, PDAs and legacy transactions                          |
+| `contracts`, `codec`, `instruction` | v0.2.0 and v0.3.0 instruction (incl. `completeGame`) and account codecs |
+| `events`                            | Program events decoded from transaction logs                            |
+| `plans`                             | Create, join, unjoin and close plans, wrapped SOL and game decoding     |
+| `randomness`                        | Solana winner calculation                                               |
+| `amounts`                           | Exact token amount parsing and formatting                               |
+| `games`                             | Chain-neutral lifecycle, transaction progress, drafts and game paths    |
+| `validators`                        | Solana address, signature, base64 and hex checks                        |
+| `evm` (feature `evm`)               | EVM v0.1.0 bindings, EIP-712 digests, calls, events, randomness, HTTP   |
+
+The crate is not on crates.io. Depend on a release tag, adding `features = ["evm"]` for EVM support:
 
 ```toml
 [dependencies]
 timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.15.0" }
 ```
 
-Its version always matches `package.json`.
-
-The `evm` feature adds EVM contract v0.1.0: alloy bindings from `src/evm/v0.1.0/timba.json`, typed-data digests, game IDs, contract calls, winner selection, event decoding and the EVM HTTP validators.
-
-```toml
-timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.15.0", features = ["evm"] }
-```
+Its version always matches `package.json`, and it needs Rust 1.85 or newer. Two differences from TypeScript: amounts are `u128` (larger values fail with the `range` code), and the HTTP schemas for the oracle, indexer, bot and web services are TypeScript only for now.
 
 ## Usage
 
@@ -181,18 +195,18 @@ bun install
 bun run typecheck
 bun test
 bun run build
-cargo test
+cargo test --all-features
 ```
 
 Generated code and the built `dist` folder are committed, and CI fails if they drift from their sources.
 
-| Change                         | Then run                                                                     |
-| ------------------------------ | ---------------------------------------------------------------------------- |
-| New or updated Solana IDL      | Copy the IDL and its Anchor type together, then `bun run generate:contracts` |
-| New or updated EVM ABI         | Update `src/evm/v0.1.0/source.json`, then `bun run generate:evm`             |
-| Compare EVM artifacts upstream | `bun run check:evm-upstream /path/to/contracts`                              |
-| Anything under `src`           | `bun run build`, then commit `dist`                                          |
-| Solana plans, codecs or IDLs   | `bun run generate:rust-fixtures`, then commit the fixtures                   |
+| Change                          | Then run                                                                     |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| New or updated Solana IDL       | Copy the IDL and its Anchor type together, then `bun run generate:contracts` |
+| New or updated EVM ABI          | Update `src/evm/v0.1.0/source.json`, then `bun run generate:evm`             |
+| Compare EVM artifacts upstream  | `bun run check:evm-upstream /path/to/contracts`                              |
+| Anything under `src`            | `bun run build`, then commit `dist`                                          |
+| Anything the Rust crate mirrors | `bun run generate:rust-fixtures`, then commit the fixtures                   |
 
 Solana IDL snapshots come from tagged commits in the contracts repository. The EVM ABI records its source commit and SHA-256 in `source.json`.
 

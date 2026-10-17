@@ -40,6 +40,10 @@ fn registry() -> Vec<(&'static str, &'static Schema)> {
         ("SignGameTransactionResponseSchema", &oracle::SIGN_GAME_TRANSACTION_RESPONSE),
         ("TokenPoliciesResponseSchema", &oracle::TOKEN_POLICIES_RESPONSE),
         ("TokenPolicySchema", &oracle::TOKEN_POLICY),
+        // Fields only used inside objects, run on the edge values too.
+        ("TokenPolicySchema.effectiveAt", &Schema::DateTime),
+        ("GenerateHashRequestSchema.gameType", &Schema::Optional(&Schema::TrimLower { min: 1, max: 128 })),
+        ("VerifiedGameSchema.explorerUrl", &Schema::Url),
         ("BackfillCommitRequestSchema", &indexer::BACKFILL_COMMIT_REQUEST),
         ("BackfillConflictResponseSchema", &indexer::BACKFILL_CONFLICT_RESPONSE),
         ("BackfillRetryableErrorSchema", &indexer::BACKFILL_RETRYABLE_ERROR),
@@ -178,7 +182,8 @@ fn expand(value: &Value) -> Value {
 fn schemas_match_zod() {
     let fixtures = fixtures();
     let schemas = fixtures["schemas"].as_object().unwrap();
-    assert_eq!(schemas.len(), 79, "every zod schema has a fixture");
+    // `schema(name)` below fails for any fixture without a Rust schema.
+    assert_eq!(schemas.len(), 82, "every zod schema has a fixture");
     let mut checked = 0;
     for (name, fixture) in schemas {
         let schema = schema(name);

@@ -65,3 +65,27 @@ impl Endpoint {
 pub fn endpoint(contract: &'static [(&'static str, Endpoint)], name: &str) -> Option<&'static Endpoint> {
     contract.iter().find(|(key, _)| *key == name).map(|(_, endpoint)| endpoint)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::schema::array;
+
+    static BODY: Schema = Schema::Bool;
+    static RESPONSES: [(u16, &Schema); 2] = [(200, &BODY), (404, &BODY)];
+
+    #[test]
+    fn builders_fill_the_endpoint_at_runtime_too() {
+        // The contract tables run these in const context, which coverage cannot see.
+        let path = std::hint::black_box("/games/{address}");
+        let endpoint = Endpoint::post(path, true).params(&BODY).query(&BODY).body(&BODY).responses(&RESPONSES);
+        assert_eq!((endpoint.method, endpoint.path, endpoint.authenticated), ("POST", path, true));
+        assert!([endpoint.params, endpoint.query, endpoint.body].iter().all(|slot| slot.is_some()));
+        assert!(std::ptr::eq(endpoint.response(404).unwrap(), &BODY));
+        assert!(endpoint.response(500).is_none());
+        let endpoint = Endpoint::get(path, false);
+        assert_eq!((endpoint.method, endpoint.authenticated), ("GET", false));
+        assert!(endpoint.params.is_none() && endpoint.responses.is_empty());
+        assert!(matches!(array(std::hint::black_box(&BODY)), Schema::Array { min: 0, max: usize::MAX, .. }));
+    }
+}

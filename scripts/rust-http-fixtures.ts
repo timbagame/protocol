@@ -282,7 +282,14 @@ const SAMPLES: Record<string, unknown[]> = {
   TokenPoliciesResponseSchema: [
     { ...ENVELOPE, success: true, policies: [tokenPolicy] },
   ],
-  TokenPolicySchema: [tokenPolicy],
+  TokenPolicySchema: [
+    tokenPolicy,
+    { ...tokenPolicy, acceptedMinimumAmountRaw: "1000" },
+    { ...tokenPolicy, acceptedMinimumAmountRaw: "1001" },
+  ],
+  "TokenPolicySchema.effectiveAt": [TIME],
+  "GenerateHashRequestSchema.gameType": ["coinflip"],
+  "VerifiedGameSchema.explorerUrl": ["https://timba.cc/verify"],
   BackfillCommitRequestSchema: [{ expectedBefore: SIG, page }],
   BackfillConflictResponseSchema: [{ error: "Stale", state: backfillState }],
   BackfillRetryableErrorSchema: [
@@ -416,6 +423,21 @@ const SAMPLES: Record<string, unknown[]> = {
       maxPlayers: 2,
       timeoutSeconds: 60,
     },
+    // Rejected by the refinements: a zero amount, one coinflip player, max below min.
+    ...[
+      { amount: "0" },
+      { minPlayers: 1, maxPlayers: 1 },
+      { minPlayers: 3, maxPlayers: 2 },
+    ].map((change) => ({
+      creator: A,
+      tokenMint: B,
+      type: "coinflip",
+      amount: "1",
+      minPlayers: 2,
+      maxPlayers: 2,
+      timeoutSeconds: 60,
+      ...change,
+    })),
   ],
   FinalizedVerifiedGameSchema: [verifiedGame],
   GameAddressParamsSchema: [{ address: A }],
@@ -549,6 +571,7 @@ const EDGES: unknown[] = [
   "https://",
   "  MiXeD  ",
   " x ",
+  "a".repeat(128),
   "a".repeat(129),
   "ok",
   "healthy",
@@ -644,8 +667,18 @@ function compact(value: unknown) {
     : value;
 }
 
+/** Primitives only used inside objects, so they also run on EDGES. */
+const FIELDS: Record<string, z.ZodType> = {
+  "TokenPolicySchema.effectiveAt": oracle.TokenPolicySchema.shape.effectiveAt,
+  "GenerateHashRequestSchema.gameType":
+    oracle.GenerateHashRequestSchema.shape.gameType,
+  "VerifiedGameSchema.explorerUrl": web.VerifiedGameSchema.shape.explorerUrl,
+};
+
 export function httpFixtures() {
-  const names = new Map<z.ZodType, string>();
+  const names = new Map<z.ZodType, string>(
+    Object.entries(FIELDS).map(([name, schema]) => [schema, name]),
+  );
   for (const mod of Object.values(modules))
     for (const [name, value] of Object.entries(mod))
       if (value instanceof z.ZodType && !names.has(value))

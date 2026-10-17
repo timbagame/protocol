@@ -178,7 +178,14 @@ fn parse_at(schema: &Schema, value: &Value, path: &str) -> Result<Value, SchemaE
             }
             Ok(Value::String(text))
         }
-        Schema::Url => check(url::Url::parse(string()?).is_ok(), "invalid URL"),
+        // zod returns the trimmed string when it parses as a URL.
+        Schema::Url => {
+            let text = string()?.trim_matches(is_js_whitespace);
+            if url::Url::parse(text).is_err() {
+                return Err(SchemaError::new(path, "invalid URL"));
+            }
+            Ok(Value::String(text.to_string()))
+        }
         Schema::DateTime => check(is_iso_datetime(string()?), "invalid ISO datetime"),
         Schema::Bool => check(value.is_boolean(), "expected boolean"),
         Schema::BoolLiteral(expected) => check(value.as_bool() == Some(*expected), "unexpected literal"),
@@ -507,5 +514,195 @@ impl QueryParams {
             object.insert(key.clone(), Value::String(value.clone()));
         }
         Value::Object(object)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn issue(schema: &Schema, value: Value) -> String {
+        parse(schema, &value).unwrap_err().path
+    }
+
+    #[test]
+    fn numbers_format_like_javascript() {
+        for (value, expected) in [
+            (f64::NAN, "NaN"),
+            (f64::INFINITY, "Infinity"),
+            (f64::NEG_INFINITY, "-Infinity"),
+            (-0.0, "0"),
+            (1.0, "1"),
+            (-2.5, "-2.5"),
+            (0.1, "0.1"),
+            (123456.5, "123456.5"),
+            (0.000004, "0.000004"),
+            (0.000001, "0.000001"),
+            (-0.000001, "-0.000001"),
+            (1e-7, "1e-7"),
+            (1.5e-7, "1.5e-7"),
+            (-1.5e-7, "-1.5e-7"),
+            (1e20, "100000000000000000000"),
+            (1.5e20, "150000000000000000000"),
+            (1e21, "1e+21"),
+            (1.2345e22, "1.2345e+22"),
+        ] {
+            assert_eq!(js_number_to_string(value), expected, "{value}");
+        }
+        assert_eq!(
+            to_js_json(&json!({"a": 0.000004, "b": [1, 2.5e-5], "c": "x"})),
+            r#"{"a":0.000004,"b":[1,0.000025],"c":"x"}"#
+        );
+    }
+
+    #[test]
+    fn numbers_normalize_like_json_stringify() {
+        assert_eq!(normalize_number(f64::NAN), Value::Null);
+        assert_eq!(normalize_number(3.0), json!(3));
+        assert_eq!(normalize_number(0.5), json!(0.5));
+        assert_eq!(normalize_number(9.1e18), json!(9_100_000_000_000_000_000i64));
+        assert!(normalize_number(9.2e18).is_f64());
+    }
+
+    #[test]
+    fn number_coercion_matches_javascript() {
+        for (text, expected) in [
+            ("", 0.0),
+            ("  12 ", 12.0),
+            ("\u{a0}7\u{2003}", 7.0),
+            ("\u{feff}\u{3000}8\u{2028}", 8.0),
+            ("0x10", 16.0),
+            ("0XfF", 255.0),
+            ("0o17", 15.0),
+            ("0b101", 5.0),
+            ("1e2", 100.0),
+            ("1E-2", 0.01),
+            ("-1.5e+1", -15.0),
+            (".5", 0.5),
+            ("5.", 5.0),
+            ("+3", 3.0),
+            ("Infinity", f64::INFINITY),
+            ("+Infinity", f64::INFINITY),
+            ("-Infinity", f64::NEG_INFINITY),
+        ] {
+            assert_eq!(js_to_number(text), expected, "{text:?}");
+        }
+        for text in ["abc", "inf", "1e", "1e+", ".", "-", "e5", "0x", "-0x10", "0xzz", "0b102", "1\u{200b}", "1.2.3"] {
+            assert!(js_to_number(text).is_nan(), "{text:?}");
+        }
+        assert_eq!(js_coerce_number(&json!([" 4 "])), 4.0);
+        assert_eq!(js_coerce_number(&json!([])), 0.0);
+        assert!(js_coerce_number(&json!([1, 2])).is_nan());
+        assert!(js_coerce_number(&json!({})).is_nan());
+    }
+
+    #[test]
+    fn strings_convert_like_javascript() {
+        for (value, expected) in [
+            (json!(null), "null"),
+            (json!(true), "true"),
+            (json!(5), "5"),
+            (json!(u64::MAX), "18446744073709551615"),
+            (json!(-7), "-7"),
+            (json!(5.0), "5"),
+            (json!(0.000004), "0.000004"),
+            (json!("s"), "s"),
+            (json!([1, null, "a", [2, 3]]), "1,,a,2,3"),
+            (json!({}), "[object Object]"),
+        ] {
+            assert_eq!(js_to_string(&value), expected);
+        }
+    }
+
+    #[test]
+    fn query_params_follow_url_search_params() {
+        let query = QueryParams::parse(Some("a=1&a=2&b=x+y&c=%20"));
+        assert_eq!(query.last("a"), Some("2"));
+        assert_eq!(query.first("a"), Some("1"));
+        assert_eq!(query.last("b"), Some("x y"));
+        assert_eq!(query.first("c"), Some(" "));
+        assert_eq!(query.last("d"), None);
+        assert_eq!(query.first("d"), None);
+        assert_eq!(query.to_object(), json!({"a": "2", "b": "x y", "c": " "}));
+        assert_eq!(QueryParams::parse(None).to_object(), json!({}));
+    }
+
+    #[test]
+    fn datetimes_need_a_real_calendar_date() {
+        for text in [
+            "2026-10-16T23:35:05Z",
+            "2026-10-16T23:35:05.1Z",
+            "2026-10-16T23:35:05.123456789Z",
+            "2024-02-29T00:00:00Z",
+            "2000-02-29T00:00:00Z",
+            "2026-01-31T00:00:00Z",
+            "2026-02-28T00:00:00Z",
+            "2026-04-30T00:00:00Z",
+            "2026-12-31T23:59:59Z",
+        ] {
+            assert!(is_iso_datetime(text), "{text}");
+        }
+        for text in [
+            "2023-02-29T00:00:00Z",
+            "1900-02-29T00:00:00Z",
+            "2026-02-30T00:00:00Z",
+            "2026-04-31T00:00:00Z",
+            "2026-01-32T00:00:00Z",
+            "2026-00-10T00:00:00Z",
+            "2026-13-10T00:00:00Z",
+            "2026-10-00T00:00:00Z",
+            "2026-10-16T24:00:00Z",
+            "2026-10-16T23:60:00Z",
+            "2026-10-16T23:35:60Z",
+            "2026-10-16T23:35:05.Z",
+            "2026-10-16T23:35:05.1aZ",
+            "2026-10-16T23:35:05",
+            "2026-10-16 23:35:05Z",
+            "2026-10-16T23:35Z",
+            "2026-1a-16T23:35:05Z",
+            "+026-10-16T23:35:05Z",
+        ] {
+            assert!(!is_iso_datetime(text), "{text}");
+        }
+    }
+
+    #[test]
+    fn length_bounds_are_inclusive() {
+        let text = Schema::TrimLower { min: 1, max: 3 };
+        assert_eq!(parse(&text, &json!("  AbC ")).unwrap(), json!("abc"));
+        assert_eq!(issue(&text, json!("abcd")), "");
+        assert_eq!(issue(&text, json!("   ")), "");
+        let list = Schema::Array { item: &Schema::Bool, min: 1, max: 2 };
+        assert_eq!(parse(&list, &json!([true, false])).unwrap(), json!([true, false]));
+        assert_eq!(issue(&list, json!([])), "");
+        assert_eq!(issue(&list, json!([true, true, true])), "");
+    }
+
+    static INNER: Schema = Schema::Object(&[("n", Schema::Optional(&Schema::Bool))]);
+    static OUTER: Schema = Schema::Object(&[
+        ("skip", Schema::Ref(&Schema::Optional(&Schema::Bool))),
+        ("limit", Schema::Ref(&Schema::CoerceInteger { min: 1, max: 9, default: Some(5) })),
+        ("inner", Schema::Refine(&INNER, inner_needs_n)),
+    ]);
+
+    fn inner_needs_n(value: &Value) -> Result<(), SchemaError> {
+        if value.get("n").is_some() {
+            Ok(())
+        } else {
+            Err(SchemaError::new("n", "required by refinement"))
+        }
+    }
+
+    #[test]
+    fn refs_keep_defaults_and_refinements_prefix_their_paths() {
+        assert_eq!(parse(&OUTER, &json!({"inner": {"n": true}})).unwrap(), json!({"limit": 5, "inner": {"n": true}}));
+        let error = parse(&OUTER, &json!({"inner": {}})).unwrap_err();
+        assert_eq!((error.path.as_str(), error.message.as_str()), ("inner.n", "required by refinement"));
+        assert_eq!(error.to_string(), "Schema validation failed at inner.n: required by refinement");
+        assert_eq!(
+            parse(&Schema::Bool, &json!(1)).unwrap_err().to_string(),
+            "Schema validation failed at <root>: expected boolean"
+        );
     }
 }

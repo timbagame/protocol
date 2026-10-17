@@ -101,16 +101,18 @@ Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path y
 | `amounts`                           | Exact token amount parsing and formatting                               |
 | `games`                             | Chain-neutral lifecycle, transaction progress, drafts and game paths    |
 | `validators`                        | Solana address, signature, base64 and hex checks                        |
+| `schema`                            | Runtime validation matching the zod schemas, incl. query parameters     |
+| `http`                              | Oracle, indexer, web and bot schemas and endpoint contracts             |
 | `evm` (feature `evm`)               | EVM v0.1.0 bindings, EIP-712 digests, calls, events, randomness, HTTP   |
 
 The crate is not on crates.io. Depend on a release tag, adding `features = ["evm"]` for EVM support:
 
 ```toml
 [dependencies]
-timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.15.0" }
+timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.16.0" }
 ```
 
-Its version always matches `package.json`, and it needs Rust 1.85 or newer. Two differences from TypeScript: amounts are `u128` (larger values fail with the `range` code), and the HTTP schemas for the oracle, indexer, bot and web services are TypeScript only for now.
+Its version always matches `package.json`, and it needs Rust 1.85 or newer. Two differences from TypeScript: amounts are `u128` (larger values fail with the `range` code), and the `http` module validates JSON values (`schema::parse` returns the same output zod would) but has no typed REST client.
 
 ## Usage
 

@@ -29,3 +29,20 @@ test("policy evaluation preserves the accepted minimum boundary and rejection pr
     policy,
   });
 });
+
+test("policy parsing reports invalid amounts instead of throwing", () => {
+  for (const amounts of [
+    { minimumAmountRaw: "x" },
+    { acceptedMinimumAmountRaw: 5 },
+    { minimumAmountRaw: null, acceptedMinimumAmountRaw: "1e3" },
+  ]) {
+    const result = TokenPolicySchema.safeParse({ ...policy, ...amounts });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.path[0]).toBe(Object.keys(amounts)[0]);
+  }
+  const above = TokenPolicySchema.safeParse({
+    ...policy,
+    acceptedMinimumAmountRaw: "101",
+  });
+  expect(above.error?.issues[0]?.path).toEqual(["acceptedMinimumAmountRaw"]);
+});

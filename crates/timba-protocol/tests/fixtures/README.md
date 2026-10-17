@@ -9,6 +9,7 @@ crate is checked byte for byte against it.
 | `complete.json` | `completeGame` instructions for v0.2.0 and v0.3.0          | `tests/kit_parity.rs`   |
 | `evm.json`      | EVM v0.1.0 identifiers, digests, calls, winners and events | `tests/evm_parity.rs`   |
 | `games.json`    | Token amounts, game reference keys and paths, game drafts  | `tests/games_parity.rs` |
+| `http.json`     | HTTP schemas and endpoint contracts, plus mutated inputs   | `tests/http_parity.rs`  |
 
 `scripts/generate-rust-fixtures.ts` writes them from `src/`. After changing
 the TypeScript package, regenerate them and commit the result:

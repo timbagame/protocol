@@ -15,9 +15,11 @@ pub mod events;
 #[cfg(feature = "evm")]
 pub mod evm;
 pub mod games;
+pub mod http;
 pub mod instruction;
 pub mod plans;
 pub mod randomness;
+pub mod schema;
 pub mod transaction;
 pub mod validators;
 

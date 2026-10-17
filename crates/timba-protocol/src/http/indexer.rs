@@ -294,6 +294,7 @@ pub static PLAYER_ADDRESS_QUERY: Schema = Schema::Object(&[("player", Schema::Ad
 pub static LEADERBOARD_QUERY: Schema = Schema::Object(&[
     ("limit", Schema::CoerceInteger { min: 1, max: 100, default: Some(20) }),
     ("tokenMint", Schema::Optional(&Schema::Address)),
+    ("period", Schema::Default(&Schema::Enum(&["24h", "7d", "all"]), "all")),
 ]);
 
 /// `indexerContract.latestGames.responses[200]`.

@@ -109,7 +109,7 @@ The crate is not on crates.io. Depend on a release tag, adding `features = ["evm
 
 ```toml
 [dependencies]
-timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.16.0" }
+timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.17.0" }
 ```
 
 Its version always matches `package.json`, and it needs Rust 1.85 or newer. Two differences from TypeScript: amounts are `u128` (larger values fail with the `range` code), and the `http` module validates JSON values (`schema::parse` returns the same output zod would) but has no typed REST client.

@@ -19710,11 +19710,12 @@
         {},
         {
           "limit": "1",
-          "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+          "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+          "period": "7d"
         }
       ],
       "cases": [
-        [0, "", "", { "output": { "limit": 20 } }],
+        [0, "", "", { "output": { "limit": 20, "period": "all" } }],
         [0, "", "null", ""],
         [0, "", "emptyString", ""],
         [0, "", "zero", ""],
@@ -19722,10 +19723,10 @@
         [0, "", "fraction", ""],
         [0, "", "true", ""],
         [0, "", "emptyArray", ""],
-        [0, "", "emptyObject", { "output": { "limit": 20 } }],
+        [0, "", "emptyObject", { "output": { "limit": 20, "period": "all" } }],
         [0, "", "huge", ""],
         [0, "", "word", ""],
-        [0, "", "extraKey", { "output": { "limit": 20 } }],
+        [0, "", "extraKey", { "output": { "limit": 20, "period": "all" } }],
         [
           1,
           "",
@@ -19733,7 +19734,8 @@
           {
             "output": {
               "limit": 1,
-              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+              "period": "7d"
             }
           }
         ],
@@ -19744,7 +19746,7 @@
         [1, "", "fraction", ""],
         [1, "", "true", ""],
         [1, "", "emptyArray", ""],
-        [1, "", "emptyObject", { "output": { "limit": 20 } }],
+        [1, "", "emptyObject", { "output": { "limit": 20, "period": "all" } }],
         [1, "", "huge", ""],
         [1, "", "word", ""],
         [
@@ -19754,7 +19756,8 @@
           {
             "output": {
               "limit": 1,
-              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+              "period": "7d"
             }
           }
         ],
@@ -19765,7 +19768,8 @@
           {
             "output": {
               "limit": 20,
-              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+              "period": "7d"
             }
           }
         ],
@@ -19781,7 +19785,8 @@
           {
             "output": {
               "limit": 1,
-              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+              "period": "7d"
             }
           }
         ],
@@ -19789,7 +19794,12 @@
         [1, "limit", "emptyObject", "limit"],
         [1, "limit", "huge", "limit"],
         [1, "limit", "word", "limit"],
-        [1, "tokenMint", "delete", { "output": { "limit": 1 } }],
+        [
+          1,
+          "tokenMint",
+          "delete",
+          { "output": { "limit": 1, "period": "7d" } }
+        ],
         [1, "tokenMint", "null", "tokenMint"],
         [1, "tokenMint", "emptyString", "tokenMint"],
         [1, "tokenMint", "zero", "tokenMint"],
@@ -19799,7 +19809,29 @@
         [1, "tokenMint", "emptyArray", "tokenMint"],
         [1, "tokenMint", "emptyObject", "tokenMint"],
         [1, "tokenMint", "huge", "tokenMint"],
-        [1, "tokenMint", "word", "tokenMint"]
+        [1, "tokenMint", "word", "tokenMint"],
+        [
+          1,
+          "period",
+          "delete",
+          {
+            "output": {
+              "limit": 1,
+              "tokenMint": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx",
+              "period": "all"
+            }
+          }
+        ],
+        [1, "period", "null", "period"],
+        [1, "period", "emptyString", "period"],
+        [1, "period", "zero", "period"],
+        [1, "period", "negative", "period"],
+        [1, "period", "fraction", "period"],
+        [1, "period", "true", "period"],
+        [1, "period", "emptyArray", "period"],
+        [1, "period", "emptyObject", "period"],
+        [1, "period", "huge", "period"],
+        [1, "period", "word", "period"]
       ],
       "edges": [
         [null, ""],
@@ -19889,7 +19921,7 @@
         [" 7 ", ""],
         [[], ""],
         [["5"], ""],
-        [{}, { "output": { "limit": 20 } }]
+        [{}, { "output": { "limit": 20, "period": "all" } }]
       ]
     },
     "webContract.game.query": {

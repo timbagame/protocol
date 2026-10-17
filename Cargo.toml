@@ -4,7 +4,7 @@ resolver = "2"
 
 [workspace.package]
 # Matches package.json, so a crate and npm release share one protocol version.
-version = "0.15.0"
+version = "0.16.0"
 edition = "2021"
 rust-version = "1.85"
 license = "AGPL-3.0-only"
@@ -25,3 +25,4 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 sha2 = "0.11"
 thiserror = "2"
+url = "2"

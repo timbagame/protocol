@@ -43,7 +43,10 @@ export const TokenPolicySchema = z
     effectiveAt: z.iso.datetime(),
   })
   .refine(
+    // zod still runs this when a field failed; those fields already carry their own issue.
     ({ minimumAmountRaw, acceptedMinimumAmountRaw }) =>
+      !/^\d+$/.test(`${minimumAmountRaw}`) ||
+      !/^\d+$/.test(`${acceptedMinimumAmountRaw}`) ||
       BigInt(acceptedMinimumAmountRaw) <= BigInt(minimumAmountRaw),
     {
       message: "accepted minimum must not exceed the recommended minimum",

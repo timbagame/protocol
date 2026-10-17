@@ -16,6 +16,7 @@ import {
 } from "viem";
 import { parseTokenAmount } from "../src/amounts/index.ts";
 import * as evm from "../src/evm/v0.1.0/index.ts";
+import { httpFixtures } from "./rust-http-fixtures.ts";
 import {
   gameCapabilities,
   gamePath,
@@ -448,6 +449,7 @@ const fixtures: Record<string, () => Promise<unknown>> = {
   "complete.json": complete,
   "evm.json": evmFixtures,
   "games.json": games,
+  "http.json": async () => httpFixtures(),
 };
 const check = Bun.argv.includes("--check");
 const stale: string[] = [];

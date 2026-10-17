@@ -13,7 +13,8 @@
     "src/solana/plans/types.ts",
     "scripts/generate-contract-clients.ts",
     "scripts/generate-evm.ts",
-    "scripts/generate-rust-fixtures.ts"
+    "scripts/generate-rust-fixtures.ts",
+    "scripts/rust-http-fixtures.ts"
   ],
   "excludeReasons": {
     "*.d.ts": "Declaration files emit no JavaScript.",
@@ -27,6 +28,7 @@
     "src/solana/plans/types.ts": "Type-only interfaces; emits no JavaScript.",
     "scripts/generate-contract-clients.ts": "Code generator entrypoint; its output is verified byte-for-byte by the check:generated CI step.",
     "scripts/generate-evm.ts": "Code generator entrypoint; its output is verified byte-for-byte by the check:generated CI step.",
-    "scripts/generate-rust-fixtures.ts": "Fixture generator entrypoint; its output is diffed by check:rust-fixtures and consumed by the Rust parity tests."
+    "scripts/generate-rust-fixtures.ts": "Fixture generator entrypoint; its output is diffed by check:rust-fixtures and consumed by the Rust parity tests.",
+    "scripts/rust-http-fixtures.ts": "HTTP fixture builder for generate-rust-fixtures.ts; its output is diffed by check:rust-fixtures and consumed by tests/http_parity.rs."
   }
 }

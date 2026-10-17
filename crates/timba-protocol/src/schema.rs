@@ -88,6 +88,8 @@ pub enum Schema {
     DiscriminatedUnion { key: &'static str, options: &'static [(&'static str, Schema)] },
     /// `schema.refine(...)` / `schema.superRefine(...)`.
     Refine(&'static Schema, Refinement),
+    /// `inner.default(value)`: a missing key takes the string `value`.
+    Default(&'static Schema, &'static str),
     /// Another schema used as a field, unchanged.
     Ref(&'static Schema),
 }
@@ -240,7 +242,7 @@ fn parse_at(schema: &Schema, value: &Value, path: &str) -> Result<Value, SchemaE
                 .ok_or_else(|| SchemaError::new(&join(path, key), "invalid discriminator"))?;
             parse_at(&option.1, value, path)
         }
-        Schema::Ref(inner) => parse_at(inner, value, path),
+        Schema::Ref(inner) | Schema::Default(inner, _) => parse_at(inner, value, path),
         Schema::Refine(inner, refinement) => {
             let parsed = parse_at(inner, value, path)?;
             refinement(&parsed).map_err(|error| prefixed(path, error))?;
@@ -254,6 +256,7 @@ fn missing(schema: &Schema) -> Option<Option<Value>> {
     match schema {
         Schema::Optional(_) => Some(None),
         Schema::CoerceInteger { default: Some(default), .. } => Some(Some(Value::from(*default))),
+        Schema::Default(_, default) => Some(Some(Value::from(*default))),
         Schema::Ref(inner) => missing(inner),
         _ => None,
     }
@@ -677,6 +680,15 @@ mod tests {
         assert_eq!(parse(&list, &json!([true, false])).unwrap(), json!([true, false]));
         assert_eq!(issue(&list, json!([])), "");
         assert_eq!(issue(&list, json!([true, true, true])), "");
+    }
+
+    #[test]
+    fn defaults_fill_only_missing_keys() {
+        static PERIOD: Schema = Schema::Object(&[("period", Schema::Default(&Schema::Enum(&["7d", "all"]), "all"))]);
+        assert_eq!(parse(&PERIOD, &json!({})).unwrap(), json!({"period": "all"}));
+        assert_eq!(parse(&PERIOD, &json!({"period": "7d"})).unwrap(), json!({"period": "7d"}));
+        assert_eq!(issue(&PERIOD, json!({"period": null})), "period");
+        assert_eq!(issue(&PERIOD, json!({"period": "1y"})), "period");
     }
 
     static INNER: Schema = Schema::Object(&[("n", Schema::Optional(&Schema::Bool))]);

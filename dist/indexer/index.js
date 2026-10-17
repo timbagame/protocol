@@ -400,6 +400,7 @@ export const indexerContract = {
         query: z.object({
             limit: z.coerce.number().int().min(1).max(100).default(20),
             tokenMint: SolanaAddressSchema.optional(),
+            period: z.enum(["24h", "7d", "all"]).default("all"),
         }),
         responses: {
             200: IndexerLeaderboardResponseSchema,

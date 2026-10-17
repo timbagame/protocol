@@ -402,7 +402,10 @@ const SAMPLES: Record<string, unknown[]> = {
   "indexerContract.stats.query": [{}, { tokenMint: A }],
   "indexerContract.playerActiveGames.query": [{ player: A }],
   "indexerContract.playerProfile.query": [{ player: B }],
-  "indexerContract.leaderboard.query": [{}, { limit: "1", tokenMint: A }],
+  "indexerContract.leaderboard.query": [
+    {},
+    { limit: "1", tokenMint: A, period: "7d" },
+  ],
   "indexerContract.latestGames.responses.200": [[indexerGame]],
   CreateGameRequestSchema: [
     {

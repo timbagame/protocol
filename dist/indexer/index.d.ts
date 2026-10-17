@@ -1135,6 +1135,11 @@ export declare const indexerContract: {
         readonly query: z.ZodObject<{
             limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
             tokenMint: z.ZodOptional<z.core.$ZodBranded<z.ZodString, "SolanaAddress", "out">>;
+            period: z.ZodDefault<z.ZodEnum<{
+                "24h": "24h";
+                "7d": "7d";
+                all: "all";
+            }>>;
         }, z.core.$strip>;
         readonly responses: {
             200: z.ZodObject<{

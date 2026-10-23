@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type EncodedAccount, type FetchAccountConfig, type FetchAccountsConfig, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
+import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type ClientWithRpc, type EncodedAccount, type FetchAccountConfig, type FetchAccountsConfig, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type GetAccountInfoApi, type GetMultipleAccountsApi, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
 export declare const ORACLE_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getOracleDiscriminatorBytes(): ReadonlyUint8Array;
 export type Oracle = {
@@ -45,9 +45,9 @@ export declare function getOracleDecoder(): FixedSizeDecoder<Oracle>;
 export declare function getOracleCodec(): FixedSizeCodec<OracleArgs, Oracle>;
 export declare function decodeOracle<TAddress extends string = string>(encodedAccount: EncodedAccount<TAddress>): Account<Oracle, TAddress>;
 export declare function decodeOracle<TAddress extends string = string>(encodedAccount: MaybeEncodedAccount<TAddress>): MaybeAccount<Oracle, TAddress>;
-export declare function fetchOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<Oracle, TAddress>>;
-export declare function fetchMaybeOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Oracle, TAddress>>;
-export declare function fetchAllOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<Oracle>[]>;
-export declare function fetchAllMaybeOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<Oracle>[]>;
+export declare function fetchOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0] | ClientWithRpc<GetAccountInfoApi>, address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<Oracle, TAddress>>;
+export declare function fetchMaybeOracle<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0] | ClientWithRpc<GetAccountInfoApi>, address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Oracle, TAddress>>;
+export declare function fetchAllOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0] | ClientWithRpc<GetMultipleAccountsApi>, addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<Oracle>[]>;
+export declare function fetchAllMaybeOracle(rpc: Parameters<typeof fetchEncodedAccounts>[0] | ClientWithRpc<GetMultipleAccountsApi>, addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<Oracle>[]>;
 export declare function getOracleSize(): number;
 //# sourceMappingURL=oracle.d.ts.map

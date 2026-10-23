@@ -5,7 +5,7 @@
  *
  * @see https://github.com/codama-idl/codama
  */
-import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type Codec, type Decoder, type EncodedAccount, type Encoder, type FetchAccountConfig, type FetchAccountsConfig, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
+import { fetchEncodedAccount, fetchEncodedAccounts, type Account, type Address, type ClientWithRpc, type Codec, type Decoder, type EncodedAccount, type Encoder, type FetchAccountConfig, type FetchAccountsConfig, type GetAccountInfoApi, type GetMultipleAccountsApi, type HasAddress, type MaybeAccount, type MaybeEncodedAccount, type ReadonlyUint8Array } from "@solana/kit";
 import { type GameType, type GameTypeArgs } from "../types/index.js";
 export declare const GAME_DISCRIMINATOR: ReadonlyUint8Array;
 export declare function getGameDiscriminatorBytes(): ReadonlyUint8Array;
@@ -74,8 +74,8 @@ export declare function getGameDecoder(): Decoder<Game>;
 export declare function getGameCodec(): Codec<GameArgs, Game>;
 export declare function decodeGame<TAddress extends string = string>(encodedAccount: EncodedAccount<TAddress>): Account<Game, TAddress>;
 export declare function decodeGame<TAddress extends string = string>(encodedAccount: MaybeEncodedAccount<TAddress>): MaybeAccount<Game, TAddress>;
-export declare function fetchGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<Game, TAddress>>;
-export declare function fetchMaybeGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0], address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Game, TAddress>>;
-export declare function fetchAllGame(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<Game>[]>;
-export declare function fetchAllMaybeGame(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<Game>[]>;
+export declare function fetchGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0] | ClientWithRpc<GetAccountInfoApi>, address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<Account<Game, TAddress>>;
+export declare function fetchMaybeGame<TAddress extends string = string>(rpc: Parameters<typeof fetchEncodedAccount>[0] | ClientWithRpc<GetAccountInfoApi>, address: Address<TAddress> | HasAddress<TAddress>, config?: FetchAccountConfig): Promise<MaybeAccount<Game, TAddress>>;
+export declare function fetchAllGame(rpc: Parameters<typeof fetchEncodedAccounts>[0] | ClientWithRpc<GetMultipleAccountsApi>, addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<Account<Game>[]>;
+export declare function fetchAllMaybeGame(rpc: Parameters<typeof fetchEncodedAccounts>[0] | ClientWithRpc<GetMultipleAccountsApi>, addresses: Array<Address | HasAddress>, config?: FetchAccountsConfig): Promise<MaybeAccount<Game>[]>;
 //# sourceMappingURL=game.d.ts.map

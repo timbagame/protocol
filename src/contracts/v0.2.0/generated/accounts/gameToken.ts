@@ -30,12 +30,15 @@ import {
   transformEncoder,
   type Account,
   type Address,
+  type ClientWithRpc,
   type EncodedAccount,
   type FetchAccountConfig,
   type FetchAccountsConfig,
   type FixedSizeCodec,
   type FixedSizeDecoder,
   type FixedSizeEncoder,
+  type GetAccountInfoApi,
+  type GetMultipleAccountsApi,
   type HasAddress,
   type MaybeAccount,
   type MaybeEncodedAccount,
@@ -125,7 +128,9 @@ export function decodeGameToken<TAddress extends string = string>(
 }
 
 export async function fetchGameToken<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<Account<GameToken, TAddress>> {
@@ -135,12 +140,14 @@ export async function fetchGameToken<TAddress extends string = string>(
 }
 
 export async function fetchMaybeGameToken<TAddress extends string = string>(
-  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccount>[0]
+    | ClientWithRpc<GetAccountInfoApi>,
   address: Address<TAddress> | HasAddress<TAddress>,
   config?: FetchAccountConfig,
 ): Promise<MaybeAccount<GameToken, TAddress>> {
   const maybeAccount = await fetchEncodedAccount(
-    rpc,
+    "rpc" in rpc ? rpc.rpc : rpc,
     typeof address === "string" ? address : address.address,
     config,
   );
@@ -148,7 +155,9 @@ export async function fetchMaybeGameToken<TAddress extends string = string>(
 }
 
 export async function fetchAllGameToken(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
   addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<Account<GameToken>[]> {
@@ -158,12 +167,14 @@ export async function fetchAllGameToken(
 }
 
 export async function fetchAllMaybeGameToken(
-  rpc: Parameters<typeof fetchEncodedAccounts>[0],
+  rpc:
+    | Parameters<typeof fetchEncodedAccounts>[0]
+    | ClientWithRpc<GetMultipleAccountsApi>,
   addresses: Array<Address | HasAddress>,
   config?: FetchAccountsConfig,
 ): Promise<MaybeAccount<GameToken>[]> {
   const maybeAccounts = await fetchEncodedAccounts(
-    rpc,
+    "rpc" in rpc ? rpc.rpc : rpc,
     addresses.map((a) => (typeof a === "string" ? a : a.address)),
     config,
   );

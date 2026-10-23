@@ -49,7 +49,7 @@ export async function fetchOracle(rpc, address, config) {
     return maybeAccount;
 }
 export async function fetchMaybeOracle(rpc, address, config) {
-    const maybeAccount = await fetchEncodedAccount(rpc, typeof address === "string" ? address : address.address, config);
+    const maybeAccount = await fetchEncodedAccount("rpc" in rpc ? rpc.rpc : rpc, typeof address === "string" ? address : address.address, config);
     return decodeOracle(maybeAccount);
 }
 export async function fetchAllOracle(rpc, addresses, config) {
@@ -58,7 +58,7 @@ export async function fetchAllOracle(rpc, addresses, config) {
     return maybeAccounts;
 }
 export async function fetchAllMaybeOracle(rpc, addresses, config) {
-    const maybeAccounts = await fetchEncodedAccounts(rpc, addresses.map((a) => (typeof a === "string" ? a : a.address)), config);
+    const maybeAccounts = await fetchEncodedAccounts("rpc" in rpc ? rpc.rpc : rpc, addresses.map((a) => (typeof a === "string" ? a : a.address)), config);
     return maybeAccounts.map((maybeAccount) => decodeOracle(maybeAccount));
 }
 export function getOracleSize() {

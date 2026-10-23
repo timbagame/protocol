@@ -47,7 +47,7 @@ export async function fetchGameToken(rpc, address, config) {
     return maybeAccount;
 }
 export async function fetchMaybeGameToken(rpc, address, config) {
-    const maybeAccount = await fetchEncodedAccount(rpc, typeof address === "string" ? address : address.address, config);
+    const maybeAccount = await fetchEncodedAccount("rpc" in rpc ? rpc.rpc : rpc, typeof address === "string" ? address : address.address, config);
     return decodeGameToken(maybeAccount);
 }
 export async function fetchAllGameToken(rpc, addresses, config) {
@@ -56,7 +56,7 @@ export async function fetchAllGameToken(rpc, addresses, config) {
     return maybeAccounts;
 }
 export async function fetchAllMaybeGameToken(rpc, addresses, config) {
-    const maybeAccounts = await fetchEncodedAccounts(rpc, addresses.map((a) => (typeof a === "string" ? a : a.address)), config);
+    const maybeAccounts = await fetchEncodedAccounts("rpc" in rpc ? rpc.rpc : rpc, addresses.map((a) => (typeof a === "string" ? a : a.address)), config);
     return maybeAccounts.map((maybeAccount) => decodeGameToken(maybeAccount));
 }
 export function getGameTokenSize() {

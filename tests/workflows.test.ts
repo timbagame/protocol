@@ -89,6 +89,13 @@ describe("shared game workflows", () => {
     );
     expect(transactionProgress(null, 2)).toBe("submitted");
   });
+  test("rejects confirmation depths that are not positive integers", () => {
+    for (const required of [0, -1, 1.5, Number.NaN]) {
+      expect(() => transactionProgress(null, required)).toThrow(
+        "Invalid confirmation depth",
+      );
+    }
+  });
   test("ambiguous token symbols are rejected", () => {
     const token = {
       address: `0x${"11".repeat(20)}`,

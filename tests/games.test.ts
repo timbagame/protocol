@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { address } from "@solana/kit";
+import { address, type Address } from "@solana/kit";
 import type { Game } from "../src/contracts/v0.3.0/generated/accounts/game.js";
 import {
   gameLifecycle,
@@ -197,4 +197,28 @@ describe("cross-chain games", () => {
       }),
     ).toThrow();
   });
+});
+test("rejects Solana membership events for other games or invalid ticket indexes", () => {
+  const joined = (gameKey: Address, ticketIndex: number) => ({
+    name: "PlayerJoined" as const,
+    data: {
+      gameKey,
+      player: key,
+      ticketIndex,
+      ticketsCount: 1,
+      totalAmount: 100n,
+      lastSlot: 51n,
+      timestamp: 1110n,
+    },
+  });
+  const otherGame = address("SysvarC1ock11111111111111111111111111111111");
+  expect(() => normalizeSolanaMembership(solana, joined(otherGame, 0))).toThrow(
+    "Event belongs to another game",
+  );
+  for (const index of [-1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+    expect(() => normalizeSolanaMembership(solana, joined(key, index))).toThrow(
+      "Invalid participant index",
+    );
+  }
+  expect(normalizeSolanaMembership(solana, joined(key, 3)).index).toBe(3);
 });

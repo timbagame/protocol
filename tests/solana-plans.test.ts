@@ -62,6 +62,23 @@ describe("create game plans", () => {
     expect(initialize.data).toHaveLength(66);
   });
 
+  test("encodes the v0.3 game type from the requested type", async () => {
+    const coinflip = await buildCreateGamePlan(common, "0.3.0", PROGRAM_ID);
+    const giveaway = await buildCreateGamePlan(
+      { ...common, type: "giveaway" },
+      "0.3.0",
+      PROGRAM_ID,
+    );
+    const coinflipData = coinflip.instructions[2]!.data!;
+    const giveawayData = giveaway.instructions[2]!.data!;
+    const differing = [...coinflipData.keys()].filter(
+      (index) => coinflipData[index] !== giveawayData[index],
+    );
+    expect(differing).toHaveLength(1);
+    expect(coinflipData[differing[0]!]).toBe(0);
+    expect(giveawayData[differing[0]!]).toBe(1);
+  });
+
   test("rejects oracle commitments that are not 32 bytes", async () => {
     for (const length of [0, 31, 33]) {
       await expect(

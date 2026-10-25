@@ -333,3 +333,35 @@ test("ignores game events the normalizer does not know yet", () => {
     decode.mockRestore();
   }
 });
+test("rejects unsupported deployments and unknown created game types", () => {
+  expect(() =>
+    creationDigest(
+      { ...deployment, version: "0.2.0" } as unknown as EvmDeployment,
+      request,
+    ),
+  ).toThrow("Unsupported EVM contract version");
+  expect(() =>
+    decodeEvmGameEvent(
+      deployment,
+      log(
+        encodeEventTopics({
+          abi: timbaAbi,
+          eventName: "GameCreated",
+          args: { gameId: id, creator: request.creator },
+        }) as Hex[],
+        encodeAbiParameters(
+          [
+            {
+              type: "tuple",
+              components: timbaAbi.find(
+                (x) => x.type === "function" && x.name === "createGame",
+              )!.inputs[0].components,
+            },
+            { type: "uint64" },
+          ],
+          [{ ...request, gameType: 2 }, 1100n],
+        ),
+      ),
+    ),
+  ).toThrow("Unknown game type");
+});

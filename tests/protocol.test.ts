@@ -275,6 +275,84 @@ describe("typed REST client", () => {
       }),
     ).rejects.toBeInstanceOf(ProtocolResponseError);
   });
+
+  test("rejects response bodies that are not JSON", async () => {
+    const client = createRestClient(contract, {
+      baseUrl: "https://service.test",
+      fetch: async () => new Response("<html>bad gateway</html>"),
+    });
+    const failure = client.update({
+      params: { gameId: "game" },
+      query: { fresh: false },
+      body: { amount: 1 },
+    });
+    await expect(failure).rejects.toBeInstanceOf(ProtocolResponseError);
+    await expect(failure).rejects.toThrow(
+      "Invalid JSON response for POST /games/:gameId",
+    );
+  });
+
+  test("refuses to build URLs from missing path or non-primitive query values", async () => {
+    let called = false;
+    const fetch = async () => {
+      called = true;
+      return Response.json({ success: true, amount: 1 });
+    };
+    const loose = {
+      missing: defineEndpoint({
+        method: "GET",
+        authenticated: false,
+        path: "/games/:gameId",
+        responses: { 200: z.unknown() },
+      }),
+      unresolved: defineEndpoint({
+        method: "GET",
+        authenticated: false,
+        path: "/games/::gameId",
+        params: z.strictObject({ gameId: z.string() }),
+        responses: { 200: z.unknown() },
+      }),
+      nested: defineEndpoint({
+        method: "GET",
+        authenticated: false,
+        path: "/games",
+        query: z.strictObject({ ids: z.array(z.unknown()) }),
+        responses: { 200: z.unknown() },
+      }),
+    } as const;
+    const client = createRestClient(loose, {
+      baseUrl: "https://service.test",
+      fetch,
+    });
+
+    await expect(client.missing()).rejects.toThrow(
+      "Missing path parameter: gameId",
+    );
+    await expect(
+      client.unresolved({ params: { gameId: "game" } }),
+    ).rejects.toThrow("Unresolved path parameters in /games/:game");
+    await expect(
+      client.nested({ query: { ids: ["one", { id: "two" }] } }),
+    ).rejects.toThrow("Query parameter ids must be a primitive value");
+    expect(called).toBe(false);
+  });
+
+  test("leaves the status error plain when the body has no error message", () => {
+    for (const data of [
+      null,
+      { message: "not the error field" },
+      { error: 7 },
+    ]) {
+      const result: { status: number; data: unknown; response: Response } = {
+        status: 502,
+        data,
+        response: new Response(null, { status: 502 }),
+      };
+      expect(() => expectStatus(result, 200)).toThrow(
+        /^Expected HTTP 200, received 502$/,
+      );
+    }
+  });
 });
 
 describe("oracle contracts", () => {

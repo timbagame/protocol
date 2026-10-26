@@ -1,6 +1,6 @@
 {
     "repository": "https://github.com/timbagame/contracts",
-    "commit": "77484aa704d720808ab5ff1198b6d71ff2e4fd63",
+    "commit": "f4d8066de41668f7362d1e1f562835eb2abf7b40",
     "path": "evm/abi/Timba.json",
     "abiSha256": "d7d04c622c9daa65e0954834bae9ae916e6c7b61deaf3a5d4d5dbe3cefa76e6e",
     "contractVersion": "0.1.0",

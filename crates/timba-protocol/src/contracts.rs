@@ -507,9 +507,14 @@ pub fn join_game_account_metas(
     accounts: &JoinGameAccounts,
     program_id: &Address,
 ) -> Vec<AccountMeta> {
+    // v0.3 no longer needs the player to be writable.
+    let player = match version {
+        ContractVersion::V0_2_0 => AccountMeta::writable_signer(accounts.player),
+        ContractVersion::V0_3_0 => AccountMeta::readonly_signer(accounts.player),
+    };
     let mut metas = vec![
         AccountMeta::writable(accounts.game),
-        AccountMeta::writable_signer(accounts.player),
+        player,
         match accounts.oracle_operator {
             Some(operator) => AccountMeta::readonly_signer(operator),
             None => AccountMeta::readonly(*program_id),

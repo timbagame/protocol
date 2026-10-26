@@ -181,6 +181,35 @@ describe("Timba contract adapter", () => {
     );
   });
 
+  test("uses each version's refund instruction", async () => {
+    const expected = {
+      "0.2.0": {
+        discriminator: [105, 123, 174, 143, 207, 2, 17, 206],
+        accounts: 11,
+      },
+      "0.3.0": {
+        discriminator: [251, 32, 76, 233, 171, 106, 120, 46],
+        accounts: 9,
+      },
+    } as const;
+    for (const [version, { discriminator, accounts }] of Object.entries(
+      expected,
+    )) {
+      const plan = await createContractAdapter(
+        version as keyof typeof expected,
+        PROGRAM_ID,
+      ).buildRefundPlan({
+        game: GAME,
+        player: CREATOR,
+        authority: CREATOR,
+        tokenMint: MINT,
+      });
+      const refund = plan.instructions.at(-1);
+      expect([...(refund?.data ?? []).slice(0, 8)]).toEqual([...discriminator]);
+      expect(refund?.accounts).toHaveLength(accounts);
+    }
+  });
+
   test("fits seven refunds and close in one legacy transaction", async () => {
     const instructions = [];
     for (let index = 1; index <= 7; index++) {

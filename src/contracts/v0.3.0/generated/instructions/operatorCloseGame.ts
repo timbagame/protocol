@@ -64,8 +64,6 @@ export type OperatorCloseGameInstruction<
   TAccountGameVaultTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
-    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountCreator extends string | AccountMeta<string> = string,
   TAccountCreatorTokenAccount extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -95,9 +93,6 @@ export type OperatorCloseGameInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
-      TAccountAssociatedTokenProgram extends string
-        ? ReadonlyAccount<TAccountAssociatedTokenProgram>
-        : TAccountAssociatedTokenProgram,
       TAccountCreator extends string
         ? ReadonlyAccount<TAccountCreator>
         : TAccountCreator,
@@ -148,8 +143,6 @@ export type OperatorCloseGameAsyncInput<
     InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput =
     InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput =
-    InstructionAccountInput,
   TAccountCreator extends InstructionAccountInput = InstructionAccountInput,
   TAccountCreatorTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
@@ -161,7 +154,6 @@ export type OperatorCloseGameAsyncInput<
   gameVault?: TAccountGameVault;
   gameVaultTokenAccount?: TAccountGameVaultTokenAccount;
   tokenProgram?: TAccountTokenProgram;
-  associatedTokenProgram?: TAccountAssociatedTokenProgram;
   creator: TAccountCreator;
   creatorTokenAccount: TAccountCreatorTokenAccount;
 };
@@ -174,7 +166,6 @@ export async function getOperatorCloseGameInstructionAsync<
   TAccountGameVault extends InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput,
   TAccountCreator extends InstructionAccountInput,
   TAccountCreatorTokenAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
@@ -187,7 +178,6 @@ export async function getOperatorCloseGameInstructionAsync<
     TAccountGameVault,
     TAccountGameVaultTokenAccount,
     TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
     TAccountCreator,
     TAccountCreatorTokenAccount
   >,
@@ -225,10 +215,6 @@ export async function getOperatorCloseGameInstructionAsync<
     ResolvedInstructionAccountMeta<
       TAccountTokenProgram,
       InstructionAccountInputAddress<TAccountTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
       TAccountCreator,
@@ -276,11 +262,6 @@ export async function getOperatorCloseGameInstructionAsync<
     },
     tokenProgram: {
       value: input.tokenProgram ?? null,
-      isSigner: false,
-      isWritable: false,
-    },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
       isSigner: false,
       isWritable: false,
     },
@@ -345,10 +326,6 @@ export async function getOperatorCloseGameInstructionAsync<
       ],
     });
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
 
   return Object.freeze({
     accounts: [
@@ -359,7 +336,6 @@ export async function getOperatorCloseGameInstructionAsync<
       getAccountMeta("gameVault", accounts.gameVault),
       getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
       getAccountMeta("tokenProgram", accounts.tokenProgram),
-      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
       getAccountMeta("creator", accounts.creator),
       getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
     ],
@@ -396,10 +372,6 @@ export async function getOperatorCloseGameInstructionAsync<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
       TAccountCreator,
       InstructionAccountInputAddress<TAccountCreator>
     >,
@@ -421,8 +393,6 @@ export type OperatorCloseGameInput<
     InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput =
     InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput =
-    InstructionAccountInput,
   TAccountCreator extends InstructionAccountInput = InstructionAccountInput,
   TAccountCreatorTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
@@ -434,7 +404,6 @@ export type OperatorCloseGameInput<
   gameVault: TAccountGameVault;
   gameVaultTokenAccount: TAccountGameVaultTokenAccount;
   tokenProgram?: TAccountTokenProgram;
-  associatedTokenProgram?: TAccountAssociatedTokenProgram;
   creator: TAccountCreator;
   creatorTokenAccount: TAccountCreatorTokenAccount;
 };
@@ -447,7 +416,6 @@ export function getOperatorCloseGameInstruction<
   TAccountGameVault extends InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput,
   TAccountCreator extends InstructionAccountInput,
   TAccountCreatorTokenAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
@@ -460,7 +428,6 @@ export function getOperatorCloseGameInstruction<
     TAccountGameVault,
     TAccountGameVaultTokenAccount,
     TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
     TAccountCreator,
     TAccountCreatorTokenAccount
   >,
@@ -497,10 +464,6 @@ export function getOperatorCloseGameInstruction<
   ResolvedInstructionAccountMeta<
     TAccountTokenProgram,
     InstructionAccountInputAddress<TAccountTokenProgram>
-  >,
-  ResolvedInstructionAccountMeta<
-    TAccountAssociatedTokenProgram,
-    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
   >,
   ResolvedInstructionAccountMeta<
     TAccountCreator,
@@ -550,11 +513,6 @@ export function getOperatorCloseGameInstruction<
       isSigner: false,
       isWritable: false,
     },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
-      isSigner: false,
-      isWritable: false,
-    },
     creator: {
       value: input.creator ?? null,
       isSigner: false,
@@ -576,10 +534,6 @@ export function getOperatorCloseGameInstruction<
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
 
   return Object.freeze({
     accounts: [
@@ -590,7 +544,6 @@ export function getOperatorCloseGameInstruction<
       getAccountMeta("gameVault", accounts.gameVault),
       getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
       getAccountMeta("tokenProgram", accounts.tokenProgram),
-      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
       getAccountMeta("creator", accounts.creator),
       getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
     ],
@@ -627,10 +580,6 @@ export function getOperatorCloseGameInstruction<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
       TAccountCreator,
       InstructionAccountInputAddress<TAccountCreator>
     >,
@@ -654,9 +603,8 @@ export type ParsedOperatorCloseGameInstruction<
     gameVault: TAccountMetas[4];
     gameVaultTokenAccount: TAccountMetas[5];
     tokenProgram: TAccountMetas[6];
-    associatedTokenProgram: TAccountMetas[7];
-    creator: TAccountMetas[8];
-    creatorTokenAccount: TAccountMetas[9];
+    creator: TAccountMetas[7];
+    creatorTokenAccount: TAccountMetas[8];
   };
   data: OperatorCloseGameInstructionData;
 };
@@ -669,12 +617,12 @@ export function parseOperatorCloseGameInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedOperatorCloseGameInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 10) {
+  if (instruction.accounts.length < 9) {
     throw new SolanaError(
       SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
       {
         actualAccountMetas: instruction.accounts.length,
-        expectedAccountMetas: 10,
+        expectedAccountMetas: 9,
       },
     );
   }
@@ -694,7 +642,6 @@ export function parseOperatorCloseGameInstruction<
       gameVault: getNextAccount(),
       gameVaultTokenAccount: getNextAccount(),
       tokenProgram: getNextAccount(),
-      associatedTokenProgram: getNextAccount(),
       creator: getNextAccount(),
       creatorTokenAccount: getNextAccount(),
     },

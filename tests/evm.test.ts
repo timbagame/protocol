@@ -134,7 +134,7 @@ test("handles rejection sampling and enforces native input bounds", () => {
   expect(selected.randomValue).not.toBe(0n); // zero is below 2^256 mod 3
   expect(selected.winnerIndex).toBeGreaterThanOrEqual(0);
   expect(selected.winnerIndex).toBeLessThan(3);
-  for (const count of [0, 1001, 1.5])
+  for (const count of [0, 316, 1.5])
     expect(() => selectEvmWinnerFromEntropy(zero, count)).toThrow();
   for (const entropy of ["0x12", `0x${"zz".repeat(32)}`] as Hex[])
     expect(() => selectEvmWinnerFromEntropy(entropy, 2)).toThrow(

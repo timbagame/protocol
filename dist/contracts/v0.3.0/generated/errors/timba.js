@@ -23,8 +23,8 @@ export const TIMBA_ERROR__GAME_NOT_READY_FOR_ORACLE = 0x1bbe; // 7102
 export const TIMBA_ERROR__GAME_HAS_ACTIVE_PLAYERS = 0x1bbf; // 7103
 /** GameExpired: Game expired */
 export const TIMBA_ERROR__GAME_EXPIRED = 0x1bc0; // 7104
-/** GameAlreadyCompleted: Game already settled */
-export const TIMBA_ERROR__GAME_ALREADY_COMPLETED = 0x1bc1; // 7105
+/** GameNotExpired: Game not expired */
+export const TIMBA_ERROR__GAME_NOT_EXPIRED = 0x1bc1; // 7105
 /** OracleBufferNotExpired: Oracle buffer active */
 export const TIMBA_ERROR__ORACLE_BUFFER_NOT_EXPIRED = 0x1bc2; // 7106
 /** ParticipantStorageExceeded: Participant store full */
@@ -61,6 +61,8 @@ export const TIMBA_ERROR__INVALID_AMOUNT = 0x1c86; // 7302
 export const TIMBA_ERROR__INVALID_SECRET_KEY = 0x1c87; // 7303
 /** InvalidOracleBufferTime: Invalid oracle buffer time */
 export const TIMBA_ERROR__INVALID_ORACLE_BUFFER_TIME = 0x1c88; // 7304
+/** InvalidCommitment: Invalid commitment */
+export const TIMBA_ERROR__INVALID_COMMITMENT = 0x1c89; // 7305
 /** InvalidTokenMint: Token mint mismatch */
 export const TIMBA_ERROR__INVALID_TOKEN_MINT = 0x1ce9; // 7401
 let timbaErrorMessages;
@@ -68,15 +70,16 @@ if (process.env["NODE_ENV"] !== "production") {
     timbaErrorMessages = {
         [TIMBA_ERROR__ALREADY_JOINED]: `Already joined`,
         [TIMBA_ERROR__ARITHMETIC_OVERFLOW]: `Arithmetic overflow`,
-        [TIMBA_ERROR__GAME_ALREADY_COMPLETED]: `Game already settled`,
         [TIMBA_ERROR__GAME_CLEANUP_NOT_AVAILABLE]: `Game cleanup not available`,
         [TIMBA_ERROR__GAME_EXPIRED]: `Game expired`,
         [TIMBA_ERROR__GAME_FULL]: `Game full`,
         [TIMBA_ERROR__GAME_HAS_ACTIVE_PLAYERS]: `Active players remain`,
+        [TIMBA_ERROR__GAME_NOT_EXPIRED]: `Game not expired`,
         [TIMBA_ERROR__GAME_NOT_READY_FOR_ORACLE]: `Oracle not ready`,
         [TIMBA_ERROR__GAME_WAITING_FOR_ORACLE]: `Awaiting oracle`,
         [TIMBA_ERROR__INSUFFICIENT_BALANCE]: `Insufficient balance`,
         [TIMBA_ERROR__INVALID_AMOUNT]: `Invalid config value`,
+        [TIMBA_ERROR__INVALID_COMMITMENT]: `Invalid commitment`,
         [TIMBA_ERROR__INVALID_CREATOR]: `Creator mismatch`,
         [TIMBA_ERROR__INVALID_ORACLE_BUFFER_TIME]: `Invalid oracle buffer time`,
         [TIMBA_ERROR__INVALID_SECRET_KEY]: `Secret key mismatch`,

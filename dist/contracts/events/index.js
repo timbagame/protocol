@@ -1,12 +1,17 @@
 import { getAddressDecoder, getBase64Encoder, getStructDecoder, getU8Decoder, getU32Decoder, getU64Decoder, } from "@solana/kit";
 export const EVENT_DISCRIMINATORS = {
-    GameInitialized: [82, 221, 11, 2, 244, 52, 240, 250],
+    GameCreated: [218, 25, 150, 94, 177, 112, 96, 2],
     GameCompleted: [103, 26, 106, 108, 240, 191, 179, 120],
     GameClosed: [178, 203, 179, 224, 43, 18, 209, 4],
     PlayerJoined: [39, 144, 49, 106, 108, 210, 183, 38],
-    PlayerUnjoined: [191, 34, 140, 22, 253, 20, 237, 73],
+    PlayerRefunded: [83, 218, 165, 174, 105, 50, 123, 107],
     TokenFeeWithdrawn: [92, 98, 195, 90, 108, 129, 244, 119],
     OperatorGameClosed: [236, 51, 251, 125, 251, 64, 187, 174],
+};
+/** v0.2 emits the same layouts under its original event names. */
+export const LEGACY_EVENT_DISCRIMINATORS = {
+    GameCreated: [82, 221, 11, 2, 244, 52, 240, 250],
+    PlayerRefunded: [191, 34, 140, 22, 253, 20, 237, 73],
 };
 const key = getAddressDecoder();
 const u64 = getU64Decoder();
@@ -19,7 +24,7 @@ const membership = [
     ["ticketIndex", u32],
 ];
 const decoders = {
-    GameInitialized: getStructDecoder([
+    GameCreated: getStructDecoder([
         ["gameKey", key],
         ["creator", key],
         ["gameType", getU8Decoder()],
@@ -68,8 +73,8 @@ function exact(data, decoder) {
         throw new Error("Invalid Timba event length");
     return decoder.decode(data.slice(8));
 }
-function initialized(data) {
-    const value = exact(data, decoders.GameInitialized);
+function created(data) {
+    const value = exact(data, decoders.GameCreated);
     if (value.gameType > 1 || value.isPrivate > 1)
         throw new Error("Invalid Timba event enum or boolean");
     return {
@@ -78,13 +83,13 @@ function initialized(data) {
         isPrivate: value.isPrivate === 1,
     };
 }
-function unjoined(data) {
+function refunded(data) {
     // Historical deployments emitted membership without the moved-participant option.
     if (data.length === 104)
         return { ...exact(data, decoders.PlayerJoined), movedParticipant: null };
     const flag = data[88];
     if ((flag !== 0 && flag !== 1) || data.length !== (flag === 1 ? 137 : 105))
-        throw new Error("Invalid PlayerUnjoined event");
+        throw new Error("Invalid PlayerRefunded event");
     const head = getStructDecoder(membership).decode(data.slice(8));
     const offset = flag === 1 ? 121 : 89;
     return {
@@ -95,17 +100,20 @@ function unjoined(data) {
     };
 }
 const readers = {
-    GameInitialized: initialized,
+    GameCreated: created,
     GameCompleted: (data) => exact(data, decoders.GameCompleted),
     GameClosed: (data) => exact(data, decoders.GameClosed),
     PlayerJoined: (data) => exact(data, decoders.PlayerJoined),
-    PlayerUnjoined: unjoined,
+    PlayerRefunded: refunded,
     TokenFeeWithdrawn: (data) => exact(data, decoders.TokenFeeWithdrawn),
     OperatorGameClosed: (data) => exact(data, decoders.OperatorGameClosed),
 };
 /** Unknown events are ignored; malformed recognized events throw. Layouts cover v0.2 and v0.3. */
 export function decodeProgramEvent(data) {
-    const name = Object.keys(EVENT_DISCRIMINATORS).find((name) => EVENT_DISCRIMINATORS[name].every((byte, index) => data[index] === byte));
+    const matches = (discriminator) => discriminator.every((byte, index) => data[index] === byte);
+    const name = Object.keys(EVENT_DISCRIMINATORS).find((name) => matches(EVENT_DISCRIMINATORS[name]) ||
+        (name in LEGACY_EVENT_DISCRIMINATORS &&
+            matches(LEGACY_EVENT_DISCRIMINATORS[name])));
     if (!name)
         return null;
     return { name, data: readers[name](data) };

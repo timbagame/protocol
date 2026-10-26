@@ -15,8 +15,8 @@ function event(name: keyof typeof EVENT_DISCRIMINATORS, size: number) {
   return bytes;
 }
 
-test("decodes initialized giveaway terms into labelled values", () => {
-  const bytes = event("GameInitialized", 146);
+test("decodes created giveaway terms into labelled values", () => {
+  const bytes = event("GameCreated", 146);
   bytes[72] = 1;
   bytes.writeBigUInt64LE(MAX_U64, 73);
   bytes.writeUInt32LE(10, 89);
@@ -24,7 +24,7 @@ test("decodes initialized giveaway terms into labelled values", () => {
   bytes[129] = 1;
   bytes.writeBigUInt64LE(600n, 138);
   expect(decodeProgramEvent(bytes)).toMatchObject({
-    name: "GameInitialized",
+    name: "GameCreated",
     data: {
       gameType: "giveaway",
       isPrivate: true,

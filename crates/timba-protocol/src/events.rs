@@ -10,17 +10,21 @@ use crate::contracts::GameType;
 use crate::Address;
 
 pub mod discriminators {
-    pub const GAME_INITIALIZED: [u8; 8] = [82, 221, 11, 2, 244, 52, 240, 250];
+    pub const GAME_CREATED: [u8; 8] = [218, 25, 150, 94, 177, 112, 96, 2];
     pub const GAME_COMPLETED: [u8; 8] = [103, 26, 106, 108, 240, 191, 179, 120];
     pub const GAME_CLOSED: [u8; 8] = [178, 203, 179, 224, 43, 18, 209, 4];
     pub const PLAYER_JOINED: [u8; 8] = [39, 144, 49, 106, 108, 210, 183, 38];
-    pub const PLAYER_UNJOINED: [u8; 8] = [191, 34, 140, 22, 253, 20, 237, 73];
+    pub const PLAYER_REFUNDED: [u8; 8] = [83, 218, 165, 174, 105, 50, 123, 107];
     pub const TOKEN_FEE_WITHDRAWN: [u8; 8] = [92, 98, 195, 90, 108, 129, 244, 119];
     pub const OPERATOR_GAME_CLOSED: [u8; 8] = [236, 51, 251, 125, 251, 64, 187, 174];
+
+    /// v0.2 emits the same layouts under its original event names.
+    pub const GAME_INITIALIZED: [u8; 8] = [82, 221, 11, 2, 244, 52, 240, 250];
+    pub const PLAYER_UNJOINED: [u8; 8] = [191, 34, 140, 22, 253, 20, 237, 73];
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GameInitialized {
+pub struct GameCreated {
     pub game_key: Address,
     pub creator: Address,
     pub game_type: GameType,
@@ -50,7 +54,7 @@ pub struct GameClosed {
     pub timestamp: u64,
 }
 
-/// `PlayerJoined` and `PlayerUnjoined` share this shape; joins never carry a
+/// `PlayerJoined` and `PlayerRefunded` share this shape; joins never carry a
 /// moved participant.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PlayerMembership {
@@ -83,11 +87,11 @@ pub struct OperatorGameClosed {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ProgramEvent {
-    GameInitialized(GameInitialized),
+    GameCreated(GameCreated),
     GameCompleted(GameCompleted),
     GameClosed(GameClosed),
     PlayerJoined(PlayerMembership),
-    PlayerUnjoined(PlayerMembership),
+    PlayerRefunded(PlayerMembership),
     TokenFeeWithdrawn(TokenFeeWithdrawn),
     OperatorGameClosed(OperatorGameClosed),
 }
@@ -95,11 +99,11 @@ pub enum ProgramEvent {
 impl ProgramEvent {
     pub fn name(&self) -> &'static str {
         match self {
-            Self::GameInitialized(_) => "GameInitialized",
+            Self::GameCreated(_) => "GameCreated",
             Self::GameCompleted(_) => "GameCompleted",
             Self::GameClosed(_) => "GameClosed",
             Self::PlayerJoined(_) => "PlayerJoined",
-            Self::PlayerUnjoined(_) => "PlayerUnjoined",
+            Self::PlayerRefunded(_) => "PlayerRefunded",
             Self::TokenFeeWithdrawn(_) => "TokenFeeWithdrawn",
             Self::OperatorGameClosed(_) => "OperatorGameClosed",
         }
@@ -107,10 +111,10 @@ impl ProgramEvent {
 
     pub fn game_key(&self) -> Option<&Address> {
         match self {
-            Self::GameInitialized(e) => Some(&e.game_key),
+            Self::GameCreated(e) => Some(&e.game_key),
             Self::GameCompleted(e) => Some(&e.game_key),
             Self::GameClosed(e) => Some(&e.game_key),
-            Self::PlayerJoined(e) | Self::PlayerUnjoined(e) => Some(&e.game_key),
+            Self::PlayerJoined(e) | Self::PlayerRefunded(e) => Some(&e.game_key),
             Self::TokenFeeWithdrawn(_) => None,
             Self::OperatorGameClosed(e) => Some(&e.game_key),
         }
@@ -146,7 +150,7 @@ fn player_joined(data: &[u8]) -> Result<PlayerMembership, DecodeError> {
     })
 }
 
-fn player_unjoined(data: &[u8]) -> Result<PlayerMembership, DecodeError> {
+fn player_refunded(data: &[u8]) -> Result<PlayerMembership, DecodeError> {
     // Historical deployments emitted membership without the moved-participant option.
     if data.len() == 104 {
         return player_joined(data);
@@ -158,7 +162,7 @@ fn player_unjoined(data: &[u8]) -> Result<PlayerMembership, DecodeError> {
         _ => false,
     };
     if !valid {
-        return Err(DecodeError::new("Invalid PlayerUnjoined event"));
+        return Err(DecodeError::new("Invalid PlayerRefunded event"));
     }
     let mut r = Reader::new(&data[8..]);
     let (game_key, player, total_amount, tickets_count, ticket_index) = membership_head(&mut r)?;
@@ -177,7 +181,7 @@ fn player_unjoined(data: &[u8]) -> Result<PlayerMembership, DecodeError> {
     })
 }
 
-fn game_initialized(data: &[u8]) -> Result<GameInitialized, DecodeError> {
+fn game_created(data: &[u8]) -> Result<GameCreated, DecodeError> {
     let mut r = exact(data, 32 + 32 + 1 + 8 + 8 + 4 + 4 + 32 + 1 + 8 + 8)?;
     let game_key = r.address()?;
     let creator = r.address()?;
@@ -193,7 +197,7 @@ fn game_initialized(data: &[u8]) -> Result<GameInitialized, DecodeError> {
     if game_type > 1 || is_private > 1 {
         return Err(DecodeError::new("Invalid Timba event enum or boolean"));
     }
-    Ok(GameInitialized {
+    Ok(GameCreated {
         game_key,
         creator,
         game_type: if game_type == 0 { GameType::Coinflip } else { GameType::Giveaway },
@@ -215,7 +219,9 @@ pub fn decode_program_event(data: &[u8]) -> Result<Option<ProgramEvent>, DecodeE
     }
     let disc: [u8; 8] = data[..8].try_into().expect("8 bytes");
     let event = match disc {
-        discriminators::GAME_INITIALIZED => ProgramEvent::GameInitialized(game_initialized(data)?),
+        discriminators::GAME_CREATED | discriminators::GAME_INITIALIZED => {
+            ProgramEvent::GameCreated(game_created(data)?)
+        }
         discriminators::GAME_COMPLETED => {
             let mut r = exact(data, 32 + 32 + 4 + 8 + 8 + 8)?;
             ProgramEvent::GameCompleted(GameCompleted {
@@ -232,7 +238,9 @@ pub fn decode_program_event(data: &[u8]) -> Result<Option<ProgramEvent>, DecodeE
             ProgramEvent::GameClosed(GameClosed { game_key: r.address()?, timestamp: r.u64()? })
         }
         discriminators::PLAYER_JOINED => ProgramEvent::PlayerJoined(player_joined(data)?),
-        discriminators::PLAYER_UNJOINED => ProgramEvent::PlayerUnjoined(player_unjoined(data)?),
+        discriminators::PLAYER_REFUNDED | discriminators::PLAYER_UNJOINED => {
+            ProgramEvent::PlayerRefunded(player_refunded(data)?)
+        }
         discriminators::TOKEN_FEE_WITHDRAWN => {
             let mut r = exact(data, 72)?;
             ProgramEvent::TokenFeeWithdrawn(TokenFeeWithdrawn {
@@ -329,10 +337,12 @@ mod tests {
                 let bytes: Vec<u8> =
                     event["discriminator"].as_array().unwrap().iter().map(|v| v.as_u64().unwrap() as u8).collect();
                 let expected = match event["name"].as_str().unwrap() {
+                    "GameCreated" => discriminators::GAME_CREATED,
                     "GameInitialized" => discriminators::GAME_INITIALIZED,
                     "GameCompleted" => discriminators::GAME_COMPLETED,
                     "GameClosed" => discriminators::GAME_CLOSED,
                     "PlayerJoined" => discriminators::PLAYER_JOINED,
+                    "PlayerRefunded" => discriminators::PLAYER_REFUNDED,
                     "PlayerUnjoined" => discriminators::PLAYER_UNJOINED,
                     "TokenFeeWithdrawn" => discriminators::TOKEN_FEE_WITHDRAWN,
                     "OperatorGameClosed" => discriminators::OPERATOR_GAME_CLOSED,
@@ -371,17 +381,17 @@ mod tests {
         assert_eq!((event.ticket_index, event.last_slot, event.timestamp), (1, 99, 1234));
 
         let legacy = membership_bytes(discriminators::PLAYER_UNJOINED, None);
-        let Some(ProgramEvent::PlayerUnjoined(event)) = decode_program_event(&legacy).unwrap() else { panic!() };
+        let Some(ProgramEvent::PlayerRefunded(event)) = decode_program_event(&legacy).unwrap() else { panic!() };
         assert_eq!(event.moved_participant, None);
 
-        let none = membership_bytes(discriminators::PLAYER_UNJOINED, Some(None));
+        let none = membership_bytes(discriminators::PLAYER_REFUNDED, Some(None));
         assert_eq!(none.len(), 105);
-        let Some(ProgramEvent::PlayerUnjoined(event)) = decode_program_event(&none).unwrap() else { panic!() };
+        let Some(ProgramEvent::PlayerRefunded(event)) = decode_program_event(&none).unwrap() else { panic!() };
         assert_eq!((event.moved_participant, event.timestamp), (None, 1234));
 
-        let moved = membership_bytes(discriminators::PLAYER_UNJOINED, Some(Some([7; 32])));
+        let moved = membership_bytes(discriminators::PLAYER_REFUNDED, Some(Some([7; 32])));
         assert_eq!(moved.len(), 137);
-        let Some(ProgramEvent::PlayerUnjoined(event)) = decode_program_event(&moved).unwrap() else { panic!() };
+        let Some(ProgramEvent::PlayerRefunded(event)) = decode_program_event(&moved).unwrap() else { panic!() };
         assert_eq!(event.moved_participant, Some(Address([7; 32])));
         assert_eq!(event.last_slot, 99);
 
@@ -443,12 +453,12 @@ mod tests {
 
     #[test]
     fn decodes_fixed_size_events() {
-        let Some(ProgramEvent::GameInitialized(event)) = decode_program_event(&initialized(0, 1)).unwrap() else {
+        let Some(ProgramEvent::GameCreated(event)) = decode_program_event(&initialized(0, 1)).unwrap() else {
             panic!()
         };
         assert_eq!(
             event,
-            GameInitialized {
+            GameCreated {
                 game_key: Address([1; 32]),
                 creator: Address([2; 32]),
                 game_type: GameType::Coinflip,
@@ -462,7 +472,10 @@ mod tests {
                 timeout: 600,
             }
         );
-        let Some(ProgramEvent::GameInitialized(event)) = decode_program_event(&initialized(1, 0)).unwrap() else {
+        let mut current = initialized(0, 1);
+        current[..8].copy_from_slice(&discriminators::GAME_CREATED);
+        assert_eq!(decode_program_event(&current).unwrap(), Some(ProgramEvent::GameCreated(event)));
+        let Some(ProgramEvent::GameCreated(event)) = decode_program_event(&initialized(1, 0)).unwrap() else {
             panic!()
         };
         assert_eq!((event.game_type, event.is_private), (GameType::Giveaway, false));
@@ -542,7 +555,7 @@ mod tests {
         };
         let Some(initialized) = decode_program_event(&initialized(0, 0)).unwrap() else { panic!() };
         let events = [
-            (initialized, "GameInitialized", Some(Address([1; 32]))),
+            (initialized, "GameCreated", Some(Address([1; 32]))),
             (
                 ProgramEvent::GameCompleted(GameCompleted {
                     game_key: Address([1; 32]),
@@ -561,7 +574,7 @@ mod tests {
                 Some(Address([1; 32])),
             ),
             (ProgramEvent::PlayerJoined(membership.clone()), "PlayerJoined", Some(Address([1; 32]))),
-            (ProgramEvent::PlayerUnjoined(membership), "PlayerUnjoined", Some(Address([1; 32]))),
+            (ProgramEvent::PlayerRefunded(membership), "PlayerRefunded", Some(Address([1; 32]))),
             (
                 ProgramEvent::TokenFeeWithdrawn(TokenFeeWithdrawn {
                     operator: Address([5; 32]),

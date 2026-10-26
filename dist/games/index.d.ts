@@ -93,8 +93,8 @@ export declare function normalizeSolanaMembership(reference: SolanaGameReference
     name: "PlayerJoined";
     data: EventData<"PlayerJoined">;
 } | {
-    name: "PlayerUnjoined";
-    data: EventData<"PlayerUnjoined">;
+    name: "PlayerRefunded";
+    data: EventData<"PlayerRefunded">;
 }): MembershipChange;
 export declare function normalizeEvmMembership(reference: EvmGameReference, event: {
     name: "PlayerJoined";

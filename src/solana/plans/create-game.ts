@@ -5,7 +5,7 @@ import {
 } from "../../contracts/v0.2.0/generated/index.js";
 import {
   GameType as GameTypeV030,
-  getInitializeGameInstructionAsync as getInitializeGameInstructionAsyncV030,
+  getCreateGameInstructionAsync as getCreateGameInstructionAsyncV030,
 } from "../../contracts/v0.3.0/generated/index.js";
 import {
   findGamePda,
@@ -83,7 +83,7 @@ export async function buildCreateGamePlan(
       ? await getInitializeGameInstructionAsyncV020(common, {
           programAddress: programId,
         })
-      : await getInitializeGameInstructionAsyncV030(
+      : await getCreateGameInstructionAsyncV030(
           {
             ...common,
             gameType:

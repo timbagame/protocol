@@ -1,7 +1,7 @@
 //! Byte-for-byte parity with the package's EVM v0.1.0 client (see fixtures/README).
 #![cfg(feature = "evm")]
 
-use alloy_primitives::{Address, Bytes, B256, U256};
+use alloy_primitives::{aliases::U48, Address, Bytes, B256, U256};
 use serde_json::{json, Value};
 use timba_protocol::evm::abi::{CreateRequest, Game};
 use timba_protocol::evm::actions::{evm_game_actions, EvmGameActions};
@@ -131,10 +131,10 @@ fn winner_selection_matches_typescript() {
 #[test]
 fn winner_selection_rejects_bad_input() {
     let message = |result: anyhow::Result<_>| result.map(|_| ()).unwrap_err().to_string();
-    for participants in [0, 1001] {
+    for participants in [0, 316] {
         assert_eq!(
             message(select_evm_winner_from_entropy(B256::ZERO, participants)),
-            "Participant count must be between 1 and 1000"
+            "Participant count must be between 1 and 315"
         );
     }
     assert_eq!(message(calculate_evm_winner(&deployment(), GAME, SECRET, B256::ZERO, U256::ZERO, 2)), "Invalid reveal");
@@ -199,11 +199,11 @@ fn game(status: u8, game_type: u8, participants: Vec<Address>) -> Game {
         isPrivate: false,
         minPlayers: 2,
         maxPlayers: 3,
-        expiresAt: 100,
+        expiresAt: U48::from(100),
         ticketAmount: U256::ZERO,
         totalAmount: U256::ZERO,
         commitment: B256::ZERO,
-        lastEntryBlock: U256::ZERO,
+        lastEntryBlock: U48::ZERO,
         participants,
     }
 }

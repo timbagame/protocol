@@ -32,7 +32,6 @@ import {
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
   type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
@@ -64,8 +63,6 @@ export type JoinGameInstruction<
   TAccountGameVaultTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
-    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountPlayerTokenAccount extends string | AccountMeta<string> = string,
   TAccountOracle extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -77,7 +74,7 @@ export type JoinGameInstruction<
         ? WritableAccount<TAccountGame>
         : TAccountGame,
       TAccountPlayer extends string
-        ? WritableSignerAccount<TAccountPlayer> &
+        ? ReadonlySignerAccount<TAccountPlayer> &
             AccountSignerMeta<TAccountPlayer>
         : TAccountPlayer,
       TAccountOracleOperator extends string
@@ -96,9 +93,6 @@ export type JoinGameInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
-      TAccountAssociatedTokenProgram extends string
-        ? ReadonlyAccount<TAccountAssociatedTokenProgram>
-        : TAccountAssociatedTokenProgram,
       TAccountPlayerTokenAccount extends string
         ? WritableAccount<TAccountPlayerTokenAccount>
         : TAccountPlayerTokenAccount,
@@ -147,8 +141,6 @@ export type JoinGameAsyncInput<
     InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput =
     InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput =
-    InstructionAccountInput,
   TAccountPlayerTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
   TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
@@ -160,7 +152,6 @@ export type JoinGameAsyncInput<
   gameVault?: TAccountGameVault;
   gameVaultTokenAccount?: TAccountGameVaultTokenAccount;
   tokenProgram?: TAccountTokenProgram;
-  associatedTokenProgram?: TAccountAssociatedTokenProgram;
   playerTokenAccount: TAccountPlayerTokenAccount;
   oracle?: TAccountOracle;
 };
@@ -173,7 +164,6 @@ export async function getJoinGameInstructionAsync<
   TAccountGameVault extends InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput,
   TAccountPlayerTokenAccount extends InstructionAccountInput,
   TAccountOracle extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
@@ -186,7 +176,6 @@ export async function getJoinGameInstructionAsync<
     TAccountGameVault,
     TAccountGameVaultTokenAccount,
     TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
     TAccountPlayerTokenAccount,
     TAccountOracle
   >,
@@ -226,10 +215,6 @@ export async function getJoinGameInstructionAsync<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
       TAccountPlayerTokenAccount,
       InstructionAccountInputAddress<TAccountPlayerTokenAccount>
     >,
@@ -252,7 +237,7 @@ export async function getJoinGameInstructionAsync<
   // Original accounts.
   const originalAccounts = {
     game: { value: input.game ?? null, isSigner: false, isWritable: true },
-    player: { value: input.player ?? null, isSigner: true, isWritable: true },
+    player: { value: input.player ?? null, isSigner: true, isWritable: false },
     oracleOperator: {
       value: input.oracleOperator ?? null,
       isSigner: true,
@@ -275,11 +260,6 @@ export async function getJoinGameInstructionAsync<
     },
     tokenProgram: {
       value: input.tokenProgram ?? null,
-      isSigner: false,
-      isWritable: false,
-    },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
       isSigner: false,
       isWritable: false,
     },
@@ -337,10 +317,6 @@ export async function getJoinGameInstructionAsync<
       ],
     });
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
   if (!accounts.oracle.value) {
     accounts.oracle.value = await findOraclePda({ programAddress });
   }
@@ -354,7 +330,6 @@ export async function getJoinGameInstructionAsync<
       getAccountMeta("gameVault", accounts.gameVault),
       getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
       getAccountMeta("tokenProgram", accounts.tokenProgram),
-      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
       getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
       getAccountMeta("oracle", accounts.oracle),
     ],
@@ -391,10 +366,6 @@ export async function getJoinGameInstructionAsync<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
       TAccountPlayerTokenAccount,
       InstructionAccountInputAddress<TAccountPlayerTokenAccount>
     >,
@@ -416,8 +387,6 @@ export type JoinGameInput<
     InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput =
     InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput =
-    InstructionAccountInput,
   TAccountPlayerTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
   TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
@@ -429,7 +398,6 @@ export type JoinGameInput<
   gameVault: TAccountGameVault;
   gameVaultTokenAccount: TAccountGameVaultTokenAccount;
   tokenProgram?: TAccountTokenProgram;
-  associatedTokenProgram?: TAccountAssociatedTokenProgram;
   playerTokenAccount: TAccountPlayerTokenAccount;
   oracle: TAccountOracle;
 };
@@ -442,7 +410,6 @@ export function getJoinGameInstruction<
   TAccountGameVault extends InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput,
   TAccountPlayerTokenAccount extends InstructionAccountInput,
   TAccountOracle extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
@@ -455,7 +422,6 @@ export function getJoinGameInstruction<
     TAccountGameVault,
     TAccountGameVaultTokenAccount,
     TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
     TAccountPlayerTokenAccount,
     TAccountOracle
   >,
@@ -494,10 +460,6 @@ export function getJoinGameInstruction<
     InstructionAccountInputAddress<TAccountTokenProgram>
   >,
   ResolvedInstructionAccountMeta<
-    TAccountAssociatedTokenProgram,
-    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-  >,
-  ResolvedInstructionAccountMeta<
     TAccountPlayerTokenAccount,
     InstructionAccountInputAddress<TAccountPlayerTokenAccount>
   >,
@@ -519,7 +481,7 @@ export function getJoinGameInstruction<
   // Original accounts.
   const originalAccounts = {
     game: { value: input.game ?? null, isSigner: false, isWritable: true },
-    player: { value: input.player ?? null, isSigner: true, isWritable: true },
+    player: { value: input.player ?? null, isSigner: true, isWritable: false },
     oracleOperator: {
       value: input.oracleOperator ?? null,
       isSigner: true,
@@ -545,11 +507,6 @@ export function getJoinGameInstruction<
       isSigner: false,
       isWritable: false,
     },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
-      isSigner: false,
-      isWritable: false,
-    },
     playerTokenAccount: {
       value: input.playerTokenAccount ?? null,
       isSigner: false,
@@ -567,10 +524,6 @@ export function getJoinGameInstruction<
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
 
   return Object.freeze({
     accounts: [
@@ -581,7 +534,6 @@ export function getJoinGameInstruction<
       getAccountMeta("gameVault", accounts.gameVault),
       getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
       getAccountMeta("tokenProgram", accounts.tokenProgram),
-      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
       getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
       getAccountMeta("oracle", accounts.oracle),
     ],
@@ -618,10 +570,6 @@ export function getJoinGameInstruction<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
       TAccountPlayerTokenAccount,
       InstructionAccountInputAddress<TAccountPlayerTokenAccount>
     >,
@@ -645,9 +593,8 @@ export type ParsedJoinGameInstruction<
     gameVault: TAccountMetas[4];
     gameVaultTokenAccount: TAccountMetas[5];
     tokenProgram: TAccountMetas[6];
-    associatedTokenProgram: TAccountMetas[7];
-    playerTokenAccount: TAccountMetas[8];
-    oracle: TAccountMetas[9];
+    playerTokenAccount: TAccountMetas[7];
+    oracle: TAccountMetas[8];
   };
   data: JoinGameInstructionData;
 };
@@ -660,12 +607,12 @@ export function parseJoinGameInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedJoinGameInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 10) {
+  if (instruction.accounts.length < 9) {
     throw new SolanaError(
       SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
       {
         actualAccountMetas: instruction.accounts.length,
-        expectedAccountMetas: 10,
+        expectedAccountMetas: 9,
       },
     );
   }
@@ -691,7 +638,6 @@ export function parseJoinGameInstruction<
       gameVault: getNextAccount(),
       gameVaultTokenAccount: getNextAccount(),
       tokenProgram: getNextAccount(),
-      associatedTokenProgram: getNextAccount(),
       playerTokenAccount: getNextAccount(),
       oracle: getNextAccount(),
     },

@@ -485,9 +485,14 @@ export const timbaAbi = [
             internalType: "address",
           },
           {
-            name: "token",
-            type: "address",
-            internalType: "address",
+            name: "minPlayers",
+            type: "uint32",
+            internalType: "uint32",
+          },
+          {
+            name: "maxPlayers",
+            type: "uint32",
+            internalType: "uint32",
           },
           {
             name: "gameType",
@@ -505,19 +510,19 @@ export const timbaAbi = [
             internalType: "bool",
           },
           {
-            name: "minPlayers",
-            type: "uint32",
-            internalType: "uint32",
-          },
-          {
-            name: "maxPlayers",
-            type: "uint32",
-            internalType: "uint32",
+            name: "token",
+            type: "address",
+            internalType: "address",
           },
           {
             name: "expiresAt",
-            type: "uint64",
-            internalType: "uint64",
+            type: "uint48",
+            internalType: "uint48",
+          },
+          {
+            name: "lastEntryBlock",
+            type: "uint48",
+            internalType: "uint48",
           },
           {
             name: "ticketAmount",
@@ -533,11 +538,6 @@ export const timbaAbi = [
             name: "commitment",
             type: "bytes32",
             internalType: "bytes32",
-          },
-          {
-            name: "lastEntryBlock",
-            type: "uint256",
-            internalType: "uint256",
           },
           {
             name: "participants",
@@ -663,25 +663,6 @@ export const timbaAbi = [
     ],
     outputs: [],
     stateMutability: "nonpayable",
-  },
-  {
-    type: "function",
-    name: "liabilities",
-    inputs: [
-      {
-        name: "token",
-        type: "address",
-        internalType: "address",
-      },
-    ],
-    outputs: [
-      {
-        name: "amount",
-        type: "uint256",
-        internalType: "uint256",
-      },
-    ],
-    stateMutability: "view",
   },
   {
     type: "function",
@@ -1014,9 +995,9 @@ export const timbaAbi = [
       },
       {
         name: "expiresAt",
-        type: "uint64",
+        type: "uint48",
         indexed: false,
-        internalType: "uint64",
+        internalType: "uint48",
       },
     ],
     anonymous: false,
@@ -1289,6 +1270,16 @@ export const timbaAbi = [
   },
   {
     type: "error",
+    name: "GameHasActivePlayers",
+    inputs: [],
+  },
+  {
+    type: "error",
+    name: "GameNotExpired",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "GameUnavailable",
     inputs: [],
   },
@@ -1334,6 +1325,11 @@ export const timbaAbi = [
   },
   {
     type: "error",
+    name: "OracleBufferNotExpired",
+    inputs: [],
+  },
+  {
+    type: "error",
     name: "OwnableInvalidOwner",
     inputs: [
       {
@@ -1357,11 +1353,6 @@ export const timbaAbi = [
   {
     type: "error",
     name: "RandomnessUnavailable",
-    inputs: [],
-  },
-  {
-    type: "error",
-    name: "RecoveryUnavailable",
     inputs: [],
   },
   {

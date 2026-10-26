@@ -56,7 +56,7 @@ pub fn observe_evm_game(reference: EvmGameReference, account: &Game) -> anyhow::
         minimum_participants: account.minPlayers,
         maximum_participants: account.maxPlayers,
         participant_count: account.participants.len(),
-        expires_at: account.expiresAt,
+        expires_at: account.expiresAt.to(),
     }))
 }
 
@@ -81,6 +81,7 @@ pub(crate) fn safe_index(value: U256) -> anyhow::Result<u64> {
 mod tests {
     use super::*;
     use crate::games::{game_path, game_reference_key};
+    use alloy_primitives::aliases::U48;
 
     fn reference() -> EvmGameReference {
         EvmGameReference { chain_id: 1, deployment: Address::repeat_byte(0xaa), game_id: B256::repeat_byte(0xAB) }
@@ -96,11 +97,11 @@ mod tests {
             isPrivate: false,
             minPlayers: 2,
             maxPlayers: 2,
-            expiresAt: 0,
+            expiresAt: U48::ZERO,
             ticketAmount: U256::ZERO,
             totalAmount: U256::ZERO,
             commitment: B256::ZERO,
-            lastEntryBlock: U256::ZERO,
+            lastEntryBlock: U48::ZERO,
             participants: vec![Address::ZERO],
         };
         assert_eq!(observe_evm_game(reference(), &account(0, 0)).unwrap(), None);

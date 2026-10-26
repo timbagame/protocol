@@ -59,11 +59,6 @@ export async function getCloseGameInstructionAsync(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         creatorTokenAccount: {
             value: input.creatorTokenAccount ?? null,
             isSigner: false,
@@ -94,10 +89,6 @@ export async function getCloseGameInstructionAsync(input, config) {
             ],
         });
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -107,7 +98,6 @@ export async function getCloseGameInstructionAsync(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
         ],
         data: getCloseGameInstructionDataEncoder().encode({}),
@@ -147,11 +137,6 @@ export function getCloseGameInstruction(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         creatorTokenAccount: {
             value: input.creatorTokenAccount ?? null,
             isSigner: false,
@@ -164,10 +149,6 @@ export function getCloseGameInstruction(input, config) {
         accounts.tokenProgram.value =
             "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -177,7 +158,6 @@ export function getCloseGameInstruction(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
         ],
         data: getCloseGameInstructionDataEncoder().encode({}),
@@ -185,10 +165,10 @@ export function getCloseGameInstruction(input, config) {
     });
 }
 export function parseCloseGameInstruction(instruction) {
-    if (instruction.accounts.length < 9) {
+    if (instruction.accounts.length < 8) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
-            expectedAccountMetas: 9,
+            expectedAccountMetas: 8,
         });
     }
     let accountIndex = 0;
@@ -207,7 +187,6 @@ export function parseCloseGameInstruction(instruction) {
             gameVault: getNextAccount(),
             gameVaultTokenAccount: getNextAccount(),
             tokenProgram: getNextAccount(),
-            associatedTokenProgram: getNextAccount(),
             creatorTokenAccount: getNextAccount(),
         },
         data: getCloseGameInstructionDataDecoder().decode(instruction.data),

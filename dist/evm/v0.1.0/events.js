@@ -46,7 +46,7 @@ export function decodeEvmGameEvent(deployment, log) {
                 totalAmount: r.gameType === 1 ? r.amount : 0n,
                 minimumParticipants: r.minPlayers,
                 maximumParticipants: r.maxPlayers,
-                expiresAt,
+                expiresAt: BigInt(expiresAt),
                 isPrivate: r.isPrivate,
                 commitment: r.commitment,
             };

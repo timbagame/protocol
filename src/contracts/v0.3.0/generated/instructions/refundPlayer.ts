@@ -11,17 +11,11 @@ import {
   fixDecoderSize,
   fixEncoderSize,
   getAddressEncoder,
-  getBooleanDecoder,
-  getBooleanEncoder,
   getBytesDecoder,
   getBytesEncoder,
   getProgramDerivedAddress,
   getStructDecoder,
   getStructEncoder,
-  getU32Decoder,
-  getU32Encoder,
-  getU64Decoder,
-  getU64Encoder,
   SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
   SolanaError,
   transformEncoder,
@@ -38,53 +32,41 @@ import {
   type ReadonlySignerAccount,
   type ReadonlyUint8Array,
   type WritableAccount,
-  type WritableSignerAccount,
 } from "@solana/kit";
 import {
   getAccountMetaFactory,
   getAddressFromResolvedInstructionAccount,
-  getNonNullResolvedInstructionInput,
   type InstructionAccountInput,
   type InstructionAccountInputAddress,
   type InstructionSignerInput,
   type ResolvedInstructionAccount,
   type ResolvedInstructionAccountMeta,
 } from "@solana/kit/program-client-core";
-import { findGamePda, findGameVaultPda, findOraclePda } from "../pdas/index.js";
+import { findGameVaultPda, findOraclePda } from "../pdas/index.js";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
-import {
-  getGameTypeDecoder,
-  getGameTypeEncoder,
-  type GameType,
-  type GameTypeArgs,
-} from "../types/index.js";
 
-export const INITIALIZE_GAME_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array(
-  [44, 62, 102, 247, 126, 208, 130, 215],
-);
+export const REFUND_PLAYER_DISCRIMINATOR: ReadonlyUint8Array = new Uint8Array([
+  251, 32, 76, 233, 171, 106, 120, 46,
+]);
 
-export function getInitializeGameDiscriminatorBytes(): ReadonlyUint8Array {
+export function getRefundPlayerDiscriminatorBytes(): ReadonlyUint8Array {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    INITIALIZE_GAME_DISCRIMINATOR,
+    REFUND_PLAYER_DISCRIMINATOR,
   );
 }
 
-export type InitializeGameInstruction<
+export type RefundPlayerInstruction<
   TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS,
   TAccountGame extends string | AccountMeta<string> = string,
-  TAccountCreator extends string | AccountMeta<string> = string,
+  TAccountPlayer extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
   TAccountOracle extends string | AccountMeta<string> = string,
-  TAccountOracleOperator extends string | AccountMeta<string> = string,
   TAccountTokenMint extends string | AccountMeta<string> = string,
   TAccountGameVault extends string | AccountMeta<string> = string,
   TAccountGameVaultTokenAccount extends string | AccountMeta<string> = string,
   TAccountTokenProgram extends string | AccountMeta<string> =
     "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
-    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-  TAccountCreatorTokenAccount extends string | AccountMeta<string> = string,
-  TAccountSystemProgram extends string | AccountMeta<string> =
-    "11111111111111111111111111111111",
+  TAccountPlayerTokenAccount extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -93,17 +75,16 @@ export type InitializeGameInstruction<
       TAccountGame extends string
         ? WritableAccount<TAccountGame>
         : TAccountGame,
-      TAccountCreator extends string
-        ? WritableSignerAccount<TAccountCreator> &
-            AccountSignerMeta<TAccountCreator>
-        : TAccountCreator,
+      TAccountPlayer extends string
+        ? ReadonlyAccount<TAccountPlayer>
+        : TAccountPlayer,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
       TAccountOracle extends string
         ? ReadonlyAccount<TAccountOracle>
         : TAccountOracle,
-      TAccountOracleOperator extends string
-        ? ReadonlySignerAccount<TAccountOracleOperator> &
-            AccountSignerMeta<TAccountOracleOperator>
-        : TAccountOracleOperator,
       TAccountTokenMint extends string
         ? ReadonlyAccount<TAccountTokenMint>
         : TAccountTokenMint,
@@ -116,179 +97,110 @@ export type InitializeGameInstruction<
       TAccountTokenProgram extends string
         ? ReadonlyAccount<TAccountTokenProgram>
         : TAccountTokenProgram,
-      TAccountAssociatedTokenProgram extends string
-        ? ReadonlyAccount<TAccountAssociatedTokenProgram>
-        : TAccountAssociatedTokenProgram,
-      TAccountCreatorTokenAccount extends string
-        ? WritableAccount<TAccountCreatorTokenAccount>
-        : TAccountCreatorTokenAccount,
-      TAccountSystemProgram extends string
-        ? ReadonlyAccount<TAccountSystemProgram>
-        : TAccountSystemProgram,
+      TAccountPlayerTokenAccount extends string
+        ? WritableAccount<TAccountPlayerTokenAccount>
+        : TAccountPlayerTokenAccount,
       ...TRemainingAccounts,
     ]
   >;
 
-export type InitializeGameInstructionData = {
-  discriminator: ReadonlyUint8Array;
-  /** Type of game being created */
-  gameType: GameType;
-  /** Amount per player (ticket amount for regular games, total prize for giveaways) */
-  amount: bigint;
-  /** Maximum number of tickets allowed */
-  maxTickets: number;
-  /** Minimum number of tickets required to complete */
-  minTickets: number;
-  /** Timeout duration in seconds */
-  timeout: bigint;
-  /** Whether game requires oracle operator to join */
-  isPrivate: boolean;
-  randomHash: ReadonlyUint8Array;
-};
+export type RefundPlayerInstructionData = { discriminator: ReadonlyUint8Array };
 
-export type InitializeGameInstructionDataArgs = {
-  /** Type of game being created */
-  gameType: GameTypeArgs;
-  /** Amount per player (ticket amount for regular games, total prize for giveaways) */
-  amount: number | bigint;
-  /** Maximum number of tickets allowed */
-  maxTickets: number;
-  /** Minimum number of tickets required to complete */
-  minTickets: number;
-  /** Timeout duration in seconds */
-  timeout: number | bigint;
-  /** Whether game requires oracle operator to join */
-  isPrivate: boolean;
-  randomHash: ReadonlyUint8Array;
-};
+export type RefundPlayerInstructionDataArgs = {};
 
-export function getInitializeGameInstructionDataEncoder(): FixedSizeEncoder<InitializeGameInstructionDataArgs> {
+export function getRefundPlayerInstructionDataEncoder(): FixedSizeEncoder<RefundPlayerInstructionDataArgs> {
   return transformEncoder(
-    getStructEncoder([
-      ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
-      ["gameType", getGameTypeEncoder()],
-      ["amount", getU64Encoder()],
-      ["maxTickets", getU32Encoder()],
-      ["minTickets", getU32Encoder()],
-      ["timeout", getU64Encoder()],
-      ["isPrivate", getBooleanEncoder()],
-      ["randomHash", fixEncoderSize(getBytesEncoder(), 32)],
-    ]),
-    (value) => ({ ...value, discriminator: INITIALIZE_GAME_DISCRIMINATOR }),
+    getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
+    (value) => ({ ...value, discriminator: REFUND_PLAYER_DISCRIMINATOR }),
   );
 }
 
-export function getInitializeGameInstructionDataDecoder(): FixedSizeDecoder<InitializeGameInstructionData> {
+export function getRefundPlayerInstructionDataDecoder(): FixedSizeDecoder<RefundPlayerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["gameType", getGameTypeDecoder()],
-    ["amount", getU64Decoder()],
-    ["maxTickets", getU32Decoder()],
-    ["minTickets", getU32Decoder()],
-    ["timeout", getU64Decoder()],
-    ["isPrivate", getBooleanDecoder()],
-    ["randomHash", fixDecoderSize(getBytesDecoder(), 32)],
   ]);
 }
 
-export function getInitializeGameInstructionDataCodec(): FixedSizeCodec<
-  InitializeGameInstructionDataArgs,
-  InitializeGameInstructionData
+export function getRefundPlayerInstructionDataCodec(): FixedSizeCodec<
+  RefundPlayerInstructionDataArgs,
+  RefundPlayerInstructionData
 > {
   return combineCodec(
-    getInitializeGameInstructionDataEncoder(),
-    getInitializeGameInstructionDataDecoder(),
+    getRefundPlayerInstructionDataEncoder(),
+    getRefundPlayerInstructionDataDecoder(),
   );
 }
 
-export type InitializeGameAsyncInput<
+export type RefundPlayerAsyncInput<
   TAccountGame extends InstructionAccountInput = InstructionAccountInput,
-  TAccountCreator extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPlayer extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
   TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
-  TAccountOracleOperator extends InstructionSignerInput =
-    InstructionSignerInput,
   TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
   TAccountGameVault extends InstructionAccountInput = InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput =
     InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput =
-    InstructionAccountInput,
-  TAccountCreatorTokenAccount extends InstructionAccountInput =
-    InstructionAccountInput,
-  TAccountSystemProgram extends InstructionAccountInput =
+  TAccountPlayerTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
 > = {
-  game?: TAccountGame;
-  creator: TAccountCreator;
+  game: TAccountGame;
+  player: TAccountPlayer;
+  authority: TAccountAuthority;
   oracle?: TAccountOracle;
-  oracleOperator: TAccountOracleOperator;
   tokenMint: TAccountTokenMint;
   gameVault?: TAccountGameVault;
   gameVaultTokenAccount?: TAccountGameVaultTokenAccount;
   tokenProgram?: TAccountTokenProgram;
-  associatedTokenProgram?: TAccountAssociatedTokenProgram;
-  creatorTokenAccount: TAccountCreatorTokenAccount;
-  systemProgram?: TAccountSystemProgram;
-  gameType: InitializeGameInstructionDataArgs["gameType"];
-  amount: InitializeGameInstructionDataArgs["amount"];
-  maxTickets: InitializeGameInstructionDataArgs["maxTickets"];
-  minTickets: InitializeGameInstructionDataArgs["minTickets"];
-  timeout: InitializeGameInstructionDataArgs["timeout"];
-  isPrivate: InitializeGameInstructionDataArgs["isPrivate"];
-  randomHash: InitializeGameInstructionDataArgs["randomHash"];
+  playerTokenAccount: TAccountPlayerTokenAccount;
 };
 
-export async function getInitializeGameInstructionAsync<
+export async function getRefundPlayerInstructionAsync<
   TAccountGame extends InstructionAccountInput,
-  TAccountCreator extends InstructionSignerInput,
+  TAccountPlayer extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
   TAccountOracle extends InstructionAccountInput,
-  TAccountOracleOperator extends InstructionSignerInput,
   TAccountTokenMint extends InstructionAccountInput,
   TAccountGameVault extends InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput,
-  TAccountCreatorTokenAccount extends InstructionAccountInput,
-  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountPlayerTokenAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
 >(
-  input: InitializeGameAsyncInput<
+  input: RefundPlayerAsyncInput<
     TAccountGame,
-    TAccountCreator,
+    TAccountPlayer,
+    TAccountAuthority,
     TAccountOracle,
-    TAccountOracleOperator,
     TAccountTokenMint,
     TAccountGameVault,
     TAccountGameVaultTokenAccount,
     TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
-    TAccountCreatorTokenAccount,
-    TAccountSystemProgram
+    TAccountPlayerTokenAccount
   >,
   config?: {
     programAddress?:
       TProgramAddress | { readonly address: TProgramAddress } | undefined;
   },
 ): Promise<
-  InitializeGameInstruction<
+  RefundPlayerInstruction<
     TProgramAddress,
     ResolvedInstructionAccountMeta<
       TAccountGame,
       InstructionAccountInputAddress<TAccountGame>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountCreator,
-      InstructionAccountInputAddress<TAccountCreator>
+      TAccountPlayer,
+      InstructionAccountInputAddress<TAccountPlayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
     >,
     ResolvedInstructionAccountMeta<
       TAccountOracle,
       InstructionAccountInputAddress<TAccountOracle>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountOracleOperator,
-      InstructionAccountInputAddress<TAccountOracleOperator>
     >,
     ResolvedInstructionAccountMeta<
       TAccountTokenMint,
@@ -307,16 +219,8 @@ export async function getInitializeGameInstructionAsync<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountCreatorTokenAccount,
-      InstructionAccountInputAddress<TAccountCreatorTokenAccount>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountSystemProgram,
-      InstructionAccountInputAddress<TAccountSystemProgram>
+      TAccountPlayerTokenAccount,
+      InstructionAccountInputAddress<TAccountPlayerTokenAccount>
     >
   >
 > {
@@ -333,13 +237,13 @@ export async function getInitializeGameInstructionAsync<
   // Original accounts.
   const originalAccounts = {
     game: { value: input.game ?? null, isSigner: false, isWritable: true },
-    creator: { value: input.creator ?? null, isSigner: true, isWritable: true },
-    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
-    oracleOperator: {
-      value: input.oracleOperator ?? null,
+    player: { value: input.player ?? null, isSigner: false, isWritable: false },
+    authority: {
+      value: input.authority ?? null,
       isSigner: true,
       isWritable: false,
     },
+    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
     tokenMint: {
       value: input.tokenMint ?? null,
       isSigner: false,
@@ -360,20 +264,10 @@ export async function getInitializeGameInstructionAsync<
       isSigner: false,
       isWritable: false,
     },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
-      isSigner: false,
-      isWritable: false,
-    },
-    creatorTokenAccount: {
-      value: input.creatorTokenAccount ?? null,
+    playerTokenAccount: {
+      value: input.playerTokenAccount ?? null,
       isSigner: false,
       isWritable: true,
-    },
-    systemProgram: {
-      value: input.systemProgram ?? null,
-      isSigner: false,
-      isWritable: false,
     },
   };
   const accounts = originalAccounts as Record<
@@ -381,21 +275,7 @@ export async function getInitializeGameInstructionAsync<
     ResolvedInstructionAccount
   >;
 
-  // Original args.
-  const args = { ...input };
-
   // Resolve default values.
-  if (!accounts.game.value) {
-    accounts.game.value = await findGamePda(
-      {
-        randomHash: getNonNullResolvedInstructionInput(
-          "randomHash",
-          args.randomHash,
-        ),
-      },
-      { programAddress },
-    );
-  }
   if (!accounts.oracle.value) {
     accounts.oracle.value = await findOraclePda({ programAddress });
   }
@@ -440,50 +320,38 @@ export async function getInitializeGameInstructionAsync<
       ],
     });
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
 
   return Object.freeze({
     accounts: [
       getAccountMeta("game", accounts.game),
-      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("player", accounts.player),
+      getAccountMeta("authority", accounts.authority),
       getAccountMeta("oracle", accounts.oracle),
-      getAccountMeta("oracleOperator", accounts.oracleOperator),
       getAccountMeta("tokenMint", accounts.tokenMint),
       getAccountMeta("gameVault", accounts.gameVault),
       getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
       getAccountMeta("tokenProgram", accounts.tokenProgram),
-      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
-      getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
-      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
     ],
-    data: getInitializeGameInstructionDataEncoder().encode(
-      args as InitializeGameInstructionDataArgs,
-    ),
+    data: getRefundPlayerInstructionDataEncoder().encode({}),
     programAddress,
-  } as InitializeGameInstruction<
+  } as RefundPlayerInstruction<
     TProgramAddress,
     ResolvedInstructionAccountMeta<
       TAccountGame,
       InstructionAccountInputAddress<TAccountGame>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountCreator,
-      InstructionAccountInputAddress<TAccountCreator>
+      TAccountPlayer,
+      InstructionAccountInputAddress<TAccountPlayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
     >,
     ResolvedInstructionAccountMeta<
       TAccountOracle,
       InstructionAccountInputAddress<TAccountOracle>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountOracleOperator,
-      InstructionAccountInputAddress<TAccountOracleOperator>
     >,
     ResolvedInstructionAccountMeta<
       TAccountTokenMint,
@@ -502,107 +370,81 @@ export async function getInitializeGameInstructionAsync<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountCreatorTokenAccount,
-      InstructionAccountInputAddress<TAccountCreatorTokenAccount>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountSystemProgram,
-      InstructionAccountInputAddress<TAccountSystemProgram>
+      TAccountPlayerTokenAccount,
+      InstructionAccountInputAddress<TAccountPlayerTokenAccount>
     >
   >);
 }
 
-export type InitializeGameInput<
+export type RefundPlayerInput<
   TAccountGame extends InstructionAccountInput = InstructionAccountInput,
-  TAccountCreator extends InstructionSignerInput = InstructionSignerInput,
+  TAccountPlayer extends InstructionAccountInput = InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput = InstructionSignerInput,
   TAccountOracle extends InstructionAccountInput = InstructionAccountInput,
-  TAccountOracleOperator extends InstructionSignerInput =
-    InstructionSignerInput,
   TAccountTokenMint extends InstructionAccountInput = InstructionAccountInput,
   TAccountGameVault extends InstructionAccountInput = InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput =
     InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput =
-    InstructionAccountInput,
-  TAccountCreatorTokenAccount extends InstructionAccountInput =
-    InstructionAccountInput,
-  TAccountSystemProgram extends InstructionAccountInput =
+  TAccountPlayerTokenAccount extends InstructionAccountInput =
     InstructionAccountInput,
 > = {
   game: TAccountGame;
-  creator: TAccountCreator;
+  player: TAccountPlayer;
+  authority: TAccountAuthority;
   oracle: TAccountOracle;
-  oracleOperator: TAccountOracleOperator;
   tokenMint: TAccountTokenMint;
   gameVault: TAccountGameVault;
   gameVaultTokenAccount: TAccountGameVaultTokenAccount;
   tokenProgram?: TAccountTokenProgram;
-  associatedTokenProgram?: TAccountAssociatedTokenProgram;
-  creatorTokenAccount: TAccountCreatorTokenAccount;
-  systemProgram?: TAccountSystemProgram;
-  gameType: InitializeGameInstructionDataArgs["gameType"];
-  amount: InitializeGameInstructionDataArgs["amount"];
-  maxTickets: InitializeGameInstructionDataArgs["maxTickets"];
-  minTickets: InitializeGameInstructionDataArgs["minTickets"];
-  timeout: InitializeGameInstructionDataArgs["timeout"];
-  isPrivate: InitializeGameInstructionDataArgs["isPrivate"];
-  randomHash: InitializeGameInstructionDataArgs["randomHash"];
+  playerTokenAccount: TAccountPlayerTokenAccount;
 };
 
-export function getInitializeGameInstruction<
+export function getRefundPlayerInstruction<
   TAccountGame extends InstructionAccountInput,
-  TAccountCreator extends InstructionSignerInput,
+  TAccountPlayer extends InstructionAccountInput,
+  TAccountAuthority extends InstructionSignerInput,
   TAccountOracle extends InstructionAccountInput,
-  TAccountOracleOperator extends InstructionSignerInput,
   TAccountTokenMint extends InstructionAccountInput,
   TAccountGameVault extends InstructionAccountInput,
   TAccountGameVaultTokenAccount extends InstructionAccountInput,
   TAccountTokenProgram extends InstructionAccountInput,
-  TAccountAssociatedTokenProgram extends InstructionAccountInput,
-  TAccountCreatorTokenAccount extends InstructionAccountInput,
-  TAccountSystemProgram extends InstructionAccountInput,
+  TAccountPlayerTokenAccount extends InstructionAccountInput,
   TProgramAddress extends Address = typeof TIMBA_PROGRAM_ADDRESS,
 >(
-  input: InitializeGameInput<
+  input: RefundPlayerInput<
     TAccountGame,
-    TAccountCreator,
+    TAccountPlayer,
+    TAccountAuthority,
     TAccountOracle,
-    TAccountOracleOperator,
     TAccountTokenMint,
     TAccountGameVault,
     TAccountGameVaultTokenAccount,
     TAccountTokenProgram,
-    TAccountAssociatedTokenProgram,
-    TAccountCreatorTokenAccount,
-    TAccountSystemProgram
+    TAccountPlayerTokenAccount
   >,
   config?: {
     programAddress?:
       TProgramAddress | { readonly address: TProgramAddress } | undefined;
   },
-): InitializeGameInstruction<
+): RefundPlayerInstruction<
   TProgramAddress,
   ResolvedInstructionAccountMeta<
     TAccountGame,
     InstructionAccountInputAddress<TAccountGame>
   >,
   ResolvedInstructionAccountMeta<
-    TAccountCreator,
-    InstructionAccountInputAddress<TAccountCreator>
+    TAccountPlayer,
+    InstructionAccountInputAddress<TAccountPlayer>
+  >,
+  ResolvedInstructionAccountMeta<
+    TAccountAuthority,
+    InstructionAccountInputAddress<TAccountAuthority>
   >,
   ResolvedInstructionAccountMeta<
     TAccountOracle,
     InstructionAccountInputAddress<TAccountOracle>
-  >,
-  ResolvedInstructionAccountMeta<
-    TAccountOracleOperator,
-    InstructionAccountInputAddress<TAccountOracleOperator>
   >,
   ResolvedInstructionAccountMeta<
     TAccountTokenMint,
@@ -621,16 +463,8 @@ export function getInitializeGameInstruction<
     InstructionAccountInputAddress<TAccountTokenProgram>
   >,
   ResolvedInstructionAccountMeta<
-    TAccountAssociatedTokenProgram,
-    InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-  >,
-  ResolvedInstructionAccountMeta<
-    TAccountCreatorTokenAccount,
-    InstructionAccountInputAddress<TAccountCreatorTokenAccount>
-  >,
-  ResolvedInstructionAccountMeta<
-    TAccountSystemProgram,
-    InstructionAccountInputAddress<TAccountSystemProgram>
+    TAccountPlayerTokenAccount,
+    InstructionAccountInputAddress<TAccountPlayerTokenAccount>
   >
 > {
   // Program address.
@@ -646,13 +480,13 @@ export function getInitializeGameInstruction<
   // Original accounts.
   const originalAccounts = {
     game: { value: input.game ?? null, isSigner: false, isWritable: true },
-    creator: { value: input.creator ?? null, isSigner: true, isWritable: true },
-    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
-    oracleOperator: {
-      value: input.oracleOperator ?? null,
+    player: { value: input.player ?? null, isSigner: false, isWritable: false },
+    authority: {
+      value: input.authority ?? null,
       isSigner: true,
       isWritable: false,
     },
+    oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
     tokenMint: {
       value: input.tokenMint ?? null,
       isSigner: false,
@@ -673,20 +507,10 @@ export function getInitializeGameInstruction<
       isSigner: false,
       isWritable: false,
     },
-    associatedTokenProgram: {
-      value: input.associatedTokenProgram ?? null,
-      isSigner: false,
-      isWritable: false,
-    },
-    creatorTokenAccount: {
-      value: input.creatorTokenAccount ?? null,
+    playerTokenAccount: {
+      value: input.playerTokenAccount ?? null,
       isSigner: false,
       isWritable: true,
-    },
-    systemProgram: {
-      value: input.systemProgram ?? null,
-      isSigner: false,
-      isWritable: false,
     },
   };
   const accounts = originalAccounts as Record<
@@ -694,58 +518,43 @@ export function getInitializeGameInstruction<
     ResolvedInstructionAccount
   >;
 
-  // Original args.
-  const args = { ...input };
-
   // Resolve default values.
   if (!accounts.tokenProgram.value) {
     accounts.tokenProgram.value =
       "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" as Address<"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA">;
   }
-  if (!accounts.associatedTokenProgram.value) {
-    accounts.associatedTokenProgram.value =
-      "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
-  }
-  if (!accounts.systemProgram.value) {
-    accounts.systemProgram.value =
-      "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
-  }
 
   return Object.freeze({
     accounts: [
       getAccountMeta("game", accounts.game),
-      getAccountMeta("creator", accounts.creator),
+      getAccountMeta("player", accounts.player),
+      getAccountMeta("authority", accounts.authority),
       getAccountMeta("oracle", accounts.oracle),
-      getAccountMeta("oracleOperator", accounts.oracleOperator),
       getAccountMeta("tokenMint", accounts.tokenMint),
       getAccountMeta("gameVault", accounts.gameVault),
       getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
       getAccountMeta("tokenProgram", accounts.tokenProgram),
-      getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
-      getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
-      getAccountMeta("systemProgram", accounts.systemProgram),
+      getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
     ],
-    data: getInitializeGameInstructionDataEncoder().encode(
-      args as InitializeGameInstructionDataArgs,
-    ),
+    data: getRefundPlayerInstructionDataEncoder().encode({}),
     programAddress,
-  } as InitializeGameInstruction<
+  } as RefundPlayerInstruction<
     TProgramAddress,
     ResolvedInstructionAccountMeta<
       TAccountGame,
       InstructionAccountInputAddress<TAccountGame>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountCreator,
-      InstructionAccountInputAddress<TAccountCreator>
+      TAccountPlayer,
+      InstructionAccountInputAddress<TAccountPlayer>
+    >,
+    ResolvedInstructionAccountMeta<
+      TAccountAuthority,
+      InstructionAccountInputAddress<TAccountAuthority>
     >,
     ResolvedInstructionAccountMeta<
       TAccountOracle,
       InstructionAccountInputAddress<TAccountOracle>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountOracleOperator,
-      InstructionAccountInputAddress<TAccountOracleOperator>
     >,
     ResolvedInstructionAccountMeta<
       TAccountTokenMint,
@@ -764,55 +573,45 @@ export function getInitializeGameInstruction<
       InstructionAccountInputAddress<TAccountTokenProgram>
     >,
     ResolvedInstructionAccountMeta<
-      TAccountAssociatedTokenProgram,
-      InstructionAccountInputAddress<TAccountAssociatedTokenProgram>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountCreatorTokenAccount,
-      InstructionAccountInputAddress<TAccountCreatorTokenAccount>
-    >,
-    ResolvedInstructionAccountMeta<
-      TAccountSystemProgram,
-      InstructionAccountInputAddress<TAccountSystemProgram>
+      TAccountPlayerTokenAccount,
+      InstructionAccountInputAddress<TAccountPlayerTokenAccount>
     >
   >);
 }
 
-export type ParsedInitializeGameInstruction<
+export type ParsedRefundPlayerInstruction<
   TProgram extends string = typeof TIMBA_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
   programAddress: Address<TProgram>;
   accounts: {
     game: TAccountMetas[0];
-    creator: TAccountMetas[1];
-    oracle: TAccountMetas[2];
-    oracleOperator: TAccountMetas[3];
+    player: TAccountMetas[1];
+    authority: TAccountMetas[2];
+    oracle: TAccountMetas[3];
     tokenMint: TAccountMetas[4];
     gameVault: TAccountMetas[5];
     gameVaultTokenAccount: TAccountMetas[6];
     tokenProgram: TAccountMetas[7];
-    associatedTokenProgram: TAccountMetas[8];
-    creatorTokenAccount: TAccountMetas[9];
-    systemProgram: TAccountMetas[10];
+    playerTokenAccount: TAccountMetas[8];
   };
-  data: InitializeGameInstructionData;
+  data: RefundPlayerInstructionData;
 };
 
-export function parseInitializeGameInstruction<
+export function parseRefundPlayerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedInitializeGameInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 11) {
+): ParsedRefundPlayerInstruction<TProgram, TAccountMetas> {
+  if (instruction.accounts.length < 9) {
     throw new SolanaError(
       SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS,
       {
         actualAccountMetas: instruction.accounts.length,
-        expectedAccountMetas: 11,
+        expectedAccountMetas: 9,
       },
     );
   }
@@ -826,17 +625,15 @@ export function parseInitializeGameInstruction<
     programAddress: instruction.programAddress,
     accounts: {
       game: getNextAccount(),
-      creator: getNextAccount(),
+      player: getNextAccount(),
+      authority: getNextAccount(),
       oracle: getNextAccount(),
-      oracleOperator: getNextAccount(),
       tokenMint: getNextAccount(),
       gameVault: getNextAccount(),
       gameVaultTokenAccount: getNextAccount(),
       tokenProgram: getNextAccount(),
-      associatedTokenProgram: getNextAccount(),
-      creatorTokenAccount: getNextAccount(),
-      systemProgram: getNextAccount(),
+      playerTokenAccount: getNextAccount(),
     },
-    data: getInitializeGameInstructionDataDecoder().decode(instruction.data),
+    data: getRefundPlayerInstructionDataDecoder().decode(instruction.data),
   };
 }

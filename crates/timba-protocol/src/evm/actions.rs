@@ -20,10 +20,10 @@ pub fn evm_game_actions(game: &Game, account: Option<Address>, now: u64, buffer:
     let participant = account.is_some_and(|account| game.participants.contains(&account));
     let count = game.participants.len() as u128;
     let now = u128::from(now);
-    let expired = now >= u128::from(game.expiresAt);
-    let recoverable = open
-        && expired
-        && (count < u128::from(game.minPlayers) || now >= u128::from(game.expiresAt) + u128::from(buffer));
+    let expires_at = u128::from(game.expiresAt.to::<u64>());
+    let expired = now >= expires_at;
+    let recoverable =
+        open && expired && (count < u128::from(game.minPlayers) || now >= expires_at + u128::from(buffer));
     EvmGameActions {
         creator,
         participant,

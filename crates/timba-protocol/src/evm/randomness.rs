@@ -29,8 +29,8 @@ fn select_with(
     participants: u32,
     rehash: impl Fn(B256, u8) -> B256,
 ) -> anyhow::Result<EvmWinner> {
-    if !(1..=1000).contains(&participants) {
-        anyhow::bail!("Participant count must be between 1 and 1000");
+    if !(1..=315).contains(&participants) {
+        anyhow::bail!("Participant count must be between 1 and 315");
     }
     let n = U256::from(participants);
     // (2^256) % n, computed as (2^256 - n) % n.

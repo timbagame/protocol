@@ -2,6 +2,8 @@ import { createNoopSigner } from "@solana/kit";
 import { decodeGame as decodeContractGame, getContractClient, getGameTypeName, } from "../../contracts/client/index.js";
 import { buildWrapSolInstructions, isWrappedSol } from "./wsol.js";
 import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountIdempotentInstruction, getAssociatedTokenAddress, } from "./token-program.js";
+import * as v020 from "../../contracts/v0.2.0/generated/index.js";
+import * as v030 from "../../contracts/v0.3.0/generated/index.js";
 function mapGame(address, account) {
     const type = getGameTypeName(account.gameType);
     const createdAt = Number(account.createdAt);
@@ -26,26 +28,33 @@ function mapGame(address, account) {
 export function createContractAdapter(version, programId) {
     const client = getContractClient(version);
     const decodeGame = (address, data) => mapGame(address, decodeContractGame(version, data));
-    const buildPlan = async (input, unjoin) => {
+    const buildPlan = async (input, refund) => {
         const playerTokenAccount = await getAssociatedTokenAddress(input.tokenMint, input.player);
         const authority = input.authority ?? input.player;
-        const instruction = unjoin
-            ? await client.getUnjoinGameInstructionAsync({
-                game: input.game,
-                player: input.player,
-                authority: createNoopSigner(authority),
-                tokenMint: input.tokenMint,
-                playerTokenAccount,
-            }, { programAddress: programId })
+        const refundAccounts = {
+            game: input.game,
+            player: input.player,
+            authority: createNoopSigner(authority),
+            tokenMint: input.tokenMint,
+            playerTokenAccount,
+        };
+        const instruction = refund
+            ? version === "0.2.0"
+                ? await v020.getUnjoinGameInstructionAsync(refundAccounts, {
+                    programAddress: programId,
+                })
+                : await v030.getRefundPlayerInstructionAsync(refundAccounts, {
+                    programAddress: programId,
+                })
             : await client.getJoinGameInstructionAsync({
                 game: input.game,
                 player: createNoopSigner(input.player),
                 tokenMint: input.tokenMint,
                 playerTokenAccount,
             }, { programAddress: programId });
-        const setup = createAssociatedTokenAccountIdempotentInstruction(unjoin ? authority : input.player, playerTokenAccount, input.player, input.tokenMint, TOKEN_PROGRAM_ID);
+        const setup = createAssociatedTokenAccountIdempotentInstruction(refund ? authority : input.player, playerTokenAccount, input.player, input.tokenMint, TOKEN_PROGRAM_ID);
         const instructions = [setup];
-        if (!unjoin && isWrappedSol(input.tokenMint)) {
+        if (!refund && isWrappedSol(input.tokenMint)) {
             if (!input.tokenAmount || input.tokenAmount <= 0n) {
                 throw new Error("SOL joins require a positive stake amount");
             }
@@ -57,7 +66,7 @@ export function createContractAdapter(version, programId) {
     return {
         decodeGame,
         buildJoinPlan: (input) => buildPlan(input, false),
-        buildUnjoinPlan: (input) => buildPlan(input, true),
+        buildRefundPlan: (input) => buildPlan(input, true),
         buildClosePlan: async (input) => {
             const creatorTokenAccount = await getAssociatedTokenAddress(input.tokenMint, input.creator);
             const setup = createAssociatedTokenAccountIdempotentInstruction(input.creator, creatorTokenAccount, input.creator, input.tokenMint, TOKEN_PROGRAM_ID);

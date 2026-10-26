@@ -48,7 +48,7 @@ describe("create game plans", () => {
       vaultTokenAccount,
     );
     expect(plan.instructions[1]?.accounts?.[2]?.address).toBe(gameVault);
-    expect(initialize.accounts).toHaveLength(11);
+    expect(initialize.accounts).toHaveLength(10);
     expect(initialize.accounts?.[2]?.role).toBe(AccountRole.READONLY);
     expect(initialize.accounts?.[3]?.address).toBe(common.oracleOperator);
     expect(initialize.accounts?.[3]?.role).toBe(AccountRole.READONLY_SIGNER);

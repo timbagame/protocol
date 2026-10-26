@@ -15,7 +15,7 @@ const reference: SolanaGameReference = {
 test("normalizes every Solana lifecycle event and preserves unavailable fields", () => {
   expect(
     normalizeSolanaGameEvent(reference, {
-      name: "GameInitialized",
+      name: "GameCreated",
       data: {
         gameKey: key,
         creator: key,
@@ -53,7 +53,7 @@ test("normalizes every Solana lifecycle event and preserves unavailable fields",
   ).toMatchObject({ kind: "joined", index: 0, amount: null });
   expect(
     normalizeSolanaGameEvent(reference, {
-      name: "PlayerUnjoined",
+      name: "PlayerRefunded",
       data: { ...membership, movedParticipant: null },
     }),
   ).toMatchObject({

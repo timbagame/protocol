@@ -74,7 +74,7 @@ The EVM contract uses a different, domain-separated formula. Use `calculateEvmWi
 | `@timbagame/protocol/contracts/v0.3.0/kit` | Generated `@solana/kit` instruction builders, accounts and PDAs          |
 | `@timbagame/protocol/contracts/client`     | Pick the generated client for a runtime version, decode games            |
 | `@timbagame/protocol/contracts/events`     | Decode program events from transaction logs                              |
-| `@timbagame/protocol/solana/plans`         | Create, join, unjoin and close transaction plans, with no RPC or signing |
+| `@timbagame/protocol/solana/plans`         | Create, join, refund and close transaction plans, with no RPC or signing |
 | `@timbagame/protocol/randomness`           | Solana winner calculation                                                |
 | `@timbagame/protocol/evm/v0.1.0`           | EVM ABI, transaction builders, EIP-712 payloads, events and randomness   |
 | `@timbagame/protocol/games`                | Chain-neutral game lifecycle, drafts and event normalization             |
@@ -96,7 +96,7 @@ Each `contracts/*` path also has a `solana/*` alias. Import the narrowest path y
 | `address`, `transaction`            | Solana addresses, PDAs and legacy transactions                          |
 | `contracts`, `codec`, `instruction` | v0.2.0 and v0.3.0 instruction (incl. `completeGame`) and account codecs |
 | `events`                            | Program events decoded from transaction logs                            |
-| `plans`                             | Create, join, unjoin and close plans, wrapped SOL and game decoding     |
+| `plans`                             | Create, join, refund and close plans, wrapped SOL and game decoding     |
 | `randomness`                        | Solana winner calculation                                               |
 | `amounts`                           | Exact token amount parsing and formatting                               |
 | `games`                             | Chain-neutral lifecycle, transaction progress, drafts and game paths    |
@@ -109,7 +109,7 @@ The crate is not on crates.io. Depend on a release tag, adding `features = ["evm
 
 ```toml
 [dependencies]
-timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.17.0" }
+timba-protocol = { git = "https://github.com/timbagame/protocol", tag = "v0.18.0" }
 ```
 
 Its version always matches `package.json`, and it needs Rust 1.85 or newer. Two differences from TypeScript: amounts are `u128` (larger values fail with the `range` code), and the `http` module validates JSON values (`schema::parse` returns the same output zod would) but has no typed REST client.

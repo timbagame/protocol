@@ -166,7 +166,7 @@ export function normalizeSolanaMembership(
   reference: SolanaGameReference,
   event:
     | { name: "PlayerJoined"; data: EventData<"PlayerJoined"> }
-    | { name: "PlayerUnjoined"; data: EventData<"PlayerUnjoined"> },
+    | { name: "PlayerRefunded"; data: EventData<"PlayerRefunded"> },
 ): MembershipChange {
   if (event.data.gameKey !== reference.gameId)
     throw new Error("Event belongs to another game");
@@ -176,7 +176,7 @@ export function normalizeSolanaMembership(
     player: event.data.player,
     index: safeIndex(event.data.ticketIndex),
     movedParticipant:
-      event.name === "PlayerUnjoined" ? event.data.movedParticipant : null,
+      event.name === "PlayerRefunded" ? event.data.movedParticipant : null,
   };
 }
 export function normalizeEvmMembership(

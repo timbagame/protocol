@@ -88,7 +88,7 @@ describe("Timba contract adapter", () => {
     const instruction = join.instructions[1]!;
     const gameVault = await getGameVaultPDA(MINT);
     const legacyGameToken = await getGameTokenPDA(MINT);
-    expect(instruction.accounts).toHaveLength(10);
+    expect(instruction.accounts).toHaveLength(9);
     expect(
       instruction.accounts?.some(
         (account) => account.address === SYSTEM_PROGRAM_ID,
@@ -101,9 +101,11 @@ describe("Timba contract adapter", () => {
     expect(instruction.accounts?.[3]?.address).toBe(MINT);
     expect(instruction.accounts?.[4]?.address).toBe(gameVault);
     expect(instruction.accounts?.[6]?.address).toBe(TOKEN_PROGRAM_ID);
-    expect(instruction.accounts?.[7]?.address).toBe(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-    );
+    expect(
+      instruction.accounts?.some(
+        (account) => account.address === ASSOCIATED_TOKEN_PROGRAM_ID,
+      ),
+    ).toBeFalse();
     expect(
       instruction.accounts?.some(
         (account) => account.address === legacyGameToken,
@@ -139,13 +141,13 @@ describe("Timba contract adapter", () => {
       );
     }
     // Refunds return wrapped SOL, so they never need a stake to wrap.
-    const unjoin = await adapterV030.buildUnjoinPlan({
+    const refund = await adapterV030.buildRefundPlan({
       game: GAME,
       player: CREATOR,
       authority: CREATOR,
       tokenMint: SOL_MINT,
     });
-    expect(unjoin.instructions).toHaveLength(2);
+    expect(refund.instructions).toHaveLength(2);
   });
 
   test("reports whether a player already holds a ticket", async () => {
@@ -156,7 +158,7 @@ describe("Timba contract adapter", () => {
 
   test("lets the creator refund another participant before closing", async () => {
     const participant = address("6HqDqk25HSbzsk1HJ8PMzhzD5ZNY9LqZhpGwbCLyzvC6");
-    const unjoin = await adapterV030.buildUnjoinPlan({
+    const refund = await adapterV030.buildRefundPlan({
       game: GAME,
       player: participant,
       authority: CREATOR,
@@ -167,9 +169,9 @@ describe("Timba contract adapter", () => {
       creator: CREATOR,
       tokenMint: MINT,
     });
-    expect(unjoin.instructions[0]?.accounts?.[0]?.address).toBe(CREATOR);
+    expect(refund.instructions[0]?.accounts?.[0]?.address).toBe(CREATOR);
     expect(
-      unjoin.instructions[1]?.accounts?.some(
+      refund.instructions[1]?.accounts?.some(
         (account) => account.address === CREATOR,
       ),
     ).toBeTrue();
@@ -185,7 +187,7 @@ describe("Timba contract adapter", () => {
       const participant = (await generateKeyPairSigner()).address;
       instructions.push(
         ...(
-          await adapterV030.buildUnjoinPlan({
+          await adapterV030.buildRefundPlan({
             game: GAME,
             player: participant,
             authority: CREATOR,

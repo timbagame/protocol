@@ -37,7 +37,7 @@ export async function getJoinGameInstructionAsync(input, config) {
     // Original accounts.
     const originalAccounts = {
         game: { value: input.game ?? null, isSigner: false, isWritable: true },
-        player: { value: input.player ?? null, isSigner: true, isWritable: true },
+        player: { value: input.player ?? null, isSigner: true, isWritable: false },
         oracleOperator: {
             value: input.oracleOperator ?? null,
             isSigner: true,
@@ -60,11 +60,6 @@ export async function getJoinGameInstructionAsync(input, config) {
         },
         tokenProgram: {
             value: input.tokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
             isSigner: false,
             isWritable: false,
         },
@@ -96,10 +91,6 @@ export async function getJoinGameInstructionAsync(input, config) {
             ],
         });
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     if (!accounts.oracle.value) {
         accounts.oracle.value = await findOraclePda({ programAddress });
     }
@@ -112,7 +103,6 @@ export async function getJoinGameInstructionAsync(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
             getAccountMeta("oracle", accounts.oracle),
         ],
@@ -131,7 +121,7 @@ export function getJoinGameInstruction(input, config) {
     // Original accounts.
     const originalAccounts = {
         game: { value: input.game ?? null, isSigner: false, isWritable: true },
-        player: { value: input.player ?? null, isSigner: true, isWritable: true },
+        player: { value: input.player ?? null, isSigner: true, isWritable: false },
         oracleOperator: {
             value: input.oracleOperator ?? null,
             isSigner: true,
@@ -157,11 +147,6 @@ export function getJoinGameInstruction(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         playerTokenAccount: {
             value: input.playerTokenAccount ?? null,
             isSigner: false,
@@ -175,10 +160,6 @@ export function getJoinGameInstruction(input, config) {
         accounts.tokenProgram.value =
             "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -188,7 +169,6 @@ export function getJoinGameInstruction(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
             getAccountMeta("oracle", accounts.oracle),
         ],
@@ -197,10 +177,10 @@ export function getJoinGameInstruction(input, config) {
     });
 }
 export function parseJoinGameInstruction(instruction) {
-    if (instruction.accounts.length < 10) {
+    if (instruction.accounts.length < 9) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
-            expectedAccountMetas: 10,
+            expectedAccountMetas: 9,
         });
     }
     let accountIndex = 0;
@@ -225,7 +205,6 @@ export function parseJoinGameInstruction(instruction) {
             gameVault: getNextAccount(),
             gameVaultTokenAccount: getNextAccount(),
             tokenProgram: getNextAccount(),
-            associatedTokenProgram: getNextAccount(),
             playerTokenAccount: getNextAccount(),
             oracle: getNextAccount(),
         },

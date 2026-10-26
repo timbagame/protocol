@@ -866,14 +866,14 @@ mod tests {
     /// Compares flags (and fixed addresses) with the IDL, flattening composite account groups.
     fn assert_matches_idl(version: ContractVersion, name: &str, ix: &Instruction) {
         fn flatten(accounts: &Value, out: &mut Vec<(String, bool, bool, Option<String>)>) {
-            for account in accounts.as_array().unwrap() {
-                match account.get("accounts") {
+            for entry in accounts.as_array().unwrap() {
+                match entry.get("accounts") {
                     Some(nested) => flatten(nested, out),
                     None => out.push((
-                        account["name"].as_str().unwrap().to_owned(),
-                        account["writable"].as_bool().unwrap_or(false),
-                        account["signer"].as_bool().unwrap_or(false),
-                        account["address"].as_str().map(str::to_owned),
+                        entry["name"].as_str().unwrap().to_owned(),
+                        entry["writable"].as_bool().unwrap_or(false),
+                        entry["signer"].as_bool().unwrap_or(false),
+                        entry["address"].as_str().map(str::to_owned),
                     )),
                 }
             }
@@ -883,10 +883,10 @@ mod tests {
         flatten(&find(&idl["instructions"], name)["accounts"], &mut expected);
         assert_eq!(ix.program_id, PROGRAM_ID);
         assert_eq!(ix.accounts.len(), expected.len(), "{name} {version}");
-        for (meta, (account, writable, signer, address)) in ix.accounts.iter().zip(expected) {
-            assert_eq!((meta.writable, meta.signer), (writable, signer), "{name}.{account} {version}");
+        for (meta, (label, writable, signer, address)) in ix.accounts.iter().zip(expected) {
+            assert_eq!((meta.writable, meta.signer), (writable, signer), "{name}.{label} {version}");
             if let Some(address) = address {
-                assert_eq!(meta.address.to_base58(), address, "{name}.{account} {version}");
+                assert_eq!(meta.address.to_base58(), address, "{name}.{label} {version}");
             }
         }
     }

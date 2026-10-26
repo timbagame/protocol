@@ -51,9 +51,12 @@ export function observeEvmGame(reference, account) {
         maximumParticipants: account.maxPlayers,
         participants: [...account.participants],
         participantCount: account.participants.length,
-        expiresAt: account.expiresAt,
+        expiresAt: BigInt(account.expiresAt),
         commitment: account.commitment,
-        entropyPosition: { kind: "evm-block", value: account.lastEntryBlock },
+        entropyPosition: {
+            kind: "evm-block",
+            value: BigInt(account.lastEntryBlock),
+        },
     };
     return { reference, status, game };
 }

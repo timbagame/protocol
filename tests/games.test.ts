@@ -1,5 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { address, type Address } from "@solana/kit";
+import { decodeFunctionResult, encodeFunctionResult } from "viem";
+import { evmGameActions } from "../src/evm/actions.js";
+import { timbaAbi } from "../src/evm/v0.1.0/abi.js";
 import type { Game } from "../src/contracts/v0.3.0/generated/accounts/game.js";
 import {
   gameLifecycle,
@@ -58,6 +61,33 @@ const evmAccount: EvmGame = {
 };
 
 describe("cross-chain games", () => {
+  test("accepts uint48 fields as viem decodes them from getGame", () => {
+    const player = "0x0000000000000000000000000000000000000001" as const;
+    const onChain = decodeFunctionResult({
+      abi: timbaAbi,
+      functionName: "getGame",
+      data: encodeFunctionResult({
+        abi: timbaAbi,
+        functionName: "getGame",
+        result: {
+          ...evmAccount,
+          creator: player,
+          token: player,
+          commitment: `0x${"01".repeat(32)}`,
+          expiresAt: 1100,
+          lastEntryBlock: 50,
+          participants: [player, player],
+        },
+      }),
+    });
+    expect(typeof onChain.expiresAt).toBe("number");
+    const observed = observeEvmGame(evm, onChain).game!;
+    expect(observed.expiresAt).toBe(1100n);
+    expect(observed.entropyPosition.value).toBe(50n);
+    expect(evmGameActions(onChain, player, 1099n, 10n).join).toBe(false);
+    expect(evmGameActions(onChain, player, 1110n, 10n).refund).toBe(true);
+  });
+
   test("normalizes amounts and terms without conflating slots and blocks", () => {
     const a = observeSolanaGame(solana, solanaAccount).game!;
     const b = observeEvmGame(evm, evmAccount).game!;

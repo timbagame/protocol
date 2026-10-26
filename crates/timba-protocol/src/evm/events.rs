@@ -146,7 +146,7 @@ pub fn decode_evm_game_event(deployment: &EvmDeployment, log: &EvmLog) -> anyhow
                 total_amount: if game_type == GameType::Giveaway { request.amount } else { U256::ZERO },
                 minimum_participants: request.minPlayers,
                 maximum_participants: request.maxPlayers,
-                expires_at: created.expiresAt,
+                expires_at: created.expiresAt.to(),
                 is_private: request.isPrivate,
                 commitment: request.commitment,
             }

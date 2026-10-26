@@ -374,9 +374,13 @@ export declare const timbaAbi: readonly [{
             readonly type: "address";
             readonly internalType: "address";
         }, {
-            readonly name: "token";
-            readonly type: "address";
-            readonly internalType: "address";
+            readonly name: "minPlayers";
+            readonly type: "uint32";
+            readonly internalType: "uint32";
+        }, {
+            readonly name: "maxPlayers";
+            readonly type: "uint32";
+            readonly internalType: "uint32";
         }, {
             readonly name: "gameType";
             readonly type: "uint8";
@@ -390,17 +394,17 @@ export declare const timbaAbi: readonly [{
             readonly type: "bool";
             readonly internalType: "bool";
         }, {
-            readonly name: "minPlayers";
-            readonly type: "uint32";
-            readonly internalType: "uint32";
-        }, {
-            readonly name: "maxPlayers";
-            readonly type: "uint32";
-            readonly internalType: "uint32";
+            readonly name: "token";
+            readonly type: "address";
+            readonly internalType: "address";
         }, {
             readonly name: "expiresAt";
-            readonly type: "uint64";
-            readonly internalType: "uint64";
+            readonly type: "uint48";
+            readonly internalType: "uint48";
+        }, {
+            readonly name: "lastEntryBlock";
+            readonly type: "uint48";
+            readonly internalType: "uint48";
         }, {
             readonly name: "ticketAmount";
             readonly type: "uint256";
@@ -413,10 +417,6 @@ export declare const timbaAbi: readonly [{
             readonly name: "commitment";
             readonly type: "bytes32";
             readonly internalType: "bytes32";
-        }, {
-            readonly name: "lastEntryBlock";
-            readonly type: "uint256";
-            readonly internalType: "uint256";
         }, {
             readonly name: "participants";
             readonly type: "address[]";
@@ -513,20 +513,6 @@ export declare const timbaAbi: readonly [{
     }];
     readonly outputs: readonly [];
     readonly stateMutability: "nonpayable";
-}, {
-    readonly type: "function";
-    readonly name: "liabilities";
-    readonly inputs: readonly [{
-        readonly name: "token";
-        readonly type: "address";
-        readonly internalType: "address";
-    }];
-    readonly outputs: readonly [{
-        readonly name: "amount";
-        readonly type: "uint256";
-        readonly internalType: "uint256";
-    }];
-    readonly stateMutability: "view";
 }, {
     readonly type: "function";
     readonly name: "owner";
@@ -787,9 +773,9 @@ export declare const timbaAbi: readonly [{
         }];
     }, {
         readonly name: "expiresAt";
-        readonly type: "uint64";
+        readonly type: "uint48";
         readonly indexed: false;
-        readonly internalType: "uint64";
+        readonly internalType: "uint48";
     }];
     readonly anonymous: false;
 }, {
@@ -1003,6 +989,14 @@ export declare const timbaAbi: readonly [{
     readonly inputs: readonly [];
 }, {
     readonly type: "error";
+    readonly name: "GameHasActivePlayers";
+    readonly inputs: readonly [];
+}, {
+    readonly type: "error";
+    readonly name: "GameNotExpired";
+    readonly inputs: readonly [];
+}, {
+    readonly type: "error";
     readonly name: "GameUnavailable";
     readonly inputs: readonly [];
 }, {
@@ -1039,6 +1033,10 @@ export declare const timbaAbi: readonly [{
     readonly inputs: readonly [];
 }, {
     readonly type: "error";
+    readonly name: "OracleBufferNotExpired";
+    readonly inputs: readonly [];
+}, {
+    readonly type: "error";
     readonly name: "OwnableInvalidOwner";
     readonly inputs: readonly [{
         readonly name: "owner";
@@ -1056,10 +1054,6 @@ export declare const timbaAbi: readonly [{
 }, {
     readonly type: "error";
     readonly name: "RandomnessUnavailable";
-    readonly inputs: readonly [];
-}, {
-    readonly type: "error";
-    readonly name: "RecoveryUnavailable";
     readonly inputs: readonly [];
 }, {
     readonly type: "error";

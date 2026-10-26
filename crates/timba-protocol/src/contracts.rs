@@ -86,16 +86,36 @@ impl fmt::Display for ContractVersion {
 }
 
 pub mod discriminators {
+    use super::ContractVersion;
+
     pub const GAME_ACCOUNT: [u8; 8] = [27, 90, 166, 125, 74, 100, 121, 18];
     pub const ORACLE_ACCOUNT: [u8; 8] = [139, 194, 131, 179, 140, 179, 229, 244];
     pub const GAME_TOKEN_ACCOUNT: [u8; 8] = [146, 160, 167, 120, 232, 217, 240, 63];
 
     pub const COMPLETE_GAME: [u8; 8] = [105, 69, 184, 5, 143, 182, 92, 132];
-    pub const INITIALIZE_GAME: [u8; 8] = [44, 62, 102, 247, 126, 208, 130, 215];
+    pub const CREATE_GAME: [u8; 8] = [124, 69, 75, 66, 184, 220, 72, 206];
     pub const JOIN_GAME: [u8; 8] = [107, 112, 18, 38, 56, 173, 60, 128];
-    pub const UNJOIN_GAME: [u8; 8] = [105, 123, 174, 143, 207, 2, 17, 206];
+    pub const REFUND_PLAYER: [u8; 8] = [251, 32, 76, 233, 171, 106, 120, 46];
     pub const CLOSE_GAME: [u8; 8] = [237, 236, 157, 201, 253, 20, 248, 67];
     pub const OPERATOR_CLOSE_GAME: [u8; 8] = [156, 21, 221, 84, 94, 226, 235, 185];
+
+    /// v0.2 names for `create_game` and `refund_player`.
+    pub const INITIALIZE_GAME: [u8; 8] = [44, 62, 102, 247, 126, 208, 130, 215];
+    pub const UNJOIN_GAME: [u8; 8] = [105, 123, 174, 143, 207, 2, 17, 206];
+
+    pub fn create_game(version: ContractVersion) -> [u8; 8] {
+        match version {
+            ContractVersion::V0_2_0 => INITIALIZE_GAME,
+            ContractVersion::V0_3_0 => CREATE_GAME,
+        }
+    }
+
+    pub fn refund_player(version: ContractVersion) -> [u8; 8] {
+        match version {
+            ContractVersion::V0_2_0 => UNJOIN_GAME,
+            ContractVersion::V0_3_0 => REFUND_PLAYER,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -332,7 +352,8 @@ pub fn ata(owner: &Address, mint: &Address) -> Address {
 // ---------------------------------------------------------------------------
 
 /// Token context accounts shared by every game instruction. v0.2 inserts the
-/// writable `game_token` account after the mint.
+/// writable `game_token` account after the mint and ends with the associated
+/// token program.
 fn token_context(version: ContractVersion, mint: &Address, program_id: &Address) -> Vec<AccountMeta> {
     let vault = find_game_vault_pda(mint, program_id);
     let mut metas = vec![AccountMeta::readonly(*mint)];
@@ -342,7 +363,9 @@ fn token_context(version: ContractVersion, mint: &Address, program_id: &Address)
     metas.push(AccountMeta::readonly(vault));
     metas.push(AccountMeta::writable(find_associated_token_address(&vault, mint, &TOKEN_PROGRAM_ID)));
     metas.push(AccountMeta::readonly(TOKEN_PROGRAM_ID));
-    metas.push(AccountMeta::readonly(ASSOCIATED_TOKEN_PROGRAM_ID));
+    if version == ContractVersion::V0_2_0 {
+        metas.push(AccountMeta::readonly(ASSOCIATED_TOKEN_PROGRAM_ID));
+    }
     metas
 }
 
@@ -380,7 +403,7 @@ pub fn complete_game_instruction(
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct InitializeGameArgs {
+pub struct CreateGameArgs {
     pub game_type: GameType,
     pub amount: u64,
     pub max_tickets: u32,
@@ -390,11 +413,11 @@ pub struct InitializeGameArgs {
     pub random_hash: [u8; 32],
 }
 
-pub const INITIALIZE_GAME_DATA_LEN: usize = 8 + 1 + 8 + 4 + 4 + 8 + 1 + 32;
+pub const CREATE_GAME_DATA_LEN: usize = 8 + 1 + 8 + 4 + 4 + 8 + 1 + 32;
 
-impl InitializeGameArgs {
-    pub fn encode(&self) -> Vec<u8> {
-        let mut data = discriminators::INITIALIZE_GAME.to_vec();
+impl CreateGameArgs {
+    pub fn encode(&self, version: ContractVersion) -> Vec<u8> {
+        let mut data = discriminators::create_game(version).to_vec();
         data.push(self.game_type as u8);
         data.extend_from_slice(&self.amount.to_le_bytes());
         data.extend_from_slice(&self.max_tickets.to_le_bytes());
@@ -406,11 +429,12 @@ impl InitializeGameArgs {
     }
 
     /// Mirrors the generated instruction data decoder (trailing bytes ignored).
+    /// Accepts both the v0.2 and v0.3 discriminators.
     pub fn decode(data: &[u8]) -> Result<Self, DecodeError> {
         let mut r = Reader::new(data);
         let disc = r.array::<8>()?;
-        if disc != discriminators::INITIALIZE_GAME {
-            return Err(DecodeError::new("Instruction is not initialize_game"));
+        if disc != discriminators::CREATE_GAME && disc != discriminators::INITIALIZE_GAME {
+            return Err(DecodeError::new("Instruction is not create_game"));
         }
         Ok(Self {
             game_type: GameType::from_u8(r.u8()?)?,
@@ -424,7 +448,7 @@ impl InitializeGameArgs {
     }
 }
 
-pub struct InitializeGameAccounts {
+pub struct CreateGameAccounts {
     pub game: Address,
     pub creator: Address,
     pub oracle_operator: Address,
@@ -432,9 +456,9 @@ pub struct InitializeGameAccounts {
     pub creator_token_account: Address,
 }
 
-pub fn initialize_game_account_metas(
+pub fn create_game_account_metas(
     version: ContractVersion,
-    accounts: &InitializeGameAccounts,
+    accounts: &CreateGameAccounts,
     program_id: &Address,
 ) -> Vec<AccountMeta> {
     let mut metas = vec![
@@ -449,23 +473,23 @@ pub fn initialize_game_account_metas(
     metas
 }
 
-pub fn initialize_game_instruction(
+pub fn create_game_instruction(
     version: ContractVersion,
-    accounts: &InitializeGameAccounts,
-    args: &InitializeGameArgs,
+    accounts: &CreateGameAccounts,
+    args: &CreateGameArgs,
     program_id: &Address,
 ) -> Instruction {
     Instruction {
         program_id: *program_id,
-        accounts: initialize_game_account_metas(version, accounts, program_id),
-        data: args.encode(),
+        accounts: create_game_account_metas(version, accounts, program_id),
+        data: args.encode(version),
     }
 }
 
-pub fn initialize_game_account_count(version: ContractVersion) -> usize {
+pub fn create_game_account_count(version: ContractVersion) -> usize {
     match version {
         ContractVersion::V0_2_0 => 12,
-        ContractVersion::V0_3_0 => 11,
+        ContractVersion::V0_3_0 => 10,
     }
 }
 
@@ -483,9 +507,14 @@ pub fn join_game_account_metas(
     accounts: &JoinGameAccounts,
     program_id: &Address,
 ) -> Vec<AccountMeta> {
+    // v0.3 no longer needs the player to be writable.
+    let player = match version {
+        ContractVersion::V0_2_0 => AccountMeta::writable_signer(accounts.player),
+        ContractVersion::V0_3_0 => AccountMeta::readonly_signer(accounts.player),
+    };
     let mut metas = vec![
         AccountMeta::writable(accounts.game),
-        AccountMeta::writable_signer(accounts.player),
+        player,
         match accounts.oracle_operator {
             Some(operator) => AccountMeta::readonly_signer(operator),
             None => AccountMeta::readonly(*program_id),
@@ -512,11 +541,11 @@ pub fn join_game_instruction(
 pub fn join_game_account_count(version: ContractVersion) -> usize {
     match version {
         ContractVersion::V0_2_0 => 11,
-        ContractVersion::V0_3_0 => 10,
+        ContractVersion::V0_3_0 => 9,
     }
 }
 
-pub struct UnjoinGameAccounts {
+pub struct RefundPlayerAccounts {
     pub game: Address,
     pub player: Address,
     pub authority: Address,
@@ -524,9 +553,9 @@ pub struct UnjoinGameAccounts {
     pub player_token_account: Address,
 }
 
-pub fn unjoin_game_instruction(
+pub fn refund_player_instruction(
     version: ContractVersion,
-    accounts: &UnjoinGameAccounts,
+    accounts: &RefundPlayerAccounts,
     program_id: &Address,
 ) -> Instruction {
     let mut metas = vec![
@@ -537,7 +566,7 @@ pub fn unjoin_game_instruction(
     ];
     metas.extend(token_context(version, &accounts.token_mint, program_id));
     metas.push(AccountMeta::writable(accounts.player_token_account));
-    Instruction { program_id: *program_id, accounts: metas, data: discriminators::UNJOIN_GAME.to_vec() }
+    Instruction { program_id: *program_id, accounts: metas, data: discriminators::refund_player(version).to_vec() }
 }
 
 pub struct CloseGameAccounts {
@@ -604,9 +633,13 @@ mod tests {
             assert_eq!(idl["address"], PROGRAM_ID.to_base58());
             let ix = &idl["instructions"];
             assert_eq!(disc(find(ix, "complete_game")), discriminators::COMPLETE_GAME);
-            assert_eq!(disc(find(ix, "initialize_game")), discriminators::INITIALIZE_GAME);
+            let (create, refund) = match version {
+                ContractVersion::V0_2_0 => ("initialize_game", "unjoin_game"),
+                ContractVersion::V0_3_0 => ("create_game", "refund_player"),
+            };
+            assert_eq!(disc(find(ix, create)), discriminators::create_game(version));
             assert_eq!(disc(find(ix, "join_game")), discriminators::JOIN_GAME);
-            assert_eq!(disc(find(ix, "unjoin_game")), discriminators::UNJOIN_GAME);
+            assert_eq!(disc(find(ix, refund)), discriminators::refund_player(version));
             assert_eq!(disc(find(ix, "close_game")), discriminators::CLOSE_GAME);
             let accounts = &idl["accounts"];
             assert_eq!(disc(find(accounts, "Game")), discriminators::GAME_ACCOUNT);
@@ -686,7 +719,7 @@ mod tests {
 
     #[test]
     fn instruction_account_counts() {
-        let accounts = InitializeGameAccounts {
+        let accounts = CreateGameAccounts {
             game: Address([1; 32]),
             creator: Address([2; 32]),
             oracle_operator: Address([3; 32]),
@@ -695,8 +728,8 @@ mod tests {
         };
         for version in SUPPORTED_CONTRACT_VERSIONS {
             assert_eq!(
-                initialize_game_account_metas(version, &accounts, &PROGRAM_ID).len(),
-                initialize_game_account_count(version)
+                create_game_account_metas(version, &accounts, &PROGRAM_ID).len(),
+                create_game_account_count(version)
             );
             let join = JoinGameAccounts {
                 game: Address([1; 32]),
@@ -707,7 +740,7 @@ mod tests {
             };
             assert_eq!(join_game_account_metas(version, &join, &PROGRAM_ID).len(), join_game_account_count(version));
         }
-        let args = InitializeGameArgs {
+        let args = CreateGameArgs {
             game_type: GameType::Coinflip,
             amount: 42,
             max_tickets: 2,
@@ -716,9 +749,12 @@ mod tests {
             is_private: false,
             random_hash: [9; 32],
         };
-        let data = args.encode();
-        assert_eq!(data.len(), INITIALIZE_GAME_DATA_LEN);
-        assert_eq!(InitializeGameArgs::decode(&data).unwrap(), args);
+        for version in SUPPORTED_CONTRACT_VERSIONS {
+            let data = args.encode(version);
+            assert_eq!(data[..8], discriminators::create_game(version));
+            assert_eq!(data.len(), CREATE_GAME_DATA_LEN);
+            assert_eq!(CreateGameArgs::decode(&data).unwrap(), args);
+        }
     }
 
     #[test]
@@ -791,7 +827,7 @@ mod tests {
 
     #[test]
     fn instruction_builders_follow_the_idl() {
-        let mut data = InitializeGameArgs {
+        let mut data = CreateGameArgs {
             game_type: GameType::Giveaway,
             amount: 1,
             max_tickets: 3,
@@ -800,9 +836,9 @@ mod tests {
             is_private: true,
             random_hash: [1; 32],
         }
-        .encode();
+        .encode(ContractVersion::V0_3_0);
         data[0] ^= 1;
-        assert_eq!(InitializeGameArgs::decode(&data).unwrap_err().to_string(), "Instruction is not initialize_game");
+        assert_eq!(CreateGameArgs::decode(&data).unwrap_err().to_string(), "Instruction is not create_game");
 
         let join = JoinGameAccounts {
             game: Address([1; 32]),
@@ -818,28 +854,108 @@ mod tests {
         let ix = operator_close_game_instruction(&game, &operator, &mint, &creator, &PROGRAM_ID);
         assert_eq!(ix.program_id, PROGRAM_ID);
         assert_eq!(ix.data, discriminators::OPERATOR_CLOSE_GAME.to_vec());
-        let idl = idl(ContractVersion::V0_3_0);
-        // Composite IDL account groups flatten into their member accounts.
-        fn flatten(accounts: &Value, out: &mut Vec<(bool, bool)>) {
-            for account in accounts.as_array().unwrap() {
-                match account.get("accounts") {
-                    Some(nested) => flatten(nested, out),
-                    None => out.push((
-                        account["writable"].as_bool().unwrap_or(false),
-                        account["signer"].as_bool().unwrap_or(false),
-                    )),
-                }
-            }
-        }
-        let mut expected = Vec::new();
-        flatten(&find(&idl["instructions"], "operator_close_game")["accounts"], &mut expected);
-        let actual: Vec<(bool, bool)> = ix.accounts.iter().map(|a| (a.writable, a.signer)).collect();
-        assert_eq!(actual, expected);
+        assert_matches_idl(ContractVersion::V0_3_0, "operator_close_game", &ix);
         assert_eq!(ix.accounts[0], AccountMeta::writable(game));
         assert_eq!(ix.accounts[1], AccountMeta::writable_signer(operator));
         assert_eq!(ix.accounts[2], AccountMeta::readonly(find_oracle_pda(&PROGRAM_ID)));
         assert_eq!(ix.accounts[3], AccountMeta::readonly(mint));
         assert_eq!(ix.accounts[ix.accounts.len() - 2], AccountMeta::readonly(creator));
         assert_eq!(ix.accounts[ix.accounts.len() - 1], AccountMeta::writable(ata(&creator, &mint)));
+    }
+
+    /// Compares flags (and fixed addresses) with the IDL, flattening composite account groups.
+    fn assert_matches_idl(version: ContractVersion, name: &str, ix: &Instruction) {
+        fn flatten(accounts: &Value, out: &mut Vec<(String, bool, bool, Option<String>)>) {
+            for entry in accounts.as_array().unwrap() {
+                match entry.get("accounts") {
+                    Some(nested) => flatten(nested, out),
+                    None => out.push((
+                        entry["name"].as_str().unwrap().to_owned(),
+                        entry["writable"].as_bool().unwrap_or(false),
+                        entry["signer"].as_bool().unwrap_or(false),
+                        entry["address"].as_str().map(str::to_owned),
+                    )),
+                }
+            }
+        }
+        let idl = idl(version);
+        let mut expected = Vec::new();
+        flatten(&find(&idl["instructions"], name)["accounts"], &mut expected);
+        assert_eq!(ix.program_id, PROGRAM_ID);
+        assert_eq!(ix.accounts.len(), expected.len(), "{name} {version}");
+        for (meta, (label, writable, signer, address)) in ix.accounts.iter().zip(expected) {
+            assert_eq!((meta.writable, meta.signer), (writable, signer), "{name}.{label} {version}");
+            if let Some(address) = address {
+                assert_eq!(meta.address.to_base58(), address, "{name}.{label} {version}");
+            }
+        }
+    }
+
+    #[test]
+    fn every_builder_matches_the_idl_accounts() {
+        let (game, creator, operator, mint, token_account) =
+            (Address([1; 32]), Address([2; 32]), Address([3; 32]), Address([4; 32]), Address([5; 32]));
+        let args = CreateGameArgs {
+            game_type: GameType::Coinflip,
+            amount: 1,
+            max_tickets: 2,
+            min_tickets: 2,
+            timeout: 60,
+            is_private: false,
+            random_hash: [9; 32],
+        };
+        for version in SUPPORTED_CONTRACT_VERSIONS {
+            let (create, refund) = match version {
+                ContractVersion::V0_2_0 => ("initialize_game", "unjoin_game"),
+                ContractVersion::V0_3_0 => ("create_game", "refund_player"),
+            };
+            let ix = create_game_instruction(
+                version,
+                &CreateGameAccounts {
+                    game,
+                    creator,
+                    oracle_operator: operator,
+                    token_mint: mint,
+                    creator_token_account: token_account,
+                },
+                &args,
+                &PROGRAM_ID,
+            );
+            assert_matches_idl(version, create, &ix);
+            let join = JoinGameAccounts {
+                game,
+                player: creator,
+                oracle_operator: Some(operator),
+                token_mint: mint,
+                player_token_account: token_account,
+            };
+            assert_matches_idl(version, "join_game", &join_game_instruction(version, &join, &PROGRAM_ID));
+            let ix = refund_player_instruction(
+                version,
+                &RefundPlayerAccounts {
+                    game,
+                    player: creator,
+                    authority: operator,
+                    token_mint: mint,
+                    player_token_account: token_account,
+                },
+                &PROGRAM_ID,
+            );
+            assert_eq!(ix.data, discriminators::refund_player(version).to_vec());
+            assert_matches_idl(version, refund, &ix);
+            let close = CloseGameAccounts { game, creator, token_mint: mint, creator_token_account: token_account };
+            assert_matches_idl(version, "close_game", &close_game_instruction(version, &close, &PROGRAM_ID));
+            let complete = CompleteGameInput {
+                game,
+                token_mint: mint,
+                oracle_operator: operator,
+                winner: creator,
+                creator,
+                random_hash: [1; 32],
+                secret_key: [2; 32],
+                winner_index: 0,
+            };
+            assert_matches_idl(version, "complete_game", &complete_game_instruction(version, &complete, &PROGRAM_ID));
+        }
     }
 }

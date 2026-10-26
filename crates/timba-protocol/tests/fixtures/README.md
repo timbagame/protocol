@@ -5,7 +5,7 @@ crate is checked byte for byte against it.
 
 | Fixture         | Covers                                                     | Checked by              |
 | --------------- | ---------------------------------------------------------- | ----------------------- |
-| `plans.json`    | Create, join, unjoin and close plans for v0.2.0 and v0.3.0 | `tests/kit_parity.rs`   |
+| `plans.json`    | Create, join, refund and close plans for v0.2.0 and v0.3.0 | `tests/kit_parity.rs`   |
 | `complete.json` | `completeGame` instructions for v0.2.0 and v0.3.0          | `tests/kit_parity.rs`   |
 | `evm.json`      | EVM v0.1.0 identifiers, digests, calls, winners and events | `tests/evm_parity.rs`   |
 | `games.json`    | Token amounts, game reference keys and paths, game drafts  | `tests/games_parity.rs` |

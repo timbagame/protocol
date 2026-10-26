@@ -1,14 +1,19 @@
 import { type ReadonlyUint8Array } from "@solana/kit";
 export declare const EVENT_DISCRIMINATORS: {
-    readonly GameInitialized: readonly [82, 221, 11, 2, 244, 52, 240, 250];
+    readonly GameCreated: readonly [218, 25, 150, 94, 177, 112, 96, 2];
     readonly GameCompleted: readonly [103, 26, 106, 108, 240, 191, 179, 120];
     readonly GameClosed: readonly [178, 203, 179, 224, 43, 18, 209, 4];
     readonly PlayerJoined: readonly [39, 144, 49, 106, 108, 210, 183, 38];
-    readonly PlayerUnjoined: readonly [191, 34, 140, 22, 253, 20, 237, 73];
+    readonly PlayerRefunded: readonly [83, 218, 165, 174, 105, 50, 123, 107];
     readonly TokenFeeWithdrawn: readonly [92, 98, 195, 90, 108, 129, 244, 119];
     readonly OperatorGameClosed: readonly [236, 51, 251, 125, 251, 64, 187, 174];
 };
-declare function initialized(data: ReadonlyUint8Array): {
+/** v0.2 emits the same layouts under its original event names. */
+export declare const LEGACY_EVENT_DISCRIMINATORS: {
+    readonly GameCreated: readonly [82, 221, 11, 2, 244, 52, 240, 250];
+    readonly PlayerRefunded: readonly [191, 34, 140, 22, 253, 20, 237, 73];
+};
+declare function created(data: ReadonlyUint8Array): {
     gameType: "coinflip" | "giveaway";
     isPrivate: boolean;
     createdAt: bigint;
@@ -21,7 +26,7 @@ declare function initialized(data: ReadonlyUint8Array): {
     tokenMint: import("@solana/kit").Address<string>;
     totalAmount: bigint;
 };
-declare function unjoined(data: ReadonlyUint8Array): {
+declare function refunded(data: ReadonlyUint8Array): {
     movedParticipant: import("@solana/kit").Address<string> | null;
     lastSlot: bigint;
     timestamp: bigint;
@@ -32,7 +37,7 @@ declare function unjoined(data: ReadonlyUint8Array): {
     totalAmount: bigint;
 };
 declare const readers: {
-    GameInitialized: typeof initialized;
+    GameCreated: typeof created;
     GameCompleted: (data: ReadonlyUint8Array) => {
         feeAmount: bigint;
         gameKey: import("@solana/kit").Address<string>;
@@ -54,7 +59,7 @@ declare const readers: {
         timestamp: bigint;
         totalAmount: bigint;
     };
-    PlayerUnjoined: typeof unjoined;
+    PlayerRefunded: typeof refunded;
     TokenFeeWithdrawn: (data: ReadonlyUint8Array) => {
         amount: bigint;
         operator: import("@solana/kit").Address<string>;

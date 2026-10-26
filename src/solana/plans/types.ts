@@ -23,7 +23,7 @@ export interface TimbaGameAccount extends ActiveTimbaGame {
 }
 
 export interface TransactionReview {
-  action: "create" | "join" | "unjoin" | "cancel";
+  action: "create" | "join" | "refund" | "cancel";
   gameAddress: string;
   walletAddress: string;
   tokenMint: string;

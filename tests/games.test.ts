@@ -149,7 +149,7 @@ describe("cross-chain games", () => {
   });
   test("normalizes swap-removal and last-removal events", () => {
     const a = normalizeSolanaMembership(solana, {
-      name: "PlayerUnjoined",
+      name: "PlayerRefunded",
       data: {
         gameKey: key,
         player: key,

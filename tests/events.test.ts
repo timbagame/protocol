@@ -3,6 +3,7 @@ import { getAddressEncoder, address } from "@solana/kit";
 import {
   decodeProgramEvent,
   EVENT_DISCRIMINATORS,
+  LEGACY_EVENT_DISCRIMINATORS,
   getTrustedProgramData,
 } from "../src/contracts/events/index.js";
 const program = "11111111111111111111111111111111";
@@ -32,21 +33,26 @@ describe("shared Timba events", () => {
     ).toThrow();
     expect(decodeProgramEvent(new Uint8Array(8))).toBeNull();
   });
-  test("supports legacy and current unjoin layouts", () => {
-    for (const length of [104, 105, 137]) {
-      const bytes = Buffer.alloc(length);
-      bytes.set(EVENT_DISCRIMINATORS.PlayerUnjoined);
-      if (length === 137) {
-        bytes[88] = 1;
-        bytes.set(getAddressEncoder().encode(address(other)), 89);
+  test("supports legacy and current refund layouts under both names", () => {
+    for (const discriminator of [
+      LEGACY_EVENT_DISCRIMINATORS.PlayerRefunded,
+      EVENT_DISCRIMINATORS.PlayerRefunded,
+    ]) {
+      for (const length of [104, 105, 137]) {
+        const bytes = Buffer.alloc(length);
+        bytes.set(discriminator);
+        if (length === 137) {
+          bytes[88] = 1;
+          bytes.set(getAddressEncoder().encode(address(other)), 89);
+        }
+        expect(decodeProgramEvent(bytes)).toMatchObject({
+          name: "PlayerRefunded",
+          data: { movedParticipant: length === 137 ? other : null },
+        });
       }
-      expect(decodeProgramEvent(bytes)).toMatchObject({
-        name: "PlayerUnjoined",
-        data: { movedParticipant: length === 137 ? other : null },
-      });
     }
     const invalid = Buffer.alloc(105);
-    invalid.set(EVENT_DISCRIMINATORS.PlayerUnjoined);
+    invalid.set(EVENT_DISCRIMINATORS.PlayerRefunded);
     invalid[88] = 2;
     expect(() => decodeProgramEvent(invalid)).toThrow();
   });
@@ -91,9 +97,14 @@ describe("shared Timba events", () => {
     ];
     expect(getTrustedProgramData(logs, program)).toHaveLength(2);
   });
-  test("rejects invalid initialized enum and boolean fields", () => {
+  test("decodes v0.2 creation events under the current name", () => {
     const bytes = Buffer.alloc(146);
-    bytes.set(EVENT_DISCRIMINATORS.GameInitialized);
+    bytes.set(LEGACY_EVENT_DISCRIMINATORS.GameCreated);
+    expect(decodeProgramEvent(bytes)?.name).toBe("GameCreated");
+  });
+  test("rejects invalid created enum and boolean fields", () => {
+    const bytes = Buffer.alloc(146);
+    bytes.set(EVENT_DISCRIMINATORS.GameCreated);
     bytes[72] = 2;
     expect(() => decodeProgramEvent(bytes)).toThrow();
     bytes[72] = 0;

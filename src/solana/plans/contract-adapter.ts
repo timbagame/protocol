@@ -13,6 +13,8 @@ import {
   getAssociatedTokenAddress,
 } from "./token-program.js";
 import type { ContractVersion } from "../../contracts/index.js";
+import * as v020 from "../../contracts/v0.2.0/generated/index.js";
+import * as v030 from "../../contracts/v0.3.0/generated/index.js";
 
 export interface GameInstructionInput {
   game: Address;
@@ -36,7 +38,7 @@ export interface GameInstructionPlan {
 export interface TimbaContractAdapter {
   decodeGame(address: string, data: Uint8Array): TimbaGameAccount;
   buildJoinPlan(input: GameInstructionInput): Promise<GameInstructionPlan>;
-  buildUnjoinPlan(input: GameInstructionInput): Promise<GameInstructionPlan>;
+  buildRefundPlan(input: GameInstructionInput): Promise<GameInstructionPlan>;
   buildClosePlan(
     input: CloseGameInstructionInput,
   ): Promise<GameInstructionPlan>;
@@ -76,24 +78,28 @@ export function createContractAdapter(
 
   const buildPlan = async (
     input: GameInstructionInput,
-    unjoin: boolean,
+    refund: boolean,
   ): Promise<GameInstructionPlan> => {
     const playerTokenAccount = await getAssociatedTokenAddress(
       input.tokenMint,
       input.player,
     );
     const authority = input.authority ?? input.player;
-    const instruction = unjoin
-      ? await client.getUnjoinGameInstructionAsync(
-          {
-            game: input.game,
-            player: input.player,
-            authority: createNoopSigner(authority),
-            tokenMint: input.tokenMint,
-            playerTokenAccount,
-          },
-          { programAddress: programId },
-        )
+    const refundAccounts = {
+      game: input.game,
+      player: input.player,
+      authority: createNoopSigner(authority),
+      tokenMint: input.tokenMint,
+      playerTokenAccount,
+    };
+    const instruction = refund
+      ? version === "0.2.0"
+        ? await v020.getUnjoinGameInstructionAsync(refundAccounts, {
+            programAddress: programId,
+          })
+        : await v030.getRefundPlayerInstructionAsync(refundAccounts, {
+            programAddress: programId,
+          })
       : await client.getJoinGameInstructionAsync(
           {
             game: input.game,
@@ -104,7 +110,7 @@ export function createContractAdapter(
           { programAddress: programId },
         );
     const setup = createAssociatedTokenAccountIdempotentInstruction(
-      unjoin ? authority : input.player,
+      refund ? authority : input.player,
       playerTokenAccount,
       input.player,
       input.tokenMint,
@@ -112,7 +118,7 @@ export function createContractAdapter(
     );
 
     const instructions: Instruction[] = [setup];
-    if (!unjoin && isWrappedSol(input.tokenMint)) {
+    if (!refund && isWrappedSol(input.tokenMint)) {
       if (!input.tokenAmount || input.tokenAmount <= 0n) {
         throw new Error("SOL joins require a positive stake amount");
       }
@@ -129,7 +135,7 @@ export function createContractAdapter(
   return {
     decodeGame,
     buildJoinPlan: (input) => buildPlan(input, false),
-    buildUnjoinPlan: (input) => buildPlan(input, true),
+    buildRefundPlan: (input) => buildPlan(input, true),
     buildClosePlan: async (input) => {
       const creatorTokenAccount = await getAssociatedTokenAddress(
         input.tokenMint,

@@ -20,7 +20,7 @@ export interface GameInstructionPlan {
 export interface TimbaContractAdapter {
     decodeGame(address: string, data: Uint8Array): TimbaGameAccount;
     buildJoinPlan(input: GameInstructionInput): Promise<GameInstructionPlan>;
-    buildUnjoinPlan(input: GameInstructionInput): Promise<GameInstructionPlan>;
+    buildRefundPlan(input: GameInstructionInput): Promise<GameInstructionPlan>;
     buildClosePlan(input: CloseGameInstructionInput): Promise<GameInstructionPlan>;
     hasParticipant(game: TimbaGameAccount, player: Address): Promise<boolean>;
 }

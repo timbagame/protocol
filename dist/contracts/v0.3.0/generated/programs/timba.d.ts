@@ -8,7 +8,7 @@
 import { type Address, type ClientWithRpc, type ClientWithTransactionPlanning, type ClientWithTransactionSending, type ExtendedClient, type GetAccountInfoApi, type GetMultipleAccountsApi, type HasAddress, type Instruction, type InstructionWithData, type ReadonlyUint8Array } from "@solana/kit";
 import { type SelfFetchFunctions, type SelfPlanAndSendFunctions } from "@solana/kit/program-client-core";
 import { getGameCodec, getOracleCodec, type Game, type GameArgs, type Oracle, type OracleArgs } from "../accounts/index.js";
-import { getCloseGameInstructionAsync, getCloseOracleInstructionAsync, getCompleteGameInstructionAsync, getInitializeGameInstructionAsync, getInitializeOracleInstructionAsync, getJoinGameInstructionAsync, getOperatorCloseGameInstructionAsync, getUnjoinGameInstructionAsync, getUpdateOracleInstructionAsync, type CloseGameAsyncInput, type CloseOracleAsyncInput, type CompleteGameAsyncInput, type InitializeGameAsyncInput, type InitializeOracleAsyncInput, type JoinGameAsyncInput, type OperatorCloseGameAsyncInput, type ParsedCloseGameInstruction, type ParsedCloseOracleInstruction, type ParsedCompleteGameInstruction, type ParsedInitializeGameInstruction, type ParsedInitializeOracleInstruction, type ParsedJoinGameInstruction, type ParsedOperatorCloseGameInstruction, type ParsedUnjoinGameInstruction, type ParsedUpdateOracleInstruction, type UnjoinGameAsyncInput, type UpdateOracleAsyncInput } from "../instructions/index.js";
+import { getCloseGameInstructionAsync, getCloseOracleInstructionAsync, getCompleteGameInstructionAsync, getCreateGameInstructionAsync, getInitializeOracleInstructionAsync, getJoinGameInstructionAsync, getOperatorCloseGameInstructionAsync, getRefundPlayerInstructionAsync, getUpdateOracleInstructionAsync, type CloseGameAsyncInput, type CloseOracleAsyncInput, type CompleteGameAsyncInput, type CreateGameAsyncInput, type InitializeOracleAsyncInput, type JoinGameAsyncInput, type OperatorCloseGameAsyncInput, type ParsedCloseGameInstruction, type ParsedCloseOracleInstruction, type ParsedCompleteGameInstruction, type ParsedCreateGameInstruction, type ParsedInitializeOracleInstruction, type ParsedJoinGameInstruction, type ParsedOperatorCloseGameInstruction, type ParsedRefundPlayerInstruction, type ParsedUpdateOracleInstruction, type RefundPlayerAsyncInput, type UpdateOracleAsyncInput } from "../instructions/index.js";
 import { findGamePda, findGameVaultPda, findOraclePda } from "../pdas/index.js";
 export declare const TIMBA_PROGRAM_ADDRESS: Address<"32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5">;
 export declare enum TimbaAccount {
@@ -21,13 +21,13 @@ export declare function identifyTimbaAccount(account: {
 export declare enum TimbaEvent {
     GameClosed = 0,
     GameCompleted = 1,
-    GameInitialized = 2,
+    GameCreated = 2,
     OperatorGameClosed = 3,
     OracleClosed = 4,
     OracleInitialized = 5,
     OracleUpdated = 6,
     PlayerJoined = 7,
-    PlayerUnjoined = 8
+    PlayerRefunded = 8
 }
 export declare function identifyTimbaEvent(event: {
     data: ReadonlyUint8Array;
@@ -36,11 +36,11 @@ export declare enum TimbaInstruction {
     CloseGame = 0,
     CloseOracle = 1,
     CompleteGame = 2,
-    InitializeGame = 3,
+    CreateGame = 3,
     InitializeOracle = 4,
     JoinGame = 5,
     OperatorCloseGame = 6,
-    UnjoinGame = 7,
+    RefundPlayer = 7,
     UpdateOracle = 8
 }
 export declare function identifyTimbaInstruction(instruction: {
@@ -53,16 +53,16 @@ export type ParsedTimbaInstruction<TProgram extends string = "32Jr4JnXWvqq9GqPQy
 } & ParsedCloseOracleInstruction<TProgram>) | ({
     instructionType: TimbaInstruction.CompleteGame;
 } & ParsedCompleteGameInstruction<TProgram>) | ({
-    instructionType: TimbaInstruction.InitializeGame;
-} & ParsedInitializeGameInstruction<TProgram>) | ({
+    instructionType: TimbaInstruction.CreateGame;
+} & ParsedCreateGameInstruction<TProgram>) | ({
     instructionType: TimbaInstruction.InitializeOracle;
 } & ParsedInitializeOracleInstruction<TProgram>) | ({
     instructionType: TimbaInstruction.JoinGame;
 } & ParsedJoinGameInstruction<TProgram>) | ({
     instructionType: TimbaInstruction.OperatorCloseGame;
 } & ParsedOperatorCloseGameInstruction<TProgram>) | ({
-    instructionType: TimbaInstruction.UnjoinGame;
-} & ParsedUnjoinGameInstruction<TProgram>) | ({
+    instructionType: TimbaInstruction.RefundPlayer;
+} & ParsedRefundPlayerInstruction<TProgram>) | ({
     instructionType: TimbaInstruction.UpdateOracle;
 } & ParsedUpdateOracleInstruction<TProgram>);
 export declare function parseTimbaInstruction<TProgram extends string>(instruction: Instruction<TProgram> & InstructionWithData<ReadonlyUint8Array>): ParsedTimbaInstruction<TProgram>;
@@ -88,9 +88,9 @@ export type TimbaPluginInstructions = {
     completeGame: (input: CompleteGameAsyncInput, config?: {
         programAddress?: Address | HasAddress;
     }) => ReturnType<typeof getCompleteGameInstructionAsync> & SelfPlanAndSendFunctions;
-    initializeGame: (input: InitializeGameAsyncInput, config?: {
+    createGame: (input: CreateGameAsyncInput, config?: {
         programAddress?: Address | HasAddress;
-    }) => ReturnType<typeof getInitializeGameInstructionAsync> & SelfPlanAndSendFunctions;
+    }) => ReturnType<typeof getCreateGameInstructionAsync> & SelfPlanAndSendFunctions;
     initializeOracle: (input: InitializeOracleAsyncInput, config?: {
         programAddress?: Address | HasAddress;
     }) => ReturnType<typeof getInitializeOracleInstructionAsync> & SelfPlanAndSendFunctions;
@@ -100,9 +100,9 @@ export type TimbaPluginInstructions = {
     operatorCloseGame: (input: OperatorCloseGameAsyncInput, config?: {
         programAddress?: Address | HasAddress;
     }) => ReturnType<typeof getOperatorCloseGameInstructionAsync> & SelfPlanAndSendFunctions;
-    unjoinGame: (input: UnjoinGameAsyncInput, config?: {
+    refundPlayer: (input: RefundPlayerAsyncInput, config?: {
         programAddress?: Address | HasAddress;
-    }) => ReturnType<typeof getUnjoinGameInstructionAsync> & SelfPlanAndSendFunctions;
+    }) => ReturnType<typeof getRefundPlayerInstructionAsync> & SelfPlanAndSendFunctions;
     updateOracle: (input: UpdateOracleAsyncInput, config?: {
         programAddress?: Address | HasAddress;
     }) => ReturnType<typeof getUpdateOracleInstructionAsync> & SelfPlanAndSendFunctions;

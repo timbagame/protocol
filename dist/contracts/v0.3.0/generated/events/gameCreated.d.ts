@@ -7,9 +7,9 @@
  */
 import { type Address, type FixedSizeCodec, type FixedSizeDecoder, type FixedSizeEncoder, type HasAddress, type ReadonlyUint8Array } from "@solana/kit";
 import { type GameType, type GameTypeArgs } from "../types/index.js";
-export declare const GAME_INITIALIZED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
-export declare function getGameInitializedEventDiscriminatorBytes(): ReadonlyUint8Array;
-export type GameInitializedEvent = {
+export declare const GAME_CREATED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
+export declare function getGameCreatedEventDiscriminatorBytes(): ReadonlyUint8Array;
+export type GameCreatedEvent = {
     /** Game account address */
     gameKey: Address;
     /** Game creator */
@@ -33,7 +33,7 @@ export type GameInitializedEvent = {
     /** Game timeout duration */
     timeout: bigint;
 };
-export type GameInitializedEventArgs = {
+export type GameCreatedEventArgs = {
     /** Game account address */
     gameKey: Address | HasAddress;
     /** Game creator */
@@ -57,12 +57,12 @@ export type GameInitializedEventArgs = {
     /** Game timeout duration */
     timeout: number | bigint;
 };
-/** Gets the encoder for {@link GameInitializedEventArgs} event data. */
-export declare function getGameInitializedEventEncoder(): FixedSizeEncoder<GameInitializedEventArgs>;
-/** Gets the decoder for {@link GameInitializedEvent} event data. */
-export declare function getGameInitializedEventDecoder(): FixedSizeDecoder<GameInitializedEvent>;
-/** Gets the codec for {@link GameInitializedEvent} event data. */
-export declare function getGameInitializedEventCodec(): FixedSizeCodec<GameInitializedEventArgs, GameInitializedEvent>;
-/** Parses the provided bytes into {@link GameInitializedEvent} event data. */
-export declare function parseGameInitializedEvent(data: ReadonlyUint8Array | Uint8Array): GameInitializedEvent;
-//# sourceMappingURL=gameInitialized.d.ts.map
+/** Gets the encoder for {@link GameCreatedEventArgs} event data. */
+export declare function getGameCreatedEventEncoder(): FixedSizeEncoder<GameCreatedEventArgs>;
+/** Gets the decoder for {@link GameCreatedEvent} event data. */
+export declare function getGameCreatedEventDecoder(): FixedSizeDecoder<GameCreatedEvent>;
+/** Gets the codec for {@link GameCreatedEvent} event data. */
+export declare function getGameCreatedEventCodec(): FixedSizeCodec<GameCreatedEventArgs, GameCreatedEvent>;
+/** Parses the provided bytes into {@link GameCreatedEvent} event data. */
+export declare function parseGameCreatedEvent(data: ReadonlyUint8Array | Uint8Array): GameCreatedEvent;
+//# sourceMappingURL=gameCreated.d.ts.map

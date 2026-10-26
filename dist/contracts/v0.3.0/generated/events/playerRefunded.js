@@ -6,12 +6,12 @@
  * @see https://github.com/codama-idl/codama
  */
 import { combineCodec, containsBytes, fixEncoderSize, getAddressDecoder, getAddressEncoder, getBytesEncoder, getConstantDecoder, getConstantEncoder, getHiddenPrefixDecoder, getHiddenPrefixEncoder, getOptionDecoder, getOptionEncoder, getStructDecoder, getStructEncoder, getU32Decoder, getU32Encoder, getU64Decoder, getU64Encoder, } from "@solana/kit";
-export const PLAYER_UNJOINED_EVENT_DISCRIMINATOR = new Uint8Array([191, 34, 140, 22, 253, 20, 237, 73]);
-export function getPlayerUnjoinedEventDiscriminatorBytes() {
-    return fixEncoderSize(getBytesEncoder(), 8).encode(PLAYER_UNJOINED_EVENT_DISCRIMINATOR);
+export const PLAYER_REFUNDED_EVENT_DISCRIMINATOR = new Uint8Array([83, 218, 165, 174, 105, 50, 123, 107]);
+export function getPlayerRefundedEventDiscriminatorBytes() {
+    return fixEncoderSize(getBytesEncoder(), 8).encode(PLAYER_REFUNDED_EVENT_DISCRIMINATOR);
 }
-/** Gets the encoder for {@link PlayerUnjoinedEventArgs} event data. */
-export function getPlayerUnjoinedEventEncoder() {
+/** Gets the encoder for {@link PlayerRefundedEventArgs} event data. */
+export function getPlayerRefundedEventEncoder() {
     return getHiddenPrefixEncoder(getStructEncoder([
         ["gameKey", getAddressEncoder()],
         ["player", getAddressEncoder()],
@@ -21,10 +21,10 @@ export function getPlayerUnjoinedEventEncoder() {
         ["movedParticipant", getOptionEncoder(getAddressEncoder())],
         ["lastSlot", getU64Encoder()],
         ["timestamp", getU64Encoder()],
-    ]), [getConstantEncoder(PLAYER_UNJOINED_EVENT_DISCRIMINATOR)]);
+    ]), [getConstantEncoder(PLAYER_REFUNDED_EVENT_DISCRIMINATOR)]);
 }
-/** Gets the decoder for {@link PlayerUnjoinedEvent} event data. */
-export function getPlayerUnjoinedEventDecoder() {
+/** Gets the decoder for {@link PlayerRefundedEvent} event data. */
+export function getPlayerRefundedEventDecoder() {
     return getHiddenPrefixDecoder(getStructDecoder([
         ["gameKey", getAddressDecoder()],
         ["player", getAddressDecoder()],
@@ -34,17 +34,17 @@ export function getPlayerUnjoinedEventDecoder() {
         ["movedParticipant", getOptionDecoder(getAddressDecoder())],
         ["lastSlot", getU64Decoder()],
         ["timestamp", getU64Decoder()],
-    ]), [getConstantDecoder(PLAYER_UNJOINED_EVENT_DISCRIMINATOR)]);
+    ]), [getConstantDecoder(PLAYER_REFUNDED_EVENT_DISCRIMINATOR)]);
 }
-/** Gets the codec for {@link PlayerUnjoinedEvent} event data. */
-export function getPlayerUnjoinedEventCodec() {
-    return combineCodec(getPlayerUnjoinedEventEncoder(), getPlayerUnjoinedEventDecoder());
+/** Gets the codec for {@link PlayerRefundedEvent} event data. */
+export function getPlayerRefundedEventCodec() {
+    return combineCodec(getPlayerRefundedEventEncoder(), getPlayerRefundedEventDecoder());
 }
-/** Parses the provided bytes into {@link PlayerUnjoinedEvent} event data. */
-export function parsePlayerUnjoinedEvent(data) {
-    if (containsBytes(data, PLAYER_UNJOINED_EVENT_DISCRIMINATOR, 0)) {
-        return getPlayerUnjoinedEventDecoder().decode(data);
+/** Parses the provided bytes into {@link PlayerRefundedEvent} event data. */
+export function parsePlayerRefundedEvent(data) {
+    if (containsBytes(data, PLAYER_REFUNDED_EVENT_DISCRIMINATOR, 0)) {
+        return getPlayerRefundedEventDecoder().decode(data);
     }
-    throw new Error('The provided data does not match the "PlayerUnjoinedEvent" event discriminators.');
+    throw new Error('The provided data does not match the "PlayerRefundedEvent" event discriminators.');
 }
-//# sourceMappingURL=playerUnjoined.js.map
+//# sourceMappingURL=playerRefunded.js.map

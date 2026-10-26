@@ -6,7 +6,7 @@ export function normalizeSolanaGameEvent(reference, event) {
     if (event.data.gameKey !== reference.gameId)
         throw new Error("Event belongs to another game");
     switch (event.name) {
-        case "GameInitialized": {
+        case "GameCreated": {
             const e = event.data;
             return {
                 kind: "created",
@@ -24,7 +24,7 @@ export function normalizeSolanaGameEvent(reference, event) {
             };
         }
         case "PlayerJoined":
-        case "PlayerUnjoined":
+        case "PlayerRefunded":
             return { ...normalizeSolanaMembership(reference, event), amount: null };
         case "GameCompleted":
             return {

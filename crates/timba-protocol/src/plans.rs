@@ -8,8 +8,8 @@ use crate::address::{
 };
 use crate::codec::DecodeError;
 use crate::contracts::{
-    self, find_game_pda, find_game_vault_pda, ContractVersion, GameAccount, GameType, InitializeGameAccounts,
-    InitializeGameArgs,
+    self, find_game_pda, find_game_vault_pda, ContractVersion, CreateGameAccounts, CreateGameArgs, GameAccount,
+    GameType,
 };
 use crate::instruction::{AccountMeta, Instruction};
 use crate::Address;
@@ -220,13 +220,13 @@ impl ContractAdapter {
         decode_game(address, data)
     }
 
-    fn build_plan(&self, input: &GameInstructionInput, unjoin: bool) -> Result<GameInstructionPlan, PlanError> {
+    fn build_plan(&self, input: &GameInstructionInput, refund: bool) -> Result<GameInstructionPlan, PlanError> {
         let player_token_account = get_associated_token_address(&input.token_mint, &input.player, false)?;
         let authority = input.authority.unwrap_or(input.player);
-        let instruction = if unjoin {
-            contracts::unjoin_game_instruction(
+        let instruction = if refund {
+            contracts::refund_player_instruction(
                 self.version,
-                &contracts::UnjoinGameAccounts {
+                &contracts::RefundPlayerAccounts {
                     game: input.game,
                     player: input.player,
                     authority,
@@ -249,14 +249,14 @@ impl ContractAdapter {
             )
         };
         let setup = create_associated_token_account_idempotent_instruction(
-            if unjoin { &authority } else { &input.player },
+            if refund { &authority } else { &input.player },
             &player_token_account,
             &input.player,
             &input.token_mint,
             &TOKEN_PROGRAM_ID,
         );
         let mut instructions = vec![setup];
-        if !unjoin && is_wrapped_sol(&input.token_mint) {
+        if !refund && is_wrapped_sol(&input.token_mint) {
             let amount = input
                 .token_amount
                 .filter(|a| *a > 0)
@@ -272,7 +272,7 @@ impl ContractAdapter {
         self.build_plan(input, false)
     }
 
-    pub fn build_unjoin_plan(&self, input: &GameInstructionInput) -> Result<GameInstructionPlan, PlanError> {
+    pub fn build_refund_plan(&self, input: &GameInstructionInput) -> Result<GameInstructionPlan, PlanError> {
         self.build_plan(input, true)
     }
 
@@ -342,16 +342,16 @@ pub fn build_create_game_plan(
     let game_vault = find_game_vault_pda(&input.token_mint, program_id);
     let game_vault_token_account = get_associated_token_address(&input.token_mint, &game_vault, true)?;
     let creator_token_account = get_associated_token_address(&input.token_mint, &input.creator, false)?;
-    let initialize = contracts::initialize_game_instruction(
+    let create = contracts::create_game_instruction(
         version,
-        &InitializeGameAccounts {
+        &CreateGameAccounts {
             game,
             creator: input.creator,
             oracle_operator: input.oracle_operator,
             token_mint: input.token_mint,
             creator_token_account,
         },
-        &InitializeGameArgs {
+        &CreateGameArgs {
             game_type: input.game_type,
             amount: input.amount,
             max_tickets: input.max_players,
@@ -378,7 +378,7 @@ pub fn build_create_game_plan(
             &TOKEN_PROGRAM_ID,
         ));
     }
-    instructions.push(initialize);
+    instructions.push(create);
     Ok(CreateGamePlan { game, instructions })
 }
 

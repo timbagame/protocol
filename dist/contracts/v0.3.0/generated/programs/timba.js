@@ -8,7 +8,7 @@
 import { assertIsInstructionWithAccounts, containsBytes, extendClient, fixEncoderSize, getBytesEncoder, SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_ACCOUNT, SOLANA_ERROR__PROGRAM_CLIENTS__FAILED_TO_IDENTIFY_INSTRUCTION, SOLANA_ERROR__PROGRAM_CLIENTS__UNRECOGNIZED_INSTRUCTION_TYPE, SolanaError, } from "@solana/kit";
 import { addSelfFetchFunctions, addSelfPlanAndSendFunctions, } from "@solana/kit/program-client-core";
 import { getGameCodec, getOracleCodec, } from "../accounts/index.js";
-import { getCloseGameInstructionAsync, getCloseOracleInstructionAsync, getCompleteGameInstructionAsync, getInitializeGameInstructionAsync, getInitializeOracleInstructionAsync, getJoinGameInstructionAsync, getOperatorCloseGameInstructionAsync, getUnjoinGameInstructionAsync, getUpdateOracleInstructionAsync, parseCloseGameInstruction, parseCloseOracleInstruction, parseCompleteGameInstruction, parseInitializeGameInstruction, parseInitializeOracleInstruction, parseJoinGameInstruction, parseOperatorCloseGameInstruction, parseUnjoinGameInstruction, parseUpdateOracleInstruction, } from "../instructions/index.js";
+import { getCloseGameInstructionAsync, getCloseOracleInstructionAsync, getCompleteGameInstructionAsync, getCreateGameInstructionAsync, getInitializeOracleInstructionAsync, getJoinGameInstructionAsync, getOperatorCloseGameInstructionAsync, getRefundPlayerInstructionAsync, getUpdateOracleInstructionAsync, parseCloseGameInstruction, parseCloseOracleInstruction, parseCompleteGameInstruction, parseCreateGameInstruction, parseInitializeOracleInstruction, parseJoinGameInstruction, parseOperatorCloseGameInstruction, parseRefundPlayerInstruction, parseUpdateOracleInstruction, } from "../instructions/index.js";
 import { findGamePda, findGameVaultPda, findOraclePda } from "../pdas/index.js";
 export const TIMBA_PROGRAM_ADDRESS = "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5";
 export var TimbaAccount;
@@ -30,13 +30,13 @@ export var TimbaEvent;
 (function (TimbaEvent) {
     TimbaEvent[TimbaEvent["GameClosed"] = 0] = "GameClosed";
     TimbaEvent[TimbaEvent["GameCompleted"] = 1] = "GameCompleted";
-    TimbaEvent[TimbaEvent["GameInitialized"] = 2] = "GameInitialized";
+    TimbaEvent[TimbaEvent["GameCreated"] = 2] = "GameCreated";
     TimbaEvent[TimbaEvent["OperatorGameClosed"] = 3] = "OperatorGameClosed";
     TimbaEvent[TimbaEvent["OracleClosed"] = 4] = "OracleClosed";
     TimbaEvent[TimbaEvent["OracleInitialized"] = 5] = "OracleInitialized";
     TimbaEvent[TimbaEvent["OracleUpdated"] = 6] = "OracleUpdated";
     TimbaEvent[TimbaEvent["PlayerJoined"] = 7] = "PlayerJoined";
-    TimbaEvent[TimbaEvent["PlayerUnjoined"] = 8] = "PlayerUnjoined";
+    TimbaEvent[TimbaEvent["PlayerRefunded"] = 8] = "PlayerRefunded";
 })(TimbaEvent || (TimbaEvent = {}));
 export function identifyTimbaEvent(event) {
     const data = "data" in event ? event.data : event;
@@ -46,8 +46,8 @@ export function identifyTimbaEvent(event) {
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([103, 26, 106, 108, 240, 191, 179, 120])), 0)) {
         return TimbaEvent.GameCompleted;
     }
-    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([82, 221, 11, 2, 244, 52, 240, 250])), 0)) {
-        return TimbaEvent.GameInitialized;
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([218, 25, 150, 94, 177, 112, 96, 2])), 0)) {
+        return TimbaEvent.GameCreated;
     }
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([236, 51, 251, 125, 251, 64, 187, 174])), 0)) {
         return TimbaEvent.OperatorGameClosed;
@@ -64,8 +64,8 @@ export function identifyTimbaEvent(event) {
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([39, 144, 49, 106, 108, 210, 183, 38])), 0)) {
         return TimbaEvent.PlayerJoined;
     }
-    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([191, 34, 140, 22, 253, 20, 237, 73])), 0)) {
-        return TimbaEvent.PlayerUnjoined;
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([83, 218, 165, 174, 105, 50, 123, 107])), 0)) {
+        return TimbaEvent.PlayerRefunded;
     }
     throw new Error("The provided event could not be identified as a timba event.");
 }
@@ -74,11 +74,11 @@ export var TimbaInstruction;
     TimbaInstruction[TimbaInstruction["CloseGame"] = 0] = "CloseGame";
     TimbaInstruction[TimbaInstruction["CloseOracle"] = 1] = "CloseOracle";
     TimbaInstruction[TimbaInstruction["CompleteGame"] = 2] = "CompleteGame";
-    TimbaInstruction[TimbaInstruction["InitializeGame"] = 3] = "InitializeGame";
+    TimbaInstruction[TimbaInstruction["CreateGame"] = 3] = "CreateGame";
     TimbaInstruction[TimbaInstruction["InitializeOracle"] = 4] = "InitializeOracle";
     TimbaInstruction[TimbaInstruction["JoinGame"] = 5] = "JoinGame";
     TimbaInstruction[TimbaInstruction["OperatorCloseGame"] = 6] = "OperatorCloseGame";
-    TimbaInstruction[TimbaInstruction["UnjoinGame"] = 7] = "UnjoinGame";
+    TimbaInstruction[TimbaInstruction["RefundPlayer"] = 7] = "RefundPlayer";
     TimbaInstruction[TimbaInstruction["UpdateOracle"] = 8] = "UpdateOracle";
 })(TimbaInstruction || (TimbaInstruction = {}));
 export function identifyTimbaInstruction(instruction) {
@@ -92,8 +92,8 @@ export function identifyTimbaInstruction(instruction) {
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([105, 69, 184, 5, 143, 182, 92, 132])), 0)) {
         return TimbaInstruction.CompleteGame;
     }
-    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([44, 62, 102, 247, 126, 208, 130, 215])), 0)) {
-        return TimbaInstruction.InitializeGame;
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([124, 69, 75, 66, 184, 220, 72, 206])), 0)) {
+        return TimbaInstruction.CreateGame;
     }
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([144, 223, 131, 120, 196, 253, 181, 99])), 0)) {
         return TimbaInstruction.InitializeOracle;
@@ -104,8 +104,8 @@ export function identifyTimbaInstruction(instruction) {
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([156, 21, 221, 84, 94, 226, 235, 185])), 0)) {
         return TimbaInstruction.OperatorCloseGame;
     }
-    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([105, 123, 174, 143, 207, 2, 17, 206])), 0)) {
-        return TimbaInstruction.UnjoinGame;
+    if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([251, 32, 76, 233, 171, 106, 120, 46])), 0)) {
+        return TimbaInstruction.RefundPlayer;
     }
     if (containsBytes(data, fixEncoderSize(getBytesEncoder(), 8).encode(new Uint8Array([112, 41, 209, 18, 248, 226, 252, 188])), 0)) {
         return TimbaInstruction.UpdateOracle;
@@ -136,11 +136,11 @@ export function parseTimbaInstruction(instruction) {
                 ...parseCompleteGameInstruction(instruction),
             };
         }
-        case TimbaInstruction.InitializeGame: {
+        case TimbaInstruction.CreateGame: {
             assertIsInstructionWithAccounts(instruction);
             return {
-                instructionType: TimbaInstruction.InitializeGame,
-                ...parseInitializeGameInstruction(instruction),
+                instructionType: TimbaInstruction.CreateGame,
+                ...parseCreateGameInstruction(instruction),
             };
         }
         case TimbaInstruction.InitializeOracle: {
@@ -164,11 +164,11 @@ export function parseTimbaInstruction(instruction) {
                 ...parseOperatorCloseGameInstruction(instruction),
             };
         }
-        case TimbaInstruction.UnjoinGame: {
+        case TimbaInstruction.RefundPlayer: {
             assertIsInstructionWithAccounts(instruction);
             return {
-                instructionType: TimbaInstruction.UnjoinGame,
-                ...parseUnjoinGameInstruction(instruction),
+                instructionType: TimbaInstruction.RefundPlayer,
+                ...parseRefundPlayerInstruction(instruction),
             };
         }
         case TimbaInstruction.UpdateOracle: {
@@ -200,7 +200,7 @@ export function timbaProgram(config = {}) {
                     completeGame: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getCompleteGameInstructionAsync(input, {
                         programAddress: instructionConfig?.programAddress ?? config.programAddress,
                     })),
-                    initializeGame: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getInitializeGameInstructionAsync(input, {
+                    createGame: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getCreateGameInstructionAsync(input, {
                         programAddress: instructionConfig?.programAddress ?? config.programAddress,
                     })),
                     initializeOracle: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getInitializeOracleInstructionAsync(input, {
@@ -212,7 +212,7 @@ export function timbaProgram(config = {}) {
                     operatorCloseGame: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getOperatorCloseGameInstructionAsync(input, {
                         programAddress: instructionConfig?.programAddress ?? config.programAddress,
                     })),
-                    unjoinGame: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getUnjoinGameInstructionAsync(input, {
+                    refundPlayer: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getRefundPlayerInstructionAsync(input, {
                         programAddress: instructionConfig?.programAddress ?? config.programAddress,
                     })),
                     updateOracle: (input, instructionConfig) => addSelfPlanAndSendFunctions(client, getUpdateOracleInstructionAsync(input, {

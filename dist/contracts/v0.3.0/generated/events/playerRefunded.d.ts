@@ -6,50 +6,50 @@
  * @see https://github.com/codama-idl/codama
  */
 import { type Address, type Codec, type Decoder, type Encoder, type HasAddress, type Option, type OptionOrNullable, type ReadonlyUint8Array } from "@solana/kit";
-export declare const PLAYER_UNJOINED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
-export declare function getPlayerUnjoinedEventDiscriminatorBytes(): ReadonlyUint8Array;
-export type PlayerUnjoinedEvent = {
+export declare const PLAYER_REFUNDED_EVENT_DISCRIMINATOR: ReadonlyUint8Array;
+export declare function getPlayerRefundedEventDiscriminatorBytes(): ReadonlyUint8Array;
+export type PlayerRefundedEvent = {
     /** Game that was left */
     gameKey: Address;
     /** Player who left */
     player: Address;
-    /** Remaining total amount after unjoin */
+    /** Remaining total amount after the refund */
     totalAmount: bigint;
     /** Remaining total tickets count */
     ticketsCount: number;
-    /** Ticket index associated with this unjoin operation */
+    /** Ticket index associated with this refund */
     ticketIndex: number;
     /** Participant moved into `ticket_index` by O(1) removal, if any */
     movedParticipant: Option<Address>;
     /** Last slot for entropy */
     lastSlot: bigint;
-    /** Timestamp of the unjoin */
+    /** Timestamp of the refund */
     timestamp: bigint;
 };
-export type PlayerUnjoinedEventArgs = {
+export type PlayerRefundedEventArgs = {
     /** Game that was left */
     gameKey: Address | HasAddress;
     /** Player who left */
     player: Address | HasAddress;
-    /** Remaining total amount after unjoin */
+    /** Remaining total amount after the refund */
     totalAmount: number | bigint;
     /** Remaining total tickets count */
     ticketsCount: number;
-    /** Ticket index associated with this unjoin operation */
+    /** Ticket index associated with this refund */
     ticketIndex: number;
     /** Participant moved into `ticket_index` by O(1) removal, if any */
     movedParticipant: OptionOrNullable<Address | HasAddress>;
     /** Last slot for entropy */
     lastSlot: number | bigint;
-    /** Timestamp of the unjoin */
+    /** Timestamp of the refund */
     timestamp: number | bigint;
 };
-/** Gets the encoder for {@link PlayerUnjoinedEventArgs} event data. */
-export declare function getPlayerUnjoinedEventEncoder(): Encoder<PlayerUnjoinedEventArgs>;
-/** Gets the decoder for {@link PlayerUnjoinedEvent} event data. */
-export declare function getPlayerUnjoinedEventDecoder(): Decoder<PlayerUnjoinedEvent>;
-/** Gets the codec for {@link PlayerUnjoinedEvent} event data. */
-export declare function getPlayerUnjoinedEventCodec(): Codec<PlayerUnjoinedEventArgs, PlayerUnjoinedEvent>;
-/** Parses the provided bytes into {@link PlayerUnjoinedEvent} event data. */
-export declare function parsePlayerUnjoinedEvent(data: ReadonlyUint8Array | Uint8Array): PlayerUnjoinedEvent;
-//# sourceMappingURL=playerUnjoined.d.ts.map
+/** Gets the encoder for {@link PlayerRefundedEventArgs} event data. */
+export declare function getPlayerRefundedEventEncoder(): Encoder<PlayerRefundedEventArgs>;
+/** Gets the decoder for {@link PlayerRefundedEvent} event data. */
+export declare function getPlayerRefundedEventDecoder(): Decoder<PlayerRefundedEvent>;
+/** Gets the codec for {@link PlayerRefundedEvent} event data. */
+export declare function getPlayerRefundedEventCodec(): Codec<PlayerRefundedEventArgs, PlayerRefundedEvent>;
+/** Parses the provided bytes into {@link PlayerRefundedEvent} event data. */
+export declare function parsePlayerRefundedEvent(data: ReadonlyUint8Array | Uint8Array): PlayerRefundedEvent;
+//# sourceMappingURL=playerRefunded.d.ts.map

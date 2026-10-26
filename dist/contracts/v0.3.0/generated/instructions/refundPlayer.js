@@ -9,24 +9,24 @@ import { combineCodec, fixDecoderSize, fixEncoderSize, getAddressEncoder, getByt
 import { getAccountMetaFactory, getAddressFromResolvedInstructionAccount, } from "@solana/kit/program-client-core";
 import { findGameVaultPda, findOraclePda } from "../pdas/index.js";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
-export const UNJOIN_GAME_DISCRIMINATOR = new Uint8Array([
-    105, 123, 174, 143, 207, 2, 17, 206,
+export const REFUND_PLAYER_DISCRIMINATOR = new Uint8Array([
+    251, 32, 76, 233, 171, 106, 120, 46,
 ]);
-export function getUnjoinGameDiscriminatorBytes() {
-    return fixEncoderSize(getBytesEncoder(), 8).encode(UNJOIN_GAME_DISCRIMINATOR);
+export function getRefundPlayerDiscriminatorBytes() {
+    return fixEncoderSize(getBytesEncoder(), 8).encode(REFUND_PLAYER_DISCRIMINATOR);
 }
-export function getUnjoinGameInstructionDataEncoder() {
-    return transformEncoder(getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]), (value) => ({ ...value, discriminator: UNJOIN_GAME_DISCRIMINATOR }));
+export function getRefundPlayerInstructionDataEncoder() {
+    return transformEncoder(getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]), (value) => ({ ...value, discriminator: REFUND_PLAYER_DISCRIMINATOR }));
 }
-export function getUnjoinGameInstructionDataDecoder() {
+export function getRefundPlayerInstructionDataDecoder() {
     return getStructDecoder([
         ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ]);
 }
-export function getUnjoinGameInstructionDataCodec() {
-    return combineCodec(getUnjoinGameInstructionDataEncoder(), getUnjoinGameInstructionDataDecoder());
+export function getRefundPlayerInstructionDataCodec() {
+    return combineCodec(getRefundPlayerInstructionDataEncoder(), getRefundPlayerInstructionDataDecoder());
 }
-export async function getUnjoinGameInstructionAsync(input, config) {
+export async function getRefundPlayerInstructionAsync(input, config) {
     // Program address.
     const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
     const programAddress = typeof programAddressInput === "string"
@@ -61,11 +61,6 @@ export async function getUnjoinGameInstructionAsync(input, config) {
         },
         tokenProgram: {
             value: input.tokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
             isSigner: false,
             isWritable: false,
         },
@@ -99,10 +94,6 @@ export async function getUnjoinGameInstructionAsync(input, config) {
             ],
         });
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -113,14 +104,13 @@ export async function getUnjoinGameInstructionAsync(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
         ],
-        data: getUnjoinGameInstructionDataEncoder().encode({}),
+        data: getRefundPlayerInstructionDataEncoder().encode({}),
         programAddress,
     });
 }
-export function getUnjoinGameInstruction(input, config) {
+export function getRefundPlayerInstruction(input, config) {
     // Program address.
     const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
     const programAddress = typeof programAddressInput === "string"
@@ -158,11 +148,6 @@ export function getUnjoinGameInstruction(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         playerTokenAccount: {
             value: input.playerTokenAccount ?? null,
             isSigner: false,
@@ -175,10 +160,6 @@ export function getUnjoinGameInstruction(input, config) {
         accounts.tokenProgram.value =
             "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -189,18 +170,17 @@ export function getUnjoinGameInstruction(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("playerTokenAccount", accounts.playerTokenAccount),
         ],
-        data: getUnjoinGameInstructionDataEncoder().encode({}),
+        data: getRefundPlayerInstructionDataEncoder().encode({}),
         programAddress,
     });
 }
-export function parseUnjoinGameInstruction(instruction) {
-    if (instruction.accounts.length < 10) {
+export function parseRefundPlayerInstruction(instruction) {
+    if (instruction.accounts.length < 9) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
-            expectedAccountMetas: 10,
+            expectedAccountMetas: 9,
         });
     }
     let accountIndex = 0;
@@ -220,10 +200,9 @@ export function parseUnjoinGameInstruction(instruction) {
             gameVault: getNextAccount(),
             gameVaultTokenAccount: getNextAccount(),
             tokenProgram: getNextAccount(),
-            associatedTokenProgram: getNextAccount(),
             playerTokenAccount: getNextAccount(),
         },
-        data: getUnjoinGameInstructionDataDecoder().decode(instruction.data),
+        data: getRefundPlayerInstructionDataDecoder().decode(instruction.data),
     };
 }
-//# sourceMappingURL=unjoinGame.js.map
+//# sourceMappingURL=refundPlayer.js.map

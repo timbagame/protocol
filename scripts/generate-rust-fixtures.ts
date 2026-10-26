@@ -84,7 +84,7 @@ async function plans() {
       tokenMint: SOL,
       tokenAmount: 5000n,
     });
-    const unjoin = await adapter.buildUnjoinPlan({
+    const refund = await adapter.buildRefundPlan({
       game: plan.game,
       player: OPERATOR,
       tokenMint: USDC,
@@ -99,7 +99,7 @@ async function plans() {
       game: plan.game,
       create: encode(CREATOR, plan.instructions),
       join: encode(OPERATOR, join.instructions),
-      unjoin: encode(CREATOR, unjoin.instructions),
+      refund: encode(CREATOR, refund.instructions),
       close: encode(CREATOR, close.instructions),
     };
   }
@@ -251,7 +251,7 @@ async function evmFixtures() {
   };
   const winners = [
     [bytes32("00"), 3],
-    [bytes32("00"), 1000],
+    [bytes32("00"), 315],
     [bytes32("ff"), 1],
     [bytes32("5a"), 7],
   ].map(([entropy, participants]) => ({

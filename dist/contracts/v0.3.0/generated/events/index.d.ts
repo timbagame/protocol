@@ -7,11 +7,11 @@
  */
 export * from "./gameClosed.js";
 export * from "./gameCompleted.js";
-export * from "./gameInitialized.js";
+export * from "./gameCreated.js";
 export * from "./operatorGameClosed.js";
 export * from "./oracleClosed.js";
 export * from "./oracleInitialized.js";
 export * from "./oracleUpdated.js";
 export * from "./playerJoined.js";
-export * from "./playerUnjoined.js";
+export * from "./playerRefunded.js";
 //# sourceMappingURL=index.d.ts.map

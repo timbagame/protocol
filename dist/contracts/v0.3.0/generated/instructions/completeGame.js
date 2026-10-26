@@ -65,11 +65,6 @@ export async function getCompleteGameInstructionAsync(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
         oracleOperator: {
             value: input.oracleOperator ?? null,
@@ -121,10 +116,6 @@ export async function getCompleteGameInstructionAsync(input, config) {
             ],
         });
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     if (!accounts.oracle.value) {
         accounts.oracle.value = await findOraclePda({ programAddress });
     }
@@ -135,7 +126,6 @@ export async function getCompleteGameInstructionAsync(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("oracle", accounts.oracle),
             getAccountMeta("oracleOperator", accounts.oracleOperator),
             getAccountMeta("winner", accounts.winner),
@@ -178,11 +168,6 @@ export function getCompleteGameInstruction(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         oracle: { value: input.oracle ?? null, isSigner: false, isWritable: false },
         oracleOperator: {
             value: input.oracleOperator ?? null,
@@ -214,10 +199,6 @@ export function getCompleteGameInstruction(input, config) {
         accounts.tokenProgram.value =
             "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     return Object.freeze({
         accounts: [
             getAccountMeta("game", accounts.game),
@@ -225,7 +206,6 @@ export function getCompleteGameInstruction(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("oracle", accounts.oracle),
             getAccountMeta("oracleOperator", accounts.oracleOperator),
             getAccountMeta("winner", accounts.winner),
@@ -238,10 +218,10 @@ export function getCompleteGameInstruction(input, config) {
     });
 }
 export function parseCompleteGameInstruction(instruction) {
-    if (instruction.accounts.length < 12) {
+    if (instruction.accounts.length < 11) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
-            expectedAccountMetas: 12,
+            expectedAccountMetas: 11,
         });
     }
     let accountIndex = 0;
@@ -258,7 +238,6 @@ export function parseCompleteGameInstruction(instruction) {
             gameVault: getNextAccount(),
             gameVaultTokenAccount: getNextAccount(),
             tokenProgram: getNextAccount(),
-            associatedTokenProgram: getNextAccount(),
             oracle: getNextAccount(),
             oracleOperator: getNextAccount(),
             winner: getNextAccount(),

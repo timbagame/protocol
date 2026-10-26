@@ -148,10 +148,6 @@ export type Timba = {
                         {
                             "name": "tokenProgram";
                             "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-                        },
-                        {
-                            "name": "associatedTokenProgram";
-                            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
                         }
                     ];
                 },
@@ -400,10 +396,6 @@ export type Timba = {
                         {
                             "name": "tokenProgram";
                             "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-                        },
-                        {
-                            "name": "associatedTokenProgram";
-                            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
                         }
                     ];
                 },
@@ -581,19 +573,19 @@ export type Timba = {
             ];
         },
         {
-            "name": "initializeGame";
+            "name": "createGame";
             "docs": [
                 "Creates a new game with specified configuration"
             ];
             "discriminator": [
-                44,
-                62,
-                102,
-                247,
-                126,
-                208,
-                130,
-                215
+                124,
+                69,
+                75,
+                66,
+                184,
+                220,
+                72,
+                206
             ];
             "accounts": [
                 {
@@ -736,10 +728,6 @@ export type Timba = {
                         {
                             "name": "tokenProgram";
                             "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-                        },
-                        {
-                            "name": "associatedTokenProgram";
-                            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
                         }
                     ];
                 },
@@ -916,7 +904,6 @@ export type Timba = {
                 },
                 {
                     "name": "player";
-                    "writable": true;
                     "signer": true;
                 },
                 {
@@ -1016,10 +1003,6 @@ export type Timba = {
                         {
                             "name": "tokenProgram";
                             "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-                        },
-                        {
-                            "name": "associatedTokenProgram";
-                            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
                         }
                     ];
                 },
@@ -1238,10 +1221,6 @@ export type Timba = {
                         {
                             "name": "tokenProgram";
                             "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-                        },
-                        {
-                            "name": "associatedTokenProgram";
-                            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
                         }
                     ];
                 },
@@ -1311,19 +1290,19 @@ export type Timba = {
             "args": [];
         },
         {
-            "name": "unjoinGame";
+            "name": "refundPlayer";
             "docs": [
                 "Allows a player to leave a game before completion (with refund)"
             ];
             "discriminator": [
-                105,
-                123,
-                174,
-                143,
-                207,
-                2,
-                17,
-                206
+                251,
+                32,
+                76,
+                233,
+                171,
+                106,
+                120,
+                46
             ];
             "accounts": [
                 {
@@ -1447,10 +1426,6 @@ export type Timba = {
                         {
                             "name": "tokenProgram";
                             "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-                        },
-                        {
-                            "name": "associatedTokenProgram";
-                            "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
                         }
                     ];
                 },
@@ -1628,16 +1603,16 @@ export type Timba = {
             ];
         },
         {
-            "name": "gameInitialized";
+            "name": "gameCreated";
             "discriminator": [
-                82,
-                221,
-                11,
-                2,
-                244,
-                52,
-                240,
-                250
+                218,
+                25,
+                150,
+                94,
+                177,
+                112,
+                96,
+                2
             ];
         },
         {
@@ -1706,16 +1681,16 @@ export type Timba = {
             ];
         },
         {
-            "name": "playerUnjoined";
+            "name": "playerRefunded";
             "discriminator": [
-                191,
-                34,
-                140,
-                22,
-                253,
-                20,
-                237,
-                73
+                83,
+                218,
+                165,
+                174,
+                105,
+                50,
+                123,
+                107
             ];
         }
     ];
@@ -1762,8 +1737,8 @@ export type Timba = {
         },
         {
             "code": 7105;
-            "name": "gameAlreadyCompleted";
-            "msg": "Game already settled";
+            "name": "gameNotExpired";
+            "msg": "Game not expired";
         },
         {
             "code": 7106;
@@ -1854,6 +1829,11 @@ export type Timba = {
             "code": 7304;
             "name": "invalidOracleBufferTime";
             "msg": "Invalid oracle buffer time";
+        },
+        {
+            "code": 7305;
+            "name": "invalidCommitment";
+            "msg": "Invalid commitment";
         },
         {
             "code": 7401;
@@ -2103,7 +2083,7 @@ export type Timba = {
             };
         },
         {
-            "name": "gameInitialized";
+            "name": "gameCreated";
             "docs": [
                 "Emitted when a new game is created"
             ];
@@ -2552,7 +2532,7 @@ export type Timba = {
             };
         },
         {
-            "name": "playerUnjoined";
+            "name": "playerRefunded";
             "docs": [
                 "Emitted when a player leaves a game before completion"
             ];
@@ -2576,7 +2556,7 @@ export type Timba = {
                     {
                         "name": "totalAmount";
                         "docs": [
-                            "Remaining total amount after unjoin"
+                            "Remaining total amount after the refund"
                         ];
                         "type": "u64";
                     },
@@ -2590,7 +2570,7 @@ export type Timba = {
                     {
                         "name": "ticketIndex";
                         "docs": [
-                            "Ticket index associated with this unjoin operation"
+                            "Ticket index associated with this refund"
                         ];
                         "type": "u32";
                     },
@@ -2613,7 +2593,7 @@ export type Timba = {
                     {
                         "name": "timestamp";
                         "docs": [
-                            "Timestamp of the unjoin"
+                            "Timestamp of the refund"
                         ];
                         "type": "u64";
                     }

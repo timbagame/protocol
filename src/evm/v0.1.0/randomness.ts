@@ -24,12 +24,8 @@ export function selectEvmWinnerFromEntropy(
     size(initialEntropy) !== 32
   )
     throw new Error("Entropy must be 32 bytes");
-  if (
-    !Number.isInteger(participants) ||
-    participants < 1 ||
-    participants > 1000
-  )
-    throw new Error("Participant count must be between 1 and 1000");
+  if (!Number.isInteger(participants) || participants < 1 || participants > 315)
+    throw new Error("Participant count must be between 1 and 315");
   const n = BigInt(participants);
   const threshold = (1n << 256n) % n;
   let entropy = initialEntropy;

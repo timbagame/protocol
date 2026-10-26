@@ -7,12 +7,12 @@
  */
 import { combineCodec, containsBytes, fixEncoderSize, getAddressDecoder, getAddressEncoder, getBooleanDecoder, getBooleanEncoder, getBytesEncoder, getConstantDecoder, getConstantEncoder, getHiddenPrefixDecoder, getHiddenPrefixEncoder, getStructDecoder, getStructEncoder, getU32Decoder, getU32Encoder, getU64Decoder, getU64Encoder, } from "@solana/kit";
 import { getGameTypeDecoder, getGameTypeEncoder, } from "../types/index.js";
-export const GAME_INITIALIZED_EVENT_DISCRIMINATOR = new Uint8Array([82, 221, 11, 2, 244, 52, 240, 250]);
-export function getGameInitializedEventDiscriminatorBytes() {
-    return fixEncoderSize(getBytesEncoder(), 8).encode(GAME_INITIALIZED_EVENT_DISCRIMINATOR);
+export const GAME_CREATED_EVENT_DISCRIMINATOR = new Uint8Array([218, 25, 150, 94, 177, 112, 96, 2]);
+export function getGameCreatedEventDiscriminatorBytes() {
+    return fixEncoderSize(getBytesEncoder(), 8).encode(GAME_CREATED_EVENT_DISCRIMINATOR);
 }
-/** Gets the encoder for {@link GameInitializedEventArgs} event data. */
-export function getGameInitializedEventEncoder() {
+/** Gets the encoder for {@link GameCreatedEventArgs} event data. */
+export function getGameCreatedEventEncoder() {
     return getHiddenPrefixEncoder(getStructEncoder([
         ["gameKey", getAddressEncoder()],
         ["creator", getAddressEncoder()],
@@ -25,10 +25,10 @@ export function getGameInitializedEventEncoder() {
         ["isPrivate", getBooleanEncoder()],
         ["createdAt", getU64Encoder()],
         ["timeout", getU64Encoder()],
-    ]), [getConstantEncoder(GAME_INITIALIZED_EVENT_DISCRIMINATOR)]);
+    ]), [getConstantEncoder(GAME_CREATED_EVENT_DISCRIMINATOR)]);
 }
-/** Gets the decoder for {@link GameInitializedEvent} event data. */
-export function getGameInitializedEventDecoder() {
+/** Gets the decoder for {@link GameCreatedEvent} event data. */
+export function getGameCreatedEventDecoder() {
     return getHiddenPrefixDecoder(getStructDecoder([
         ["gameKey", getAddressDecoder()],
         ["creator", getAddressDecoder()],
@@ -41,17 +41,17 @@ export function getGameInitializedEventDecoder() {
         ["isPrivate", getBooleanDecoder()],
         ["createdAt", getU64Decoder()],
         ["timeout", getU64Decoder()],
-    ]), [getConstantDecoder(GAME_INITIALIZED_EVENT_DISCRIMINATOR)]);
+    ]), [getConstantDecoder(GAME_CREATED_EVENT_DISCRIMINATOR)]);
 }
-/** Gets the codec for {@link GameInitializedEvent} event data. */
-export function getGameInitializedEventCodec() {
-    return combineCodec(getGameInitializedEventEncoder(), getGameInitializedEventDecoder());
+/** Gets the codec for {@link GameCreatedEvent} event data. */
+export function getGameCreatedEventCodec() {
+    return combineCodec(getGameCreatedEventEncoder(), getGameCreatedEventDecoder());
 }
-/** Parses the provided bytes into {@link GameInitializedEvent} event data. */
-export function parseGameInitializedEvent(data) {
-    if (containsBytes(data, GAME_INITIALIZED_EVENT_DISCRIMINATOR, 0)) {
-        return getGameInitializedEventDecoder().decode(data);
+/** Parses the provided bytes into {@link GameCreatedEvent} event data. */
+export function parseGameCreatedEvent(data) {
+    if (containsBytes(data, GAME_CREATED_EVENT_DISCRIMINATOR, 0)) {
+        return getGameCreatedEventDecoder().decode(data);
     }
-    throw new Error('The provided data does not match the "GameInitializedEvent" event discriminators.');
+    throw new Error('The provided data does not match the "GameCreatedEvent" event discriminators.');
 }
-//# sourceMappingURL=gameInitialized.js.map
+//# sourceMappingURL=gameCreated.js.map

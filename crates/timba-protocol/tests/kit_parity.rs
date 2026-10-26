@@ -56,8 +56,8 @@ fn plans_match_typescript() {
             })
             .unwrap();
         assert_eq!(tx(&operator, &join.instructions), expected["join"], "join {version}");
-        let unjoin = adapter
-            .build_unjoin_plan(&GameInstructionInput {
+        let refund = adapter
+            .build_refund_plan(&GameInstructionInput {
                 game: plan.game,
                 player: operator,
                 token_mint: mint,
@@ -65,7 +65,7 @@ fn plans_match_typescript() {
                 authority: Some(creator),
             })
             .unwrap();
-        assert_eq!(tx(&creator, &unjoin.instructions), expected["unjoin"], "unjoin {version}");
+        assert_eq!(tx(&creator, &refund.instructions), expected["refund"], "refund {version}");
         let close = adapter.build_close_plan(&plan.game, &creator, &mint).unwrap();
         assert_eq!(tx(&creator, &close.instructions), expected["close"], "close {version}");
     }

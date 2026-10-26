@@ -1,6 +1,6 @@
 import { createNoopSigner } from "@solana/kit";
 import { GameType as GameTypeV020, getInitializeGameInstructionAsync as getInitializeGameInstructionAsyncV020, } from "../../contracts/v0.2.0/generated/index.js";
-import { GameType as GameTypeV030, getInitializeGameInstructionAsync as getInitializeGameInstructionAsyncV030, } from "../../contracts/v0.3.0/generated/index.js";
+import { GameType as GameTypeV030, getCreateGameInstructionAsync as getCreateGameInstructionAsyncV030, } from "../../contracts/v0.3.0/generated/index.js";
 import { findGamePda, findGameVaultPda, } from "../../contracts/v0.3.0/generated/index.js";
 import { TOKEN_PROGRAM_ID, createAssociatedTokenAccountIdempotentInstruction, getAssociatedTokenAddress, } from "./token-program.js";
 export async function buildCreateGamePlan(input, version, programId) {
@@ -31,7 +31,7 @@ export async function buildCreateGamePlan(input, version, programId) {
         ? await getInitializeGameInstructionAsyncV020(common, {
             programAddress: programId,
         })
-        : await getInitializeGameInstructionAsyncV030({
+        : await getCreateGameInstructionAsyncV030({
             ...common,
             gameType: input.type === "coinflip"
                 ? GameTypeV030.Coinflip

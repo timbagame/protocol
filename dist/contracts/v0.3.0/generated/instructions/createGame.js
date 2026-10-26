@@ -10,11 +10,13 @@ import { getAccountMetaFactory, getAddressFromResolvedInstructionAccount, getNon
 import { findGamePda, findGameVaultPda, findOraclePda } from "../pdas/index.js";
 import { TIMBA_PROGRAM_ADDRESS } from "../programs/index.js";
 import { getGameTypeDecoder, getGameTypeEncoder, } from "../types/index.js";
-export const INITIALIZE_GAME_DISCRIMINATOR = new Uint8Array([44, 62, 102, 247, 126, 208, 130, 215]);
-export function getInitializeGameDiscriminatorBytes() {
-    return fixEncoderSize(getBytesEncoder(), 8).encode(INITIALIZE_GAME_DISCRIMINATOR);
+export const CREATE_GAME_DISCRIMINATOR = new Uint8Array([
+    124, 69, 75, 66, 184, 220, 72, 206,
+]);
+export function getCreateGameDiscriminatorBytes() {
+    return fixEncoderSize(getBytesEncoder(), 8).encode(CREATE_GAME_DISCRIMINATOR);
 }
-export function getInitializeGameInstructionDataEncoder() {
+export function getCreateGameInstructionDataEncoder() {
     return transformEncoder(getStructEncoder([
         ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
         ["gameType", getGameTypeEncoder()],
@@ -24,9 +26,9 @@ export function getInitializeGameInstructionDataEncoder() {
         ["timeout", getU64Encoder()],
         ["isPrivate", getBooleanEncoder()],
         ["randomHash", fixEncoderSize(getBytesEncoder(), 32)],
-    ]), (value) => ({ ...value, discriminator: INITIALIZE_GAME_DISCRIMINATOR }));
+    ]), (value) => ({ ...value, discriminator: CREATE_GAME_DISCRIMINATOR }));
 }
-export function getInitializeGameInstructionDataDecoder() {
+export function getCreateGameInstructionDataDecoder() {
     return getStructDecoder([
         ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
         ["gameType", getGameTypeDecoder()],
@@ -38,10 +40,10 @@ export function getInitializeGameInstructionDataDecoder() {
         ["randomHash", fixDecoderSize(getBytesDecoder(), 32)],
     ]);
 }
-export function getInitializeGameInstructionDataCodec() {
-    return combineCodec(getInitializeGameInstructionDataEncoder(), getInitializeGameInstructionDataDecoder());
+export function getCreateGameInstructionDataCodec() {
+    return combineCodec(getCreateGameInstructionDataEncoder(), getCreateGameInstructionDataDecoder());
 }
-export async function getInitializeGameInstructionAsync(input, config) {
+export async function getCreateGameInstructionAsync(input, config) {
     // Program address.
     const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
     const programAddress = typeof programAddressInput === "string"
@@ -76,11 +78,6 @@ export async function getInitializeGameInstructionAsync(input, config) {
         },
         tokenProgram: {
             value: input.tokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
             isSigner: false,
             isWritable: false,
         },
@@ -126,10 +123,6 @@ export async function getInitializeGameInstructionAsync(input, config) {
             ],
         });
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     if (!accounts.systemProgram.value) {
         accounts.systemProgram.value =
             "11111111111111111111111111111111";
@@ -144,15 +137,14 @@ export async function getInitializeGameInstructionAsync(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
             getAccountMeta("systemProgram", accounts.systemProgram),
         ],
-        data: getInitializeGameInstructionDataEncoder().encode(args),
+        data: getCreateGameInstructionDataEncoder().encode(args),
         programAddress,
     });
 }
-export function getInitializeGameInstruction(input, config) {
+export function getCreateGameInstruction(input, config) {
     // Program address.
     const programAddressInput = config?.programAddress ?? TIMBA_PROGRAM_ADDRESS;
     const programAddress = typeof programAddressInput === "string"
@@ -190,11 +182,6 @@ export function getInitializeGameInstruction(input, config) {
             isSigner: false,
             isWritable: false,
         },
-        associatedTokenProgram: {
-            value: input.associatedTokenProgram ?? null,
-            isSigner: false,
-            isWritable: false,
-        },
         creatorTokenAccount: {
             value: input.creatorTokenAccount ?? null,
             isSigner: false,
@@ -214,10 +201,6 @@ export function getInitializeGameInstruction(input, config) {
         accounts.tokenProgram.value =
             "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
     }
-    if (!accounts.associatedTokenProgram.value) {
-        accounts.associatedTokenProgram.value =
-            "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-    }
     if (!accounts.systemProgram.value) {
         accounts.systemProgram.value =
             "11111111111111111111111111111111";
@@ -232,19 +215,18 @@ export function getInitializeGameInstruction(input, config) {
             getAccountMeta("gameVault", accounts.gameVault),
             getAccountMeta("gameVaultTokenAccount", accounts.gameVaultTokenAccount),
             getAccountMeta("tokenProgram", accounts.tokenProgram),
-            getAccountMeta("associatedTokenProgram", accounts.associatedTokenProgram),
             getAccountMeta("creatorTokenAccount", accounts.creatorTokenAccount),
             getAccountMeta("systemProgram", accounts.systemProgram),
         ],
-        data: getInitializeGameInstructionDataEncoder().encode(args),
+        data: getCreateGameInstructionDataEncoder().encode(args),
         programAddress,
     });
 }
-export function parseInitializeGameInstruction(instruction) {
-    if (instruction.accounts.length < 11) {
+export function parseCreateGameInstruction(instruction) {
+    if (instruction.accounts.length < 10) {
         throw new SolanaError(SOLANA_ERROR__PROGRAM_CLIENTS__INSUFFICIENT_ACCOUNT_METAS, {
             actualAccountMetas: instruction.accounts.length,
-            expectedAccountMetas: 11,
+            expectedAccountMetas: 10,
         });
     }
     let accountIndex = 0;
@@ -264,11 +246,10 @@ export function parseInitializeGameInstruction(instruction) {
             gameVault: getNextAccount(),
             gameVaultTokenAccount: getNextAccount(),
             tokenProgram: getNextAccount(),
-            associatedTokenProgram: getNextAccount(),
             creatorTokenAccount: getNextAccount(),
             systemProgram: getNextAccount(),
         },
-        data: getInitializeGameInstructionDataDecoder().decode(instruction.data),
+        data: getCreateGameInstructionDataDecoder().decode(instruction.data),
     };
 }
-//# sourceMappingURL=initializeGame.js.map
+//# sourceMappingURL=createGame.js.map

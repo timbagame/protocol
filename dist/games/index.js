@@ -91,7 +91,7 @@ export function normalizeSolanaMembership(reference, event) {
         kind: event.name === "PlayerJoined" ? "joined" : "refunded",
         player: event.data.player,
         index: safeIndex(event.data.ticketIndex),
-        movedParticipant: event.name === "PlayerUnjoined" ? event.data.movedParticipant : null,
+        movedParticipant: event.name === "PlayerRefunded" ? event.data.movedParticipant : null,
     };
 }
 export function normalizeEvmMembership(reference, event) {

@@ -8,10 +8,10 @@
 export * from "./closeGame.js";
 export * from "./closeOracle.js";
 export * from "./completeGame.js";
-export * from "./initializeGame.js";
+export * from "./createGame.js";
 export * from "./initializeOracle.js";
 export * from "./joinGame.js";
 export * from "./operatorCloseGame.js";
-export * from "./unjoinGame.js";
+export * from "./refundPlayer.js";
 export * from "./updateOracle.js";
 //# sourceMappingURL=index.d.ts.map

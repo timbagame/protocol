@@ -4,11 +4,11 @@ export function evmGameActions(game, account, now, buffer) {
     const creator = Boolean(account && game.creator.toLowerCase() === account.toLowerCase());
     const participant = Boolean(account &&
         game.participants.some((player) => player.toLowerCase() === account.toLowerCase()));
-    const expired = now >= game.expiresAt;
+    const expiresAt = BigInt(game.expiresAt);
+    const expired = now >= expiresAt;
     const recoverable = open &&
         expired &&
-        (game.participants.length < game.minPlayers ||
-            now >= game.expiresAt + buffer);
+        (game.participants.length < game.minPlayers || now >= expiresAt + buffer);
     return {
         creator,
         participant,

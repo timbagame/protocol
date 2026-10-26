@@ -61,11 +61,13 @@ export interface EvmGame {
     isPrivate: boolean;
     minPlayers: number;
     maxPlayers: number;
-    expiresAt: bigint;
+    /** `uint48`: viem decodes it as a number, the oracle HTTP schema as a bigint. */
+    expiresAt: number | bigint;
     ticketAmount: bigint;
     totalAmount: bigint;
     commitment: string;
-    lastEntryBlock: bigint;
+    /** `uint48`, like `expiresAt`. */
+    lastEntryBlock: number | bigint;
     participants: readonly string[];
 }
 /** Pass only terminal outcomes established by confirmed indexed events for this game. */

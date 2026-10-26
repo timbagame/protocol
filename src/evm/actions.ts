@@ -16,12 +16,12 @@ export function evmGameActions(
       (player) => player.toLowerCase() === account.toLowerCase(),
     ),
   );
-  const expired = now >= game.expiresAt;
+  const expiresAt = BigInt(game.expiresAt);
+  const expired = now >= expiresAt;
   const recoverable =
     open &&
     expired &&
-    (game.participants.length < game.minPlayers ||
-      now >= game.expiresAt + buffer);
+    (game.participants.length < game.minPlayers || now >= expiresAt + buffer);
   return {
     creator,
     participant,

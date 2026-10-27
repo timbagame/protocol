@@ -190,7 +190,7 @@ Transaction helpers only encode calls. Fetching nonces, estimating fees, signing
 
 ## Development
 
-Requires [Bun](https://bun.sh) 1.4.3, plus the Rust toolchain in `rust-toolchain.toml` for the crate.
+Requires [Bun](https://bun.sh) (the version in `package.json` `packageManager`), plus the Rust toolchain in `rust-toolchain.toml` for the crate.
 
 ```bash
 bun install
@@ -218,6 +218,8 @@ Each release is a normal pull request that bumps `version` in `package.json` and
 
 ## Related
 
-- [timbagame/contracts](https://github.com/timbagame/contracts): the Solana and EVM programs
-- [timba.cc](https://timba.cc): play on the web and verify games
-- [@playtimbabot](https://t.me/playtimbabot): play in Telegram
+- **[timbagame/contracts](https://github.com/timbagame/contracts):** the Solana and EVM programs
+- **[timbagame/oracle](https://github.com/timbagame/oracle):** secrets, game approval and settlement
+- **[timbagame/bot](https://github.com/timbagame/bot):** the Telegram bot
+- **[timba.cc](https://timba.cc):** play on the web and verify games
+- **[@playtimbabot](https://t.me/playtimbabot):** play in Telegram

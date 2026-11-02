@@ -14,7 +14,8 @@
     "scripts/generate-contract-clients.ts",
     "scripts/generate-evm.ts",
     "scripts/generate-rust-fixtures.ts",
-    "scripts/rust-http-fixtures.ts"
+    "scripts/rust-http-fixtures.ts",
+    "scripts/mutants.ts"
   ],
   "excludeReasons": {
     "*.d.ts": "Declaration files emit no JavaScript.",
@@ -29,6 +30,7 @@
     "scripts/generate-contract-clients.ts": "Code generator entrypoint; its output is verified byte-for-byte by the check:generated CI step.",
     "scripts/generate-evm.ts": "Code generator entrypoint; its output is verified byte-for-byte by the check:generated CI step.",
     "scripts/generate-rust-fixtures.ts": "Fixture generator entrypoint; its output is diffed by check:rust-fixtures and consumed by the Rust parity tests.",
-    "scripts/rust-http-fixtures.ts": "HTTP fixture builder for generate-rust-fixtures.ts; its output is diffed by check:rust-fixtures and consumed by tests/http_parity.rs."
+    "scripts/rust-http-fixtures.ts": "HTTP fixture builder for generate-rust-fixtures.ts; its output is diffed by check:rust-fixtures and consumed by tests/http_parity.rs.",
+    "scripts/mutants.ts": "Mutation-testing runner that starts Stryker, which only CI can afford; its range, scope and listing helpers are tested in tests/mutants.test.ts."
   }
 }

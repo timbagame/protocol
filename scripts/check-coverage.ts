@@ -2,7 +2,7 @@ import { isAbsolute, relative, resolve } from "path";
 
 const THRESHOLD = 100;
 
-type CoverageConfig = {
+export type CoverageConfig = {
   roots: string[];
   extensions: string[];
   reportBase?: string;
@@ -25,7 +25,7 @@ function globMatches(value: string, pattern: string): boolean {
   ).test(value);
 }
 
-function isInScope(path: string, config: CoverageConfig): boolean {
+export function isInScope(path: string, config: CoverageConfig): boolean {
   const rooted = config.roots.some((prefix) => {
     const normalized = prefix.replace(/\/+$/, "");
     return (
@@ -40,7 +40,7 @@ function isInScope(path: string, config: CoverageConfig): boolean {
   );
 }
 
-function trackedFiles(root: string): string[] {
+export function trackedFiles(root: string): string[] {
   const result = Bun.spawnSync(["git", "ls-files", "-z"], { cwd: root });
   if (result.exitCode !== 0) {
     throw new Error("Unable to list tracked source files");

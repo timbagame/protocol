@@ -202,6 +202,17 @@ cargo test --all-features
 
 Generated code and the built `dist` folder are committed, and CI fails if they drift from their sources.
 
+Mutation testing checks that the tests notice when the code changes. It changes a line a little, one change at a time, and runs the tests that reach it. Stryker does this for the TypeScript and cargo-mutants for the Rust crate:
+
+```bash
+bun run scripts/mutants.ts diff origin/main        # TypeScript lines this branch changed
+bun run scripts/mutants.ts part 3 64               # the 4th of 64 equal parts of all TypeScript lines
+scripts/mutants-rust.sh diff origin/main           # Rust lines this branch changed
+scripts/mutants-rust.sh shard 3/64                 # the 4th of 64 equal parts of all Rust mutants
+```
+
+It never blocks a merge. On a pull request, one comment lists the changes no test noticed, from both languages. Every Saturday a quarter of the 64 parts runs, and what lived goes in the open "Missed mutants" issue.
+
 | Change                          | Then run                                                                     |
 | ------------------------------- | ---------------------------------------------------------------------------- |
 | New or updated Solana IDL       | Copy the IDL and its Anchor type together, then `bun run generate:contracts` |

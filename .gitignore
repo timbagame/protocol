@@ -6,3 +6,8 @@ node_modules/
 # Rust
 /target/
 __pycache__/
+
+# mutation testing (scripts/mutants.ts, scripts/mutants-rust.sh)
+.stryker-tmp/
+reports/
+build/

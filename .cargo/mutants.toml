@@ -1,0 +1,4 @@
+# cargo-mutants settings, used by scripts/mutants-rust.sh.
+# Tests, examples and build scripts aren't product code; the crate's own tests
+# run for every change in its src.
+examine_globs = ["crates/*/src/**/*.rs"]

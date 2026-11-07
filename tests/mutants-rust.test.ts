@@ -110,7 +110,7 @@ fi
       [join(root, "scripts", "mutants-rust.sh"), "shard", "0/64"],
       {
         encoding: "utf8",
-        env: { PATH: `${join(root, "bin")}:${process.env.PATH}` },
+        env: { PATH: `${join(root, "bin")}:${process.env["PATH"]}` },
       },
     );
     expect(run.stderr).toBe("");

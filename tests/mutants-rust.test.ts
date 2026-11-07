@@ -84,7 +84,8 @@ describe("mutants-rust summarize", () => {
 
 describe("mutants-rust memory limit", () => {
   test("a test that allocates forever aborts instead of taking the runner down", () => {
-    const hasPrlimit = spawnSync("sh", ["-c", "command -v prlimit"]).status === 0;
+    const hasPrlimit =
+      spawnSync("sh", ["-c", "command -v prlimit"]).status === 0;
     if (!hasPrlimit) return;
     const root = mkdtempSync(join(dir, "limit-"));
     mkdirSync(join(root, "scripts"));

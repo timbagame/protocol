@@ -252,3 +252,42 @@ test("rejects Solana membership events for other games or invalid ticket indexes
   }
   expect(normalizeSolanaMembership(solana, joined(key, 3)).index).toBe(3);
 });
+
+for (const [kind, expected] of [
+  [0, "coinflip"],
+  [1, "giveaway"],
+] as const) {
+  test(`both chain adapters preserve ${expected} and participants`, () => {
+    const a = observeSolanaGame(solana, {
+      ...solanaAccount,
+      gameType: kind,
+    }).game;
+    const b = observeEvmGame(evm, { ...evmAccount, gameType: kind }).game;
+    for (const game of [a, b]) {
+      if (!game) throw new Error("Expected an active observed game");
+      expect(game.gameType).toBe(expected);
+      expect(game.participants).toEqual([key, key]);
+    }
+    if (!a || !b) throw new Error("Expected both chain games");
+    expect(a.participants).not.toBe(solanaAccount.participants);
+    expect(b.participants).not.toBe(evmAccount.participants);
+  });
+}
+
+test("lifecycle rejects invalid buffers and does not permit joining a full game", () => {
+  const game = observeEvmGame(evm, {
+    ...evmAccount,
+    participants: [key, key, key, key],
+  }).game;
+  if (!game) throw new Error("Expected an active observed game");
+  expect(gameLifecycle(game, 1099n, 10n).canJoin).toBe(false);
+  for (const [now, buffer] of [
+    [-1n, 10n],
+    [1n, 0n],
+    [1n, -1n],
+  ] as const) {
+    expect(() => gameLifecycle(game, now, buffer)).toThrow(
+      "Invalid time or buffer",
+    );
+  }
+});

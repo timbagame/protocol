@@ -559,6 +559,21 @@ mod tests {
     }
 
     #[test]
+    fn preserves_the_first_read_only_unsigned_account() {
+        let message = LegacyMessage {
+            header: MessageHeader {
+                num_required_signatures: 1,
+                num_readonly_signed_accounts: 0,
+                num_readonly_unsigned_accounts: 2,
+            },
+            account_keys: vec![Address([1; 32]), Address([2; 32]), Address([3; 32]), Address([4; 32])],
+            recent_blockhash: Address([5; 32]),
+            instructions: vec![],
+        };
+        assert_eq!((0..4).map(|i| message.is_writable(i)).collect::<Vec<_>>(), vec![true, true, false, false]);
+    }
+
+    #[test]
     fn treats_signers_as_read_only_when_the_header_overstates_read_only_signers() {
         // Header [1, 2, 0]: more read-only signers than signers. kit decompiles this
         // with every signer read-only; it must not panic on the subtraction.

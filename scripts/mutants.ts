@@ -20,6 +20,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join, relative } from "node:path";
+import ts from "typescript";
 import {
   isInScope,
   trackedFiles,
@@ -88,17 +89,61 @@ export function partRanges(
   return ranges;
 }
 
+/** Include whole syntax nodes that start in the owned lines, including blocks crossing a cut.
+ * Ownership stays with the original ranges, so overlap never duplicates a reported mutant.
+ */
+export function instrumentRanges(
+  ranges: Range[],
+  read = (file: string) => readFileSync(join(ROOT, file), "utf8"),
+): Range[] {
+  const parsed = new Map<string, ts.SourceFile>();
+  return ranges.map((range) => {
+    let source = parsed.get(range.file);
+    if (!source) {
+      source = ts.createSourceFile(
+        range.file,
+        read(range.file),
+        ts.ScriptTarget.Latest,
+        true,
+      );
+      parsed.set(range.file, source);
+    }
+    let to = range.to;
+    const visit = (node: ts.Node) => {
+      const start =
+        source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
+      if (
+        start >= range.from &&
+        start <= range.to &&
+        node.kind !== ts.SyntaxKind.SourceFile
+      ) {
+        to = Math.max(
+          to,
+          source.getLineAndCharacterOfPosition(node.getEnd()).line + 1,
+        );
+      }
+      ts.forEachChild(node, visit);
+    };
+    visit(source);
+    return { ...range, to };
+  });
+}
+
 interface Mutant {
   status: string;
   mutatorName: string;
   replacement?: string | undefined;
-  location: { start: { line: number } };
+  location: {
+    start: { line: number; column: number };
+    end: { line: number; column: number };
+  };
 }
 
 /** What no test caught, "src/a.ts:12  survived: EqualityOperator", by file and line, and how many mutants there were. */
-export function lived(report: {
-  files: Record<string, { mutants: Mutant[] }>;
-}): {
+export function lived(
+  report: { files: Record<string, { mutants: Mutant[] }> },
+  owned?: Range[],
+): {
   rows: string[];
   total: number;
 } {
@@ -107,6 +152,16 @@ export function lived(report: {
   for (const [path, { mutants }] of Object.entries(report.files)) {
     const file = path.startsWith("/") ? relative(ROOT, path) : path;
     for (const mutant of mutants) {
+      if (
+        owned &&
+        !owned.some(
+          (range) =>
+            range.file === file &&
+            mutant.location.start.line >= range.from &&
+            mutant.location.start.line <= range.to,
+        )
+      )
+        continue;
       if (mutant.status === "CompileError" || mutant.status === "Ignored")
         continue;
       total++;
@@ -115,7 +170,8 @@ export function lived(report: {
           mutant.status === "NoCoverage"
             ? "no coverage"
             : mutant.status.toLowerCase();
-        const line = mutant.location.start.line;
+        const { line, column } = mutant.location.start;
+        const end = mutant.location.end;
         const change =
           mutant.replacement === undefined
             ? ""
@@ -123,7 +179,7 @@ export function lived(report: {
         left.push([
           file,
           line,
-          `${file}:${line}  ${status}: ${mutant.mutatorName}${change}`,
+          `${file}:${line}:${column}-${end.line}:${end.column}  ${status}: ${mutant.mutatorName}${change}`,
         ]);
       }
     }
@@ -179,7 +235,7 @@ function main(argv: string[]): number {
       `${ranges.length} ranges in ${new Set(ranges.map((range) => range.file)).size} files.`,
     );
     rmSync(REPORT, { force: true });
-    const mutate = ranges
+    const mutate = instrumentRanges(ranges)
       .map(({ file, from, to }) => `${file}:${from}-${to}`)
       .join(",");
     const run = spawnSync("bun", ["x", "stryker", "run", "--mutate", mutate], {
@@ -192,7 +248,7 @@ function main(argv: string[]): number {
       );
       return 1;
     }
-    ({ rows, total } = lived(JSON.parse(readFileSync(REPORT, "utf8"))));
+    ({ rows, total } = lived(JSON.parse(readFileSync(REPORT, "utf8")), ranges));
   }
   rows.forEach((row) => console.log(row));
   const tally = `${total - rows.length} of ${total}`;

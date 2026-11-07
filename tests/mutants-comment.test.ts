@@ -135,3 +135,21 @@ describe("mutants comment", () => {
     expect(run.stderr).toContain("Usage:");
   });
 });
+
+test("long combined comments fit GitHub and keep balanced fences", () => {
+  comment(
+    [
+      {
+        lived: 'src/f.ts:12:3-12:4  survived: Literal → "á"\n'.repeat(3000),
+        tally: "1 of 2\n",
+      },
+    ],
+    false,
+  );
+  expect(Buffer.byteLength(body)).toBeLessThanOrEqual(60000);
+  expect(body).toContain(
+    "Report trimmed. [Full report artifact](https://run#artifacts)",
+  );
+  expect(body.match(/^```/gm)?.length).toBe(2);
+  expect(body).not.toContain("�");
+});

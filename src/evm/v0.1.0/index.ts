@@ -4,5 +4,7 @@ export * from "./randomness.js";
 export * from "./events.js";
 export const EVM_CONTRACT_VERSION = "0.1.0" as const;
 
+// Stryker disable next-line StringLiteral: Export attributes must remain string literals.
 export { default as timbaAbiJson } from "./timba.json" with { type: "json" };
+// Stryker disable next-line StringLiteral: Export attributes must remain string literals.
 export { default as evmArtifactSource } from "./source.json" with { type: "json" };

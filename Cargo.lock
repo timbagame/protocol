@@ -2392,7 +2392,7 @@ dependencies = [
 
 [[package]]
 name = "timba-protocol"
-version = "0.18.2"
+version = "0.18.3"
 dependencies = [
  "alloy-primitives",
  "alloy-sol-types",

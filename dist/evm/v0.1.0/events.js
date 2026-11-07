@@ -23,7 +23,7 @@ export function decodeEvmGameEvent(deployment, log) {
         strict: true,
     });
     const e = event.args;
-    if (!("gameId" in e))
+    if (!e || !("gameId" in e))
         return null;
     const reference = {
         chain: "evm",

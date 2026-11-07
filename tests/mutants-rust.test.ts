@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import {
+  copyFileSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -78,5 +79,41 @@ describe("mutants-rust summarize", () => {
     const run = spawnSync("bash", [script], { encoding: "utf8" });
     expect(run.status).toBe(2);
     expect(run.stderr).toContain("Usage:");
+  });
+});
+
+describe("mutants-rust memory limit", () => {
+  test("a test that allocates forever aborts instead of taking the runner down", () => {
+    const hasPrlimit = spawnSync("sh", ["-c", "command -v prlimit"]).status === 0;
+    if (!hasPrlimit) return;
+    const root = mkdtempSync(join(dir, "limit-"));
+    mkdirSync(join(root, "scripts"));
+    mkdirSync(join(root, "bin"));
+    mkdirSync(join(root, "solana"));
+    copyFileSync(script, join(root, "scripts", "mutants-rust.sh"));
+    const seen = join(root, "seen");
+    writeFileSync(
+      join(root, "bin", "cargo"),
+      `#!/bin/bash
+if [[ $1 == mutants && $2 == --version ]]; then echo "cargo-mutants 27.1.0"; exit 0; fi
+if [[ $1 == mutants ]]; then
+  env | grep '_RUNNER=' > "${seen}"
+  mkdir -p "${root}/build/mutants-rust/mutants.out"
+  echo '[{}]' > "${root}/build/mutants-rust/mutants.out/mutants.json"
+fi
+`,
+      { mode: 0o755 },
+    );
+    const run = spawnSync(
+      "bash",
+      [join(root, "scripts", "mutants-rust.sh"), "shard", "0/64"],
+      {
+        encoding: "utf8",
+        env: { PATH: `${join(root, "bin")}:${process.env.PATH}` },
+      },
+    );
+    expect(run.stderr).toBe("");
+    expect(run.status).toBe(0);
+    expect(readFileSync(seen, "utf8")).toContain("prlimit --as=8589934592\n");
   });
 });

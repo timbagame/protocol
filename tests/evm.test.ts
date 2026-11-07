@@ -5,6 +5,7 @@ import * as viem from "viem";
 import {
   encodeAbiParameters,
   encodeEventTopics,
+  getAddress,
   parseAbiParameters,
   zeroAddress,
   type Address,
@@ -134,13 +135,24 @@ test("handles rejection sampling and enforces native input bounds", () => {
   expect(selected.randomValue).not.toBe(0n); // zero is below 2^256 mod 3
   expect(selected.winnerIndex).toBeGreaterThanOrEqual(0);
   expect(selected.winnerIndex).toBeLessThan(3);
-  for (const count of [0, 316, 1.5])
-    expect(() => selectEvmWinnerFromEntropy(zero, count)).toThrow();
-  for (const entropy of ["0x12", `0x${"zz".repeat(32)}`] as Hex[])
+  expect(selectEvmWinnerFromEntropy(zero, 315).winnerIndex).toBeLessThan(315);
+  for (const count of [0, -1, 316, 1.5, Number.NaN])
+    expect(() => selectEvmWinnerFromEntropy(zero, count)).toThrow(
+      "Participant count must be between 1 and 315",
+    );
+  const word = "ab".repeat(32);
+  for (const entropy of [
+    "0x12",
+    `0x${"zz".repeat(32)}`,
+    `0x${word}00`,
+    `zz0x${word}`,
+    `0x${word}zz`,
+  ] as Hex[]) {
     expect(() => selectEvmWinnerFromEntropy(entropy, 2)).toThrow(
       "Entropy must be 32 bytes",
     );
-  expect(() => commitmentFor("0x12")).toThrow();
+    expect(() => commitmentFor(entropy)).toThrow("Secret must be 32 bytes");
+  }
   expect(() =>
     calculateEvmWinner(deployment, id, secret, request.commitment, -1n, 2),
   ).toThrow();
@@ -221,6 +233,24 @@ test("decodes all EVM lifecycle events without inventing missing fields", () => 
     movedParticipant: null,
     amount: 123n,
   });
+  const mover = "0x00000000000000000000000000000000000000aa";
+  expect(
+    decodeEvmGameEvent(
+      deployment,
+      log(
+        encodeEventTopics({
+          abi: timbaAbi,
+          eventName: "PlayerRefunded",
+          args: { gameId: id, player },
+        }) as Hex[],
+        encodeAbiParameters(parseAbiParameters("uint256,uint256,address"), [
+          123n,
+          1n,
+          mover,
+        ]),
+      ),
+    ),
+  ).toMatchObject({ kind: "refunded", movedParticipant: getAddress(mover) });
   expect(
     decodeEvmGameEvent(
       deployment,
@@ -277,6 +307,10 @@ test("ignores other emitters and rejects wrong-chain, removed and malformed logs
   expect(() =>
     decodeEvmGameEvent(deployment, { ...valid, removed: true }),
   ).toThrow("Removed log requires rollback");
+  const unknownTopic = ("0x" + "11".repeat(32)) as Hex;
+  expect(
+    decodeEvmGameEvent(deployment, { ...valid, topics: [unknownTopic] }),
+  ).toBeNull();
   expect(() =>
     decodeEvmGameEvent(deployment, { ...valid, data: "0x" }),
   ).toThrow();

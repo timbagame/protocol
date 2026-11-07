@@ -1,4 +1,4 @@
-import { encodeAbiParameters, keccak256, parseAbiParameters, sha256, size, } from "viem";
+import { encodeAbiParameters, keccak256, parseAbiParameters, sha256, } from "viem";
 import { evmDomain } from "./client.js";
 export const EVM_RANDOMNESS_VERSION = "keccak256-domain-block-u256-v1";
 export function commitmentFor(secret) {
@@ -7,8 +7,7 @@ export function commitmentFor(secret) {
     return sha256(secret);
 }
 export function selectEvmWinnerFromEntropy(initialEntropy, participants) {
-    if (!/^0x[0-9a-fA-F]{64}$/.test(initialEntropy) ||
-        size(initialEntropy) !== 32)
+    if (!/^0x[0-9a-fA-F]{64}$/.test(initialEntropy))
         throw new Error("Entropy must be 32 bytes");
     if (!Number.isInteger(participants) || participants < 1 || participants > 315)
         throw new Error("Participant count must be between 1 and 315");

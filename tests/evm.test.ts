@@ -315,6 +315,12 @@ test("ignores other emitters and rejects wrong-chain, removed and malformed logs
     decodeEvmGameEvent(deployment, { ...valid, data: "0x" }),
   ).toThrow();
   expect(decodeEvmGameEvent(deployment, { ...valid, topics: [] })).toBeNull();
+  expect(
+    decodeEvmGameEvent(deployment, {
+      ...valid,
+      topics: [viem.keccak256("0xdeadbeef")],
+    }),
+  ).toBeNull();
 });
 test("gives up after 32 rejected rounds like the contract", () => {
   const zero = ("0x" + "00".repeat(32)) as Hex;
@@ -398,4 +404,20 @@ test("rejects unsupported deployments and unknown created game types", () => {
       ),
     ),
   ).toThrow("Unknown game type");
+});
+
+test("ignores EIP712DomainChanged, whose decoded arguments are undefined", () => {
+  const topics = encodeEventTopics({
+    abi: timbaAbi,
+    eventName: "EIP712DomainChanged",
+  });
+  const topic = topics[0];
+  if (!topic) throw new Error("Expected the EIP712DomainChanged selector");
+  const event = viem.decodeEventLog({
+    abi: timbaAbi,
+    data: "0x",
+    topics: [topic],
+  });
+  expect(event.args).toBeUndefined();
+  expect(decodeEvmGameEvent(deployment, log(topics as Hex[], "0x"))).toBeNull();
 });

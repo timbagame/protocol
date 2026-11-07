@@ -29,7 +29,7 @@ describe("shared game workflows", () => {
         { maxPlayers: 101 },
         { timeoutMinutes: 1441 },
         { minPlayers: 11 },
-        { amount: ".0000001" },
+        { amount: "0.1" },
       ])
         expect(() =>
           validateGameDraft(
@@ -229,4 +229,28 @@ test("authorization compares address identity while rejecting changed terms", as
       gameId: zeroHash,
     }),
   ).toThrow();
+});
+
+test("confirmation success, depth one and exact minimum amounts are accepted", () => {
+  expect(transactionProgress({ success: true, confirmations: 2 }, 2)).toBe(
+    "confirmed",
+  );
+  expect(transactionProgress(null, 1)).toBe("submitted");
+  for (const chain of ["solana", "evm"] as const) {
+    const capability = gameCapabilities(chain);
+    expect(
+      validateGameDraft(
+        { ...draft, amount: "0.25", maxPlayers: 100 },
+        { decimals: 6, minimumAmount: "0.25" },
+        capability,
+      ),
+    ).toBe(250000n);
+    expect(() =>
+      validateGameDraft(
+        { ...draft, amount: "0" },
+        { decimals: 6, minimumAmount: "0" },
+        capability,
+      ),
+    ).toThrow();
+  }
 });

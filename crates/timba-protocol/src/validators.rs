@@ -87,6 +87,7 @@ mod tests {
     fn base64() {
         assert!(is_strict_base64(""));
         assert!(is_strict_base64("AAAA"));
+        assert!(is_strict_base64("AB+/"));
         assert!(is_strict_base64("AA=="));
         assert!(is_strict_base64("AAA="));
         assert!(is_strict_base64("AAAAAA=="));

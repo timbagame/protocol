@@ -3,11 +3,11 @@
 // the exact same accept/reject decisions, outputs and first issue paths.
 import { getBase58Decoder } from "@solana/kit";
 import * as z from "zod";
-import * as bot from "../src/bot/index.ts";
-import * as common from "../src/common/index.ts";
-import * as indexer from "../src/indexer/index.ts";
-import * as oracle from "../src/oracle/index.ts";
-import * as web from "../src/web/index.ts";
+import * as bot from "../src/bot/index.js";
+import * as common from "../src/common/index.js";
+import * as indexer from "../src/indexer/index.js";
+import * as oracle from "../src/oracle/index.js";
+import * as web from "../src/web/index.js";
 
 const modules = { common, oracle, indexer, web, bot } as const;
 const base58 = (byte: number, length: number) =>
@@ -196,7 +196,7 @@ const tokenPolicy = {
 /** One or more valid inputs per schema, by TypeScript export name or contract path. */
 const SAMPLES: Record<string, unknown[]> = {
   ApiErrorSchema: [{ ...ENVELOPE, success: false, error: "Boom" }],
-  Base64TransactionSchema: [TX],
+  Base64TransactionSchema: [TX, "AB+/"],
   Hex32Schema: [HEX],
   NonNegativeIntegerSchema: [0],
   NullablePriceUsdSchema: [null, 2.5],
@@ -299,10 +299,16 @@ const SAMPLES: Record<string, unknown[]> = {
       reason: "rpc_rate_limited",
       error: "Slow down",
     },
+    {
+      success: false,
+      retryable: true,
+      reason: "page_failed",
+      error: "fake retry",
+    },
   ],
   BackfillStateResponseSchema: [{ success: true, state: backfillState }],
   GameByKeyQuerySchema: [{ gameKey: A }, { gameKey: A, fresh: "" }],
-  GameStatusSchema: ["cancelled"],
+  GameStatusSchema: ["active", "completed", "cancelled"],
   GameTypeSchema: ["coinflip"],
   GamesQuerySchema: [{}, { limit: "20", offset: "40", tokenMint: A }],
   HistoricalBackfillStateSchema: [backfillState],
@@ -310,7 +316,10 @@ const SAMPLES: Record<string, unknown[]> = {
   HistoricalCompletedEventSchema: [page.completed[0]],
   HistoricalGameEventPageSchema: [page],
   HistoricalInitializedEventSchema: [page.initialized[0]],
-  HistoricalMembershipEventSchema: [page.membership[0]],
+  HistoricalMembershipEventSchema: [
+    page.membership[0],
+    { ...page.membership[0], kind: "unjoined" },
+  ],
   HistoricalOperatorClosedEventSchema: [page.operatorClosed[0]],
   IndexerActiveGameSchema: [activeGame],
   IndexerActiveGamesResponseSchema: [{ games: [activeGame], count: 1 }],

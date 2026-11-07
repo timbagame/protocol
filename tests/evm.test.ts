@@ -273,10 +273,14 @@ test("ignores other emitters and rejects wrong-chain, removed and malformed logs
   ).toBeNull();
   expect(() =>
     decodeEvmGameEvent(deployment, { ...valid, chainId: 1 }),
-  ).toThrow();
+  ).toThrow("Log belongs to another chain");
   expect(() =>
     decodeEvmGameEvent(deployment, { ...valid, removed: true }),
-  ).toThrow();
+  ).toThrow("Removed log requires rollback");
+  const unknownTopic = ("0x" + "11".repeat(32)) as Hex;
+  expect(
+    decodeEvmGameEvent(deployment, { ...valid, topics: [unknownTopic] }),
+  ).toBeNull();
   expect(() =>
     decodeEvmGameEvent(deployment, { ...valid, data: "0x" }),
   ).toThrow();

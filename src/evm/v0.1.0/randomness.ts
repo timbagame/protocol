@@ -3,7 +3,6 @@ import {
   keccak256,
   parseAbiParameters,
   sha256,
-  size,
   type Hex,
 } from "viem";
 import type { EvmDeployment } from "../index.js";
@@ -19,10 +18,7 @@ export function selectEvmWinnerFromEntropy(
   initialEntropy: Hex,
   participants: number,
 ) {
-  if (
-    !/^0x[0-9a-fA-F]{64}$/.test(initialEntropy) ||
-    size(initialEntropy) !== 32
-  )
+  if (!/^0x[0-9a-fA-F]{64}$/.test(initialEntropy))
     throw new Error("Entropy must be 32 bytes");
   if (!Number.isInteger(participants) || participants < 1 || participants > 315)
     throw new Error("Participant count must be between 1 and 315");

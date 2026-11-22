@@ -468,4 +468,46 @@ mod tests {
         assert!(is_wrapped_sol(&NATIVE_MINT));
         assert!(!is_wrapped_sol(&TOKEN_PROGRAM_ID));
     }
+
+    #[test]
+    fn sol_joins_require_a_positive_stake() {
+        let adapter = ContractAdapter::new(ContractVersion::V0_3_0, PROGRAM_ID);
+        let player = Address::parse("9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM").unwrap();
+        for token_amount in [None, Some(0)] {
+            let input = GameInstructionInput {
+                game: Address([9; 32]),
+                player,
+                token_mint: NATIVE_MINT,
+                token_amount,
+                authority: None,
+            };
+            assert_eq!(
+                adapter.build_join_plan(&input).unwrap_err(),
+                PlanError::Invalid("SOL joins require a positive stake amount".into()),
+                "{token_amount:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn create_game_requires_a_32_byte_oracle_commitment() {
+        let creator = Address::parse("9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM").unwrap();
+        for random_hash in [vec![], vec![7; 31], vec![7; 33]] {
+            let input = CreateGameInput {
+                creator,
+                token_mint: NATIVE_MINT,
+                game_type: GameType::Coinflip,
+                amount: 1,
+                min_players: 2,
+                max_players: 2,
+                timeout_seconds: 60,
+                random_hash,
+                oracle_operator: creator,
+            };
+            assert_eq!(
+                build_create_game_plan(&input, ContractVersion::V0_3_0, &PROGRAM_ID).unwrap_err(),
+                PlanError::Invalid("Oracle commitment must be 32 bytes".into())
+            );
+        }
+    }
 }

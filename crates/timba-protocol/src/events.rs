@@ -625,4 +625,20 @@ mod tests {
         ];
         assert_eq!(get_trusted_program_data(&logs, program), vec![vec![5u8; 12]]);
     }
+
+    #[test]
+    fn trusted_program_data_keeps_the_frame_after_a_stray_completion() {
+        let program = "32Jr4JnXWvqq9GqPQynkooHsszaucUUvZfNLh2hdX2L5";
+        let other = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+        let payload = base64::engine::general_purpose::STANDARD.encode([5u8; 12]);
+        let logs = vec![
+            format!("Program {program} invoke [1]"),
+            // A completion for a program that does not own the top frame
+            // must not close the frame.
+            format!("Program {other} success"),
+            format!("Program data: {payload}"),
+            format!("Program {program} success"),
+        ];
+        assert_eq!(get_trusted_program_data(&logs, program), vec![vec![5u8; 12]]);
+    }
 }
